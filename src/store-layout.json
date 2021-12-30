@@ -1,0 +1,11 @@
+{
+  "employeeFilter": "SHOW_ALL",
+  "employees": {
+    "byID": {},
+    "visibilityFilter": "FILTER_EMPLOYEES_NONE"
+  },
+  "steps": [],
+  "entries": [],
+  "workOrderNo": "",
+  "workOrder": {}
+}

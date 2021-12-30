@@ -1,0 +1,30 @@
+
+#app {
+  .table {
+    &.table-selectable tbody tr {
+     &.text-danger  td {
+        cursor: not-allowed;
+      }
+      &.text-primary  td {
+        cursor: pointer;
+      }
+    }
+  }
+
+  @media print {
+    .hidden-print {
+      display: none;
+    }
+    .container {
+      max-width: 100%;
+    }
+    table tbody.employee {
+      display: block;
+      page-break-after: always;
+      width: 100%;
+    }
+  }
+  footer {
+    display: none;
+  }
+}

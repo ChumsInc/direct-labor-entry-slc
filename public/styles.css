@@ -1,0 +1,24 @@
+#app .table.table-selectable tbody tr.text-danger td {
+  cursor: not-allowed;
+}
+#app .table.table-selectable tbody tr.text-primary td {
+  cursor: pointer;
+}
+@media print {
+  #app .hidden-print {
+    display: none;
+  }
+  #app .container {
+    max-width: 100%;
+  }
+  #app table tbody.employee {
+    display: block;
+    page-break-after: always;
+    width: 100%;
+  }
+}
+#app footer {
+  display: none;
+}
+
+/*# sourceMappingURL=styles.css.map */

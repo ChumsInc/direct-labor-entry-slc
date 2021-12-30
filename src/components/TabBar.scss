@@ -1,0 +1,13 @@
+.nav-tab-icons {
+  .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hide-xs {
+    margin-right: 3px;
+    @media screen and (max-width: 480px){
+      display: none;
+    }
+  }
+}
