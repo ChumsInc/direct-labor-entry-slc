@@ -1,4 +1,4 @@
-export const storePrefix = 'com.chums.intranet.dl-entry';
+export const storePrefix = 'com.chums.intranet.dl-entry-slc';
 
 export const appStorage = {
     getItem: (key) => {
