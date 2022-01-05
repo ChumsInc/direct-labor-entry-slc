@@ -1,22 +1,22 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectCurrentEntry} from "../entries/selectors";
-import {selectITOrders, selectWorkOrder} from "./index";
-import {ITOrder, WOOperationDetail} from "../common-types";
+import {selectITOrders} from "./index";
+import {ITOrder} from "../common-types";
 import numeral from "numeral";
-import {selectEntryAction, updateEntryAction} from "../entries/actions";
+import {updateEntryAction} from "../entries/actions";
 import classNames from "classnames";
 
 export interface ITOrderRowsProps {
     onSelect: () => void,
 }
 
-const ITOrderRows:React.FC<ITOrderRowsProps> = ({onSelect}) => {
+const ITOrderRows: React.FC<ITOrderRowsProps> = ({onSelect}) => {
     const dispatch = useDispatch();
     const entry = useSelector(selectCurrentEntry);
     const itOrders = useSelector(selectITOrders);
 
-    const onSelectRow = (row:ITOrder) => {
+    const onSelectRow = (row: ITOrder) => {
         dispatch(updateEntryAction({
             ...entry,
             ItemCode: row.ItemCode,
@@ -32,7 +32,8 @@ const ITOrderRows:React.FC<ITOrderRowsProps> = ({onSelect}) => {
     return (
         <>
             {itOrders.map((row, index: number) => (
-                <tr key={index} onClick={() => onSelectRow(row)}  className={classNames({'text-danger': !row.idSteps, 'text-primary': !!row.idSteps})}>
+                <tr key={index} onClick={() => onSelectRow(row)}
+                    className={classNames({'text-danger': !row.idSteps, 'text-primary': !!row.idSteps})}>
                     <td>{row.WorkCenter}</td>
                     <td>{row.OperationCode}</td>
                     <td>{row.OperationDescription}</td>

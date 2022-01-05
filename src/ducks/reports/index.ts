@@ -16,7 +16,7 @@ import {
     reportsToggleFilterInactive
 } from "./actionTypes";
 import {setDay, subWeeks} from "date-fns";
-import {WORK_CENTER_INH} from "../../constants/reports";
+import {WORK_CENTER_INH} from "./constants";
 import {ReportData, ReportGrouping} from "./types";
 import {combineReducers} from "redux";
 import {appStorage, STORAGE_KEYS} from "../../utils/appStorage";

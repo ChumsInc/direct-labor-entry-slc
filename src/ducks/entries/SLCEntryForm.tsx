@@ -1,7 +1,7 @@
 import React, {ChangeEvent, FormEvent, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {DateInput, FormColumn, InputGroup, ProgressBar, SpinnerButton} from "chums-ducks";
-import {selectCurrentEntry, selectEntryDate, selectHurricaneEmployee, selectLoading, selectSaving} from "./selectors";
+import {selectCurrentEntry, selectEntryDate, selectLoading, selectSaving} from "./selectors";
 import {fetchDocumentAction, selectLoading as selectWOLoading} from "../work-order";
 import {Employee, Entry} from "../common-types";
 import {deleteEntryAction, newEntryAction, saveEntryAction, setEntryDateAction, updateEntryAction} from "./actions";
@@ -10,7 +10,7 @@ import {REGEX_FILTER_EMPLOYEES_SLC} from "../employees/constants";
 import SelectSLCSteps from "../steps/SelectSLCSteps";
 import DocumentContainer from "../work-order/DocumentContainer";
 import numeral from "numeral";
-import {selectSLCEmployeeAction} from "../employees/actions";
+import {selectEmployeeAction} from "../employees/actions";
 
 const SLCEntryForm: React.FC = () => {
     const dispatch = useDispatch();
@@ -35,7 +35,8 @@ const SLCEntryForm: React.FC = () => {
     }
 
     const onChangeEmployee = (employee?: Employee | null) => {
-        dispatch(selectSLCEmployeeAction(employee));
+        console.log('onChangeEmployee', employee)
+        dispatch(selectEmployeeAction(employee));
         if (!employee) {
             dispatch(newEntryAction());
         } else {

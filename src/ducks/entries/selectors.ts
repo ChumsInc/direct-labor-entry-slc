@@ -1,5 +1,5 @@
 import {RootState} from "../index";
-import {BasicEntry, EmployeeEntryTotal, EmployeeTotalSorterProps, Entry} from "../common-types";
+import {EmployeeEntryTotal, EmployeeTotalSorterProps, Entry} from "../common-types";
 import {employeeTotalsSorter} from "./utils";
 
 

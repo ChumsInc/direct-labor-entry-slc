@@ -2,13 +2,12 @@ import React, {ChangeEvent, FormEvent} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectFilterEmployee, selectFilterItem, selectWorkCenter} from "./selectors";
 import {fetchReportDataAction, filterEmployeeAction, filterItemAction, workCenterChangedAction} from "./actions";
-import {WORK_CENTERS} from "../../constants/reports";
 import EmployeeSelect from "../employees/EmployeeSelect";
 import {InputGroup} from "chums-ducks";
 import GroupBySelect from "./GroupBySelect";
 import ReportMinDate from "./ReportMinDate";
 import ReportMaxDate from "./ReportMaxDate";
-
+import {WORK_CENTERS} from "./constants";
 
 const AnalysisFilters: React.FC = () => {
     const dispatch = useDispatch();

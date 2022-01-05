@@ -1,14 +1,14 @@
 import React, {ChangeEvent, useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchSteps, selectHurricaneSteps, selectLoading, selectSLCSteps} from "./index";
+import {fetchSteps, selectLoading, selectSLCSteps} from "./index";
 
 export interface SelectSLCStepsProps {
     workCenter: string,
-    value: string|number|null,
-    onChange: (ev:ChangeEvent<HTMLSelectElement>) => void,
+    value: string | number | null,
+    onChange: (ev: ChangeEvent<HTMLSelectElement>) => void,
 }
 
-const SelectSLCSteps:React.FC<SelectSLCStepsProps> = ({workCenter, value, onChange}) => {
+const SelectSLCSteps: React.FC<SelectSLCStepsProps> = ({workCenter, value, onChange}) => {
     const dispatch = useDispatch();
     const steps = useSelector(selectSLCSteps(workCenter));
     const loading = useSelector(selectLoading);

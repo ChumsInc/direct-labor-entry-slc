@@ -1,5 +1,5 @@
 import {ActionInterface, ActionPayload} from "chums-ducks";
-import {BasicEntry, BasicEntryProps, Employee, Entry} from "../common-types";
+import {Employee, Entry} from "../common-types";
 import {ThunkAction} from "redux-thunk";
 import {RootState} from "../index";
 
@@ -9,8 +9,8 @@ export interface EntryPayload extends ActionPayload {
     savedEntry?: Entry,
     list?: Entry[],
     id?: number,
-    employee?: Employee|null,
-    date?: Date|null,
+    employee?: Employee | null,
+    date?: Date | null,
     change?: object,
     workCenters?: string[],
 }
@@ -20,4 +20,5 @@ export interface EntryAction extends ActionInterface {
     status?: string,
 }
 
-export interface EntryThunkAction extends ThunkAction<any, RootState, unknown, EntryAction> {}
+export interface EntryThunkAction extends ThunkAction<any, RootState, unknown, EntryAction> {
+}

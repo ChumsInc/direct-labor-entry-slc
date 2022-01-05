@@ -5,22 +5,19 @@ import {
     entriesFetchListFailed,
     entriesFetchListRequested,
     entriesFetchListSucceeded,
+    entriesFilterWorkCenter,
     entriesSaveFailed,
     entriesSaveRequested,
     entriesSaveSucceeded,
-    hurricaneSelectEntry,
-    NEW_ENTRY,
-    hurricaneSelectEmployee,
-    hurricaneUpdateEntry,
-    hurricaneSetEntryDate,
-    UPDATE_HURR_ENTRY, entriesFilterWorkCenter
+    entriesSelectEntry,
+    entriesUpdateEntry,
+    entriesSetEntryDate,
+    NEW_ENTRY
 } from "./constants";
-
 import {format} from 'date-fns'
 import {fetchJSON} from "chums-ducks";
-import {API_PATH_DELETE_ENTRY, API_PATH_ENTRIES, API_PATH_SAVE_ENTRY} from "../../constants/paths";
 import {EntryAction, EntryThunkAction} from "./actionTypes";
-import {BasicEntry, BasicEntryField, BasicEntryProps, Employee, Entry} from "../common-types";
+import {Entry} from "../common-types";
 import {
     selectEmployeeEntryList,
     selectEntryDate,
@@ -30,16 +27,18 @@ import {
 } from "./selectors";
 import {entrySorter} from "./utils";
 
+export const API_PATH_ENTRIES = '/api/operations/production/dl/entry/:EntryDate';
+export const API_PATH_SAVE_ENTRY = '/api/operations/production/dl/entry';
+export const API_PATH_DELETE_ENTRY = '/api/operations/production/dl/entry/:id';
 
-export const updateEntryAction = (change:object):EntryAction => ({type: hurricaneUpdateEntry, payload: {change}});
-export const setEntryDateAction = (date: Date|null):EntryAction => ({type: hurricaneSetEntryDate, payload: {date}});
-export const selectEntryAction = (entry: Entry):EntryAction => ({type: hurricaneSelectEntry, payload: {entry}});
-export const selectHurricaneEmployeeAction = (employee: Employee|null, entry?: Entry):EntryAction => ({
-    type: hurricaneSelectEmployee,
-    payload: {employee, entry}
+
+export const updateEntryAction = (change: object): EntryAction => ({type: entriesUpdateEntry, payload: {change}});
+export const setEntryDateAction = (date: Date | null): EntryAction => ({type: entriesSetEntryDate, payload: {date}});
+export const selectEntryAction = (entry: Entry): EntryAction => ({type: entriesSelectEntry, payload: {entry}});
+export const selectWorkCenterAction = (workCenters: string[] = []) => ({
+    type: entriesFilterWorkCenter,
+    payload: {workCenters}
 });
-
-export const selectWorkCenterAction = (workCenters:string[] = []) => ({type: entriesFilterWorkCenter, payload: {workCenters}});
 
 export const fetchEntriesAction = (): EntryThunkAction =>
     async (dispatch, getState) => {

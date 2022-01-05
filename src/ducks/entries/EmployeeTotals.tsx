@@ -3,9 +3,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import numeral from "numeral";
 import {selectTableSort, SortableTable, SpinnerButton, tableAddedAction} from "chums-ducks";
 import {EmployeeEntryTotal, EmployeeTotalSorterProps, EmployeeTotalTableField} from "../common-types";
-import {selectEmployeeList} from "../employees/selectors";
-import {fetchEntriesAction, newEntryAction, selectHurricaneEmployeeAction} from "./actions";
+import {selectCurrentEmployee, selectEmployeeList} from "../employees/selectors";
+import {fetchEntriesAction, newEntryAction} from "./actions";
 import {selectEmployeeTotals, selectLoading} from "./selectors";
+import {selectEmployeeAction} from "../employees/actions";
 
 const employeeTableFields: EmployeeTotalTableField[] = [
     {field: 'FullName', title: 'Name', sortable: true},
@@ -39,6 +40,7 @@ const EmployeeTotals: React.FC = () => {
     const sort = useSelector(selectTableSort(tableId));
     const employeeTotals = useSelector(selectEmployeeTotals(sort as EmployeeTotalSorterProps));
     const employees = useSelector(selectEmployeeList);
+    const selected = useSelector(selectCurrentEmployee);
     const isLoading = useSelector(selectLoading);
     useEffect(() => {
         dispatch(tableAddedAction({key: tableId, field: 'FullName', ascending: true}));
@@ -48,7 +50,7 @@ const EmployeeTotals: React.FC = () => {
 
     const onSelectEmployee = (total: EmployeeEntryTotal) => {
         const [employee] = employees.filter(emp => emp.EmployeeNumber === total.EmployeeNumber);
-        dispatch(selectHurricaneEmployeeAction(employee || null));
+        dispatch(selectEmployeeAction(employee || null));
         dispatch(newEntryAction());
     }
 
@@ -83,6 +85,7 @@ const EmployeeTotals: React.FC = () => {
                            data={employeeTotals}
                            keyField="EmployeeNumber"
                            onSelectRow={onSelectEmployee}
+                           selected={row => row.EmployeeNumber === selected?.EmployeeNumber}
                            tfoot={tfoot}
             />
         </div>

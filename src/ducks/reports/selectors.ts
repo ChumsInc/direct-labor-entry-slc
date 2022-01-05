@@ -1,6 +1,6 @@
 import {RootState} from "../index";
 import {ReportData, ReportGroupingId} from "./types";
-import {filterPage, selectCurrentPage, selectRowsPerPage, selectTableSort, SorterProps} from "chums-ducks";
+import {selectTableSort, SorterProps} from "chums-ducks";
 
 export const tableId = 'analysis-report';
 

@@ -4,14 +4,14 @@ import {selectCurrentEntry} from "../entries/selectors";
 import {selectWorkOrder} from "./index";
 import {WOOperationDetail} from "../common-types";
 import numeral from "numeral";
-import {selectEntryAction, updateEntryAction} from "../entries/actions";
+import {updateEntryAction} from "../entries/actions";
 import classNames from "classnames";
 
 export interface WorkOrderRowsProps {
     onSelect: () => void,
 }
 
-const WorkOrderRows:React.FC<WorkOrderRowsProps> = ({onSelect}) => {
+const WorkOrderRows: React.FC<WorkOrderRowsProps> = ({onSelect}) => {
     const dispatch = useDispatch();
     const entry = useSelector(selectCurrentEntry);
     const workOrder = useSelector(selectWorkOrder);
@@ -20,7 +20,7 @@ const WorkOrderRows:React.FC<WorkOrderRowsProps> = ({onSelect}) => {
         return null;
     }
 
-    const onSelectRow = (row:WOOperationDetail) => {
+    const onSelectRow = (row: WOOperationDetail) => {
         if (!row.idSteps) {
             return;
         }
@@ -40,7 +40,8 @@ const WorkOrderRows:React.FC<WorkOrderRowsProps> = ({onSelect}) => {
         <>
             {workOrder.operationDetail.map((row: WOOperationDetail, index: number) => (
                 <tr key={index} onClick={() => onSelectRow(row)}
-                    className={classNames({'text-danger': !row.idSteps, 'text-primary': !!row.idSteps})} title={!!row.idSteps ? 'Select Entry' : 'Entry has no assigned step.'}>
+                    className={classNames({'text-danger': !row.idSteps, 'text-primary': !!row.idSteps})}
+                    title={!!row.idSteps ? 'Select Entry' : 'Entry has no assigned step.'}>
                     <td>{row.WorkCenter}</td>
                     <td>{row.OperationCode}</td>
                     <td>{row.OperationDescription}</td>

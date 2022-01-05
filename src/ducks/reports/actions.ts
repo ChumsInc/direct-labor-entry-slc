@@ -20,16 +20,18 @@ import {
     selectAllGroupBy,
     selectFilterEmployee,
     selectFilterOperation,
-    selectGroupBy,
     selectLoading,
     selectMaxDate,
     selectMinDate,
     selectWorkCenter
 } from "./selectors";
-import {API_PATH_REPORT, API_PATH_REPORT_EMPLOYEE_TOTAL, API_PATH_REPORT_STEP_TOTAL} from "../../constants/paths";
 import {format} from "date-fns";
 import {fetchHTML, fetchJSON} from "chums-ducks";
 import {HTMLReportType, ReportGroupingId} from "./types";
+
+export const API_PATH_REPORT = '/api/operations/production/dl/report/data/:minDate/:maxDate?:queryString';
+export const API_PATH_REPORT_EMPLOYEE_TOTAL = '/api/operations/production/dl/report/employee-total/:minDate/:maxDate/:workCenter/render';
+export const API_PATH_REPORT_STEP_TOTAL = '/api/operations/production/dl/report/step-total/:minDate/:maxDate/:workCenter/render';
 
 export const minDateChangedAction = (date: string) => ({type: reportsSetMinDate, payload: {date}});
 export const maxDateChangedAction = (date: string) => ({type: reportsSetMaxDate, payload: {date}});
@@ -38,7 +40,10 @@ export const toggleShowInactiveAction = () => ({type: reportsToggleFilterInactiv
 export const filterEmployeeAction = (value: string) => ({type: reportsFilterEmployee, payload: {value}});
 export const filterOperationAction = (id: number) => ({type: reportsFilterOperation, payload: {id}});
 export const filterItemAction = (value: string) => ({type: reportsFilterItem, payload: {value}});
-export const changeGroupByAction = (id: ReportGroupingId, value: string):ReportAction => ({type: reportsSetGroupBy, payload: {id, value}});
+export const changeGroupByAction = (id: ReportGroupingId, value: string): ReportAction => ({
+    type: reportsSetGroupBy,
+    payload: {id, value}
+});
 
 export const fetchReportDataAction = (): ReportThunkAction =>
     async (dispatch, getState) => {

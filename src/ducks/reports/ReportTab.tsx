@@ -1,20 +1,17 @@
 import React, {ChangeEvent, FormEvent, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectHTML, selectWorkCenter} from "./selectors";
-import {fetchHTMLReportAction, workCenterChangedAction} from "./actions";
-import {WORK_CENTERS} from "../../constants/reports";
+import {selectHTML} from "./selectors";
+import {fetchHTMLReportAction} from "./actions";
 import {HTMLReportType} from "./types";
 import ReportMinDate from "./ReportMinDate";
 import ReportMaxDate from "./ReportMaxDate";
+import WorkCenterSelect from "./WorkCenterSelect";
 
 
 const ReportTab: React.FC = () => {
     const dispatch = useDispatch();
-    const workCenter = useSelector(selectWorkCenter);
     const html = useSelector(selectHTML);
     const [reportType, setReportType] = useState<HTMLReportType>('employee-total')
-
-    const onChangeWorkCenter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(workCenterChangedAction(ev.target.value));
 
     const onChangeReportType = (ev: ChangeEvent<HTMLSelectElement>) => setReportType(ev.target.value as HTMLReportType);
 
@@ -38,10 +35,7 @@ const ReportTab: React.FC = () => {
 
                 <label className="col-auto">Work Center</label>
                 <div className="col-auto">
-                    <select value={workCenter} onChange={onChangeWorkCenter} className="form-select form-select-sm">
-                        <option value="%">All</option>
-                        {WORK_CENTERS.map(wc => (<option key={wc.code} value={wc.code}>{wc.description}</option>))}
-                    </select>
+                    <WorkCenterSelect/>
                 </div>
                 <label className="col-auto">Report Type</label>
                 <div className="col-auto">

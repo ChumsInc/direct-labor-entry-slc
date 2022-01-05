@@ -1,10 +1,5 @@
 import {combineReducers} from "redux";
-import {
-    entriesDeleteSucceeded,
-    entriesFetchListSucceeded,
-    entriesSaveSucceeded,
-    hurricaneSelectEntry
-} from "../entries/constants";
+import {entriesSelectEntry} from "../entries/constants";
 import {Entry, ITOrder, WorkOrder} from "../common-types";
 import {ActionInterface, ActionPayload, fetchJSON} from "chums-ducks";
 import {ThunkAction} from "redux-thunk";
@@ -60,15 +55,15 @@ export const fetchDocumentAction = (): WOThunkACtion =>
         }
     }
 
-export const selectLoading = (state: RootState):boolean => state.workOrder.loading;
-export const selectWorkOrder = (state: RootState):WorkOrder|null => state.workOrder.workOrder;
-export const selectITOrders = (state: RootState):ITOrder[] => state.workOrder.itOrders;
+export const selectLoading = (state: RootState): boolean => state.workOrder.loading;
+export const selectWorkOrder = (state: RootState): WorkOrder | null => state.workOrder.workOrder;
+export const selectITOrders = (state: RootState): ITOrder[] => state.workOrder.itOrders;
 
 
 const workOrderReducer = (state: WorkOrder | null = null, action: WOAction): WorkOrder | null => {
     const {type, payload} = action;
     switch (type) {
-    case hurricaneSelectEntry:
+    case entriesSelectEntry:
         return null;
     case docFetchSucceeded:
         if (payload?.workOrder) {
@@ -83,7 +78,7 @@ const workOrderReducer = (state: WorkOrder | null = null, action: WOAction): Wor
 const itOrdersReducer = (state: ITOrder[] = [], action: WOAction): ITOrder[] => {
     const {type, payload} = action;
     switch (type) {
-    case hurricaneSelectEntry:
+    case entriesSelectEntry:
         return [];
     case docFetchSucceeded:
         if (payload?.itOrders) {

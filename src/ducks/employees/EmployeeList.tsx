@@ -1,29 +1,33 @@
-import React, {ChangeEvent, Component, useEffect, useState} from 'react';
-import PropTypes from 'prop-types';
-import {connect, useDispatch, useSelector} from 'react-redux';
-import {DEPARTMENT_NAMES, DEPARTMENTS, EMPLOYEE_FILTERS} from './constants';
+import React, {ChangeEvent, useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {DEPARTMENT_NAMES} from './constants';
 import {fetchEmployees, selectEmployeeAction, setEmployeeVisibilityFilter, showInactiveAction} from './actions';
 import {Department, Employee, EmployeeFilter, EmployeeSorterProps, EmployeeTableField} from "../common-types";
 import {selectCurrentEmployee, selectLoading, selectShowInactive, selectVisibleEmployees} from "./selectors";
 import {
     addPageSetAction,
     FormCheck,
-    selectPagedData,
-    tableAddedAction,
-    SortableTable,
     PagerDuck,
-    selectTableSort, SpinnerButton
+    selectPagedData,
+    selectTableSort,
+    SortableTable,
+    SpinnerButton,
+    tableAddedAction
 } from "chums-ducks";
-import DepartmentFilterSelect from "./DepartmentFilterSelect'";
+import DepartmentFilterSelect from "./DepartmentFilterSelect";
 import classNames from "classnames";
 
-const EMPLOYEE_FIELDS:EmployeeTableField[] = [
+const EMPLOYEE_FIELDS: EmployeeTableField[] = [
     {field: 'FullName', title: 'Name'},
-    {field: 'Department', title: 'Dept', render: row => DEPARTMENT_NAMES[row.Department as Department] || row.Department},
+    {
+        field: 'Department',
+        title: 'Dept',
+        render: row => DEPARTMENT_NAMES[row.Department as Department] || row.Department
+    },
 ];
 
 const tableId = 'employee-list'
-const EmployeeList:React.FC = () => {
+const EmployeeList: React.FC = () => {
     const dispatch = useDispatch();
     const [filter, setFilter] = useState('');
     const showInactive = useSelector(selectShowInactive);
@@ -38,36 +42,36 @@ const EmployeeList:React.FC = () => {
     let listFilter = /^/;
     try {
         listFilter = new RegExp(filter, 'i');
-    } catch(error:unknown) {
+    } catch (error: unknown) {
         listFilter = /^/;
     }
-    const sort:EmployeeSorterProps = useSelector(selectTableSort(tableId)) as EmployeeSorterProps;
+    const sort: EmployeeSorterProps = useSelector(selectTableSort(tableId)) as EmployeeSorterProps;
     const list = useSelector(selectVisibleEmployees(sort));
     const filteredList = list.filter(emp => !filter || listFilter.test(emp.FullName) || listFilter.test(emp.FirstName) || listFilter.test(emp.LastName));
     const pagedList = useSelector(selectPagedData(tableId, filteredList));
 
-    const onChangeEmployeeFilter = (ev:ChangeEvent<HTMLSelectElement>) => dispatch(setEmployeeVisibilityFilter(ev.target.value as EmployeeFilter));
+    const onChangeEmployeeFilter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(setEmployeeVisibilityFilter(ev.target.value as EmployeeFilter));
 
-    const onChangeFilter = (ev:ChangeEvent<HTMLInputElement>) => {
+    const onChangeFilter = (ev: ChangeEvent<HTMLInputElement>) => {
         setFilter(ev.target.value);
     }
 
-    const onSelectEmployee = (emp:Employee) => dispatch(selectEmployeeAction(emp));
+    const onSelectEmployee = (emp: Employee) => dispatch(selectEmployeeAction(emp));
 
     return (
         <div className="report-form">
             <div className="row g-3">
                 <div className="col-auto">
-                    <DepartmentFilterSelect onChange={onChangeEmployeeFilter} />
+                    <DepartmentFilterSelect onChange={onChangeEmployeeFilter}/>
                 </div>
                 <div className="col-auto">
                     <input type="search" className="form-control form-control-sm" value={filter}
                            placeholder="Filter this list"
-                           onChange={onChangeFilter} />
+                           onChange={onChangeFilter}/>
                 </div>
                 <div className="col-auto">
                     <FormCheck type="checkbox" label="Show Inactive" checked={showInactive}
-                               onClick={() => dispatch(showInactiveAction(!showInactive))} />
+                               onClick={() => dispatch(showInactiveAction(!showInactive))}/>
                 </div>
                 <div className="col-auto">
                     <SpinnerButton spinning={loading} type="button"
@@ -80,8 +84,8 @@ const EmployeeList:React.FC = () => {
                            rowClassName={(row) => classNames({'table-warning': !row.active})}
                            selected={selected?.EmployeeNumber}
                            size="xs"
-                           onSelectRow={onSelectEmployee} />
-            <PagerDuck dataLength={list.length} pageKey={tableId} filtered={list.length !== filteredList.length} />
+                           onSelectRow={onSelectEmployee}/>
+            <PagerDuck dataLength={list.length} pageKey={tableId} filtered={list.length !== filteredList.length}/>
         </div>
     )
 }

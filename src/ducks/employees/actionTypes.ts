@@ -20,6 +20,21 @@ export interface EmployeeAction extends ActionInterface {
 export interface EmployeeThunkAction extends ThunkAction<any, RootState, unknown, EmployeeAction> {
 }
 
+
+export const employeesShowActive = 'employees/showActive';
+export const employeesShowInactive = 'employees/showInctive';
+
+export const employeesFetchListRequested = 'employees/fetchListRequested';
+export const employeesFetchListSucceeded = 'employees/fetchListSucceeded';
+export const employeesFetchListFailed = 'employees/fetchListFailed';
+
+export const saveEmployeeRequested = 'employees/saveRequested';
+export const saveEmployeeSucceeded = 'employees/saveSucceeded';
+export const saveEmployeeFailed = 'employees/saveFailed';
+
+export const employeeSelected = 'employees/selected';
+export const employeeSetVisibilityFilter = 'employees/setVisibilityFilter';
+
 export const defaultEmployeeSort: EmployeeSorterProps = {
     field: 'EmployeeNumber',
     ascending: true,
