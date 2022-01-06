@@ -31,7 +31,7 @@ const SLCEntryForm: React.FC = () => {
     const minutesRef = useRef<HTMLInputElement>(null);
 
     const onChangeEntryDate = (date: Date | null) => {
-        dispatch(setEntryDateAction(date));
+        dispatch(setEntryDateAction(date?.toISOString() || null));
     }
 
     const onChangeEmployee = (employee?: Employee | null) => {

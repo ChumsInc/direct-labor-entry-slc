@@ -5,7 +5,7 @@ import {employeeTotalsSorter} from "./utils";
 
 export const selectLoading = (state: RootState): boolean => state.entries.isLoading;
 export const selectSaving = (state: RootState): boolean => state.entries.isLoading;
-export const selectEntryDate = (state: RootState): Date => state.entries.entryDate;
+export const selectEntryDate = (state: RootState): string => state.entries.entryDate;
 export const selectWorkCenterFilter = (state: RootState) => state.entries.workCenterFilter;
 
 export const selectCurrentEntry = (state: RootState): Entry => state.entries.entry;

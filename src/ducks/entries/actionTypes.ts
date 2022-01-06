@@ -10,7 +10,7 @@ export interface EntryPayload extends ActionPayload {
     list?: Entry[],
     id?: number,
     employee?: Employee | null,
-    date?: Date | null,
+    date?: string | null,
     change?: object,
     workCenters?: string[],
 }

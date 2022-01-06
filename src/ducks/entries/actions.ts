@@ -26,6 +26,7 @@ import {
     selectSaving
 } from "./selectors";
 import {entrySorter} from "./utils";
+import {previousSLCWorkDay} from "../../utils/workDays";
 
 export const API_PATH_ENTRIES = '/api/operations/production/dl/entry/:EntryDate';
 export const API_PATH_SAVE_ENTRY = '/api/operations/production/dl/entry';
@@ -33,7 +34,7 @@ export const API_PATH_DELETE_ENTRY = '/api/operations/production/dl/entry/:id';
 
 
 export const updateEntryAction = (change: object): EntryAction => ({type: entriesUpdateEntry, payload: {change}});
-export const setEntryDateAction = (date: Date | null): EntryAction => ({type: entriesSetEntryDate, payload: {date}});
+export const setEntryDateAction = (date: string | null): EntryAction => ({type: entriesSetEntryDate, payload: {date}});
 export const selectEntryAction = (entry: Entry): EntryAction => ({type: entriesSelectEntry, payload: {entry}});
 export const selectWorkCenterAction = (workCenters: string[] = []) => ({
     type: entriesFilterWorkCenter,
@@ -47,10 +48,10 @@ export const fetchEntriesAction = (): EntryThunkAction =>
             if (selectLoading(state) || selectSaving(state)) {
                 return;
             }
-            const date = selectEntryDate(state);
+            const date:string = selectEntryDate(state) || previousSLCWorkDay();
             dispatch({type: entriesFetchListRequested});
             const url = API_PATH_ENTRIES
-                .replace(':EntryDate', encodeURIComponent(format(date, 'yyyy-MM-dd')));
+                .replace(':EntryDate', encodeURIComponent(format(new Date(date), 'yyyy-MM-dd')));
             const res = await fetchJSON(url, {cache: 'no-cache'});
             dispatch({type: entriesFetchListSucceeded, payload: {list: res.result || []}});
             dispatch(newEntryAction());
@@ -69,17 +70,20 @@ export const fetchEntriesAction = (): EntryThunkAction =>
 export const newEntryAction = (): EntryThunkAction => (dispatch, getState) => {
     try {
         const state = getState();
+        const entryDate = selectEntryDate(state);
         const employee = selectHurricaneEmployee(state);
         if (!employee) {
-            return;
+            return dispatch(selectEntryAction({
+                ...NEW_ENTRY,
+                EntryDate: entryDate
+            }));
         }
         const entries = selectEmployeeEntryList(state);
-        const entryDate = selectEntryDate(state);
         const [lastEntry] = entries.sort(entrySorter({field: 'LineNo', ascending: false}))
         dispatch(selectEntryAction({
             ...NEW_ENTRY,
             EmployeeNumber: employee.EmployeeNumber,
-            EntryDate: entryDate.toISOString(),
+            EntryDate: entryDate,
             LineNo: (lastEntry?.LineNo || 0) + 1
         }));
     } catch (error: unknown) {

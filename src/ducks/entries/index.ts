@@ -111,7 +111,7 @@ const isSaving = (state = false, action: EntryAction) => {
     }
 };
 
-const entryDate = (state: Date = previousHurricaneWorkDay(), action: EntryAction) => {
+const entryDate = (state: string = previousHurricaneWorkDay(), action: EntryAction) => {
     const {type, payload} = action;
     switch (type) {
     case entriesSetEntryDate:
