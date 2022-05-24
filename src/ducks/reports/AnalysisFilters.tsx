@@ -1,19 +1,34 @@
 import React, {ChangeEvent, FormEvent} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectFilterEmployee, selectFilterItem, selectWorkCenter} from "./selectors";
-import {fetchReportDataAction, filterEmployeeAction, filterItemAction, workCenterChangedAction} from "./actions";
+import {
+    selectFilterEmployee,
+    selectFilterItem,
+    selectFilterOperation,
+    selectLoading,
+    selectWorkCenter
+} from "./selectors";
+import {
+    fetchReportDataAction,
+    filterEmployeeAction,
+    filterItemAction,
+    filterOperationAction,
+    workCenterChangedAction
+} from "./actions";
 import EmployeeSelect from "../employees/EmployeeSelect";
-import {InputGroup} from "chums-ducks";
+import {InputGroup, SpinnerButton} from "chums-ducks";
 import GroupBySelect from "./GroupBySelect";
 import ReportMinDate from "./ReportMinDate";
 import ReportMaxDate from "./ReportMaxDate";
 import {WORK_CENTERS} from "./constants";
+import StepInput from "../steps/StepInput";
 
 const AnalysisFilters: React.FC = () => {
     const dispatch = useDispatch();
     const workCenter = useSelector(selectWorkCenter);
     const employee = useSelector(selectFilterEmployee);
+    const operation = useSelector(selectFilterOperation);
     const item = useSelector(selectFilterItem);
+    const loading = useSelector(selectLoading);
 
     const onChangeWorkCenter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(workCenterChangedAction(ev.target.value));
 
@@ -24,6 +39,10 @@ const AnalysisFilters: React.FC = () => {
 
     const onChangeGrouping = () => {
         dispatch(fetchReportDataAction());
+    }
+
+    const onChangeOperationFilter = (ev: ChangeEvent<HTMLInputElement>) => {
+        dispatch(filterOperationAction(ev.target.value || ''));
     }
 
     return (
@@ -67,6 +86,10 @@ const AnalysisFilters: React.FC = () => {
                 </div>
 
                 <div className="col-auto">
+                    <StepInput value={operation} onChange={onChangeOperationFilter}/>
+                </div>
+
+                <div className="col-auto">
                     <InputGroup bsSize="sm">
                         <label className="input-group-text bi-upc"/>
                         <input type="text" value={item} placeholder="item code"
@@ -74,8 +97,10 @@ const AnalysisFilters: React.FC = () => {
                                onChange={(ev) => dispatch(filterItemAction(ev.target.value))}/>
                     </InputGroup>
                 </div>
+
                 <div className="col-auto">
-                    <button type="submit" className="btn btn-sm btn-primary">Submit</button>
+                    <SpinnerButton type="submit" className="btn btn-sm btn-primary"
+                                   spinning={loading}>Submit</SpinnerButton>
                 </div>
             </div>
             <div className="row g-3 mt-1">

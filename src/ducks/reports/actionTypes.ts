@@ -1,13 +1,13 @@
 import {ActionInterface, ActionPayload} from "chums-ducks";
 import {ThunkAction} from "redux-thunk";
 import {RootState} from "../index";
-import {ReportData} from "./types";
+import {ReportData, ReportGroupingId} from "./types";
 
 export interface ReportPayload extends ActionPayload {
     date?: string|null,
     value?: string,
     active?: boolean,
-    id?: number,
+    id?: ReportGroupingId,
     data?: ReportData[]
     html?: string,
 }

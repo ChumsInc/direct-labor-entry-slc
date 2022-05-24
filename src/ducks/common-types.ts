@@ -127,4 +127,5 @@ export interface ITOrder {
     OperationCode: string,
     StandardAllowedMinutes: number,
     OperationDescription: string,
+    StepCost: number,
 }

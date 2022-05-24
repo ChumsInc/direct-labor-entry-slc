@@ -38,7 +38,7 @@ const ITOrderRows: React.FC<ITOrderRowsProps> = ({onSelect}) => {
                     <td>{row.OperationCode}</td>
                     <td>{row.OperationDescription}</td>
                     <td className="text-end">{numeral(row.StandardAllowedMinutes).format('0.0000')}</td>
-                    <td className="text-end">n/a</td>
+                    <td className="text-end">{numeral(row.StepCost).format('0.0000')}</td>
                 </tr>
             ))}
         </>

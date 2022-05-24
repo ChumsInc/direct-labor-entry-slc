@@ -33,7 +33,7 @@ export const STORAGE_KEYS = {
         workCenter: `${storePrefix}.reports.workCenter`,
         showInactive: `${storePrefix}.reports.showInactive`,
         employee: `${storePrefix}.reports.employee`,
-        operationId: `${storePrefix}.reports.operationId`,
+        operationCode: `${storePrefix}.reports.operationCode`,
         grouping: `${storePrefix}.reports.grouping`,
     },
 };

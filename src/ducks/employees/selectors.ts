@@ -1,18 +1,22 @@
 import {RootState} from "../index";
 import {Employee, EmployeeFilter, EmployeeSorterProps} from "../common-types";
-import {REGEX_FILTER_EMPLOYEES_HURR, REGEX_FILTER_EMPLOYEES_SLC} from "./constants";
+import {
+    REGEX_FILTER_EMPLOYEES_HURR,
+    REGEX_FILTER_EMPLOYEES_SLC,
+    SLCEmployeesRegex,
+    SLCTempEmployeesRegex
+} from "./constants";
 import {employeeSorter} from "./actionTypes";
 
 const getREFilter = (filter?: EmployeeFilter): RegExp => {
     switch (filter) {
     case 'slc':
-        return /^[578][HS][T]*$/;
+        return SLCEmployeesRegex;
     case 'slc-temp':
-        return /^[578]HT$/;
+        return SLCTempEmployeesRegex;
     default:
         return /^/;
     }
-
 }
 
 export const selectCurrentEmployee = (state: RootState): Employee | null => state.employees.selected;

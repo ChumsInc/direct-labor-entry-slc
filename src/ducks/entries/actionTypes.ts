@@ -1,5 +1,5 @@
 import {ActionInterface, ActionPayload} from "chums-ducks";
-import {Employee, Entry} from "../common-types";
+import {Employee, Entry, ITOrder, WorkOrder} from "../common-types";
 import {ThunkAction} from "redux-thunk";
 import {RootState} from "../index";
 
@@ -13,6 +13,8 @@ export interface EntryPayload extends ActionPayload {
     date?: string | null,
     change?: object,
     workCenters?: string[],
+    workOrder?: WorkOrder,
+    itOrders?: ITOrder[]
 }
 
 export interface EntryAction extends ActionInterface {

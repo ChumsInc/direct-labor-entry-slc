@@ -1,4 +1,6 @@
 // actions list
+import {SLCEmployeesRegex} from "./constants";
+
 export const API_PATH_EMPLOYEES = '/api/operations/production/dl/employees';
 export const API_PATH_SAVE_EMPLOYEE = '/api/operations/production/dl/employee';
 
@@ -42,7 +44,8 @@ export const fetchEmployees = (): EmployeeThunkAction =>
             dispatch({type: employeesFetchListRequested});
             const {result} = await fetchJSON(API_PATH_EMPLOYEES, {cache: 'no-cache'})
             const employees: Employee[] = result as Employee[];
-            dispatch({type: employeesFetchListSucceeded, payload: {list: employees}})
+            const list = employees.filter(emp => SLCEmployeesRegex.test(emp.Department))
+            dispatch({type: employeesFetchListSucceeded, payload: {list}})
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.log("fetchEmployees()", error.message);

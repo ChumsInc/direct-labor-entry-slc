@@ -34,4 +34,15 @@ export const employeeTotalsSorter = (sort:EmployeeTotalSorterProps) => (a:Employ
 export const rate = (entry:Entry) => entry.Quantity === 0 ? 0 : (entry.Minutes / entry.Quantity);
 export const isRateTooLow = (entry:Entry) => rate(entry) < (entry.StandardAllowedMinutes * 0.9);
 export const isRateTooHigh = (entry:Entry) => entry.StandardAllowedMinutes > 0 && rate(entry) > (entry.StandardAllowedMinutes * 1.1);
-export const isOutOfLimits = (entry:Entry) => entry.StandardAllowedMinutes > 0 && rate(entry) > (entry.StandardAllowedMinutes * 1.5) || rate(entry) < (entry.StandardAllowedMinutes * 0.5);
+export const isOutOfLimits = (entry:Entry) => entry.StandardAllowedMinutes > 0 && (rate(entry) > (entry.StandardAllowedMinutes * 1.5) || rate(entry) < (entry.StandardAllowedMinutes * 0.5));
+
+export const between = (value:number, limits:number[]) => {
+    const min = Math.min(...limits);
+    const max = Math.max(...limits);
+    return value >= min && value < max;
+}
+
+export const MIN_DANGER = 0.5;
+export const MAX_DANGER = 1.75;
+export const MIN_SUCCESS = 0.75;
+export const MAX_SUCCESS = 1.25;

@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import numeral from "numeral";
-import {isOutOfLimits, isRateTooHigh, isRateTooLow, rate} from './utils';
+import {between, MAX_DANGER, MAX_SUCCESS, MIN_DANGER, MIN_SUCCESS, rate} from './utils';
 import {addPageSetAction, Alert, ProgressBar, selectPagedData, SortableTable, tableAddedAction} from "chums-ducks";
 import {selectCurrentEntry, selectEmployeeEntryList, selectHurricaneEmployee, selectLoading} from "./selectors";
 import {Entry, EntryTableField} from "../common-types";
@@ -58,11 +58,16 @@ const entryTableFields: EntryTableField[] = [
     },
 ];
 
+const entryRate = (entry: Entry) => {
+    return entry.AllowedMinutes ? entry.Minutes / entry.AllowedMinutes : 0;
+}
+
+
 const rowClassName = (entry: Entry) => {
     return {
-        'text-danger': isOutOfLimits(entry),
-        'text-warning': isRateTooHigh(entry) || isRateTooLow(entry),
-        'text-success': !!entry.StandardAllowedMinutes && !isRateTooHigh(entry) && !isRateTooLow(entry),
+        'text-danger': entryRate(entry) !== 0 && (entryRate(entry) < MIN_DANGER || entryRate(entry) > MAX_DANGER),
+        'text-warning': entryRate(entry) !== 0 && (between(entryRate(entry), [MIN_DANGER, MIN_SUCCESS]) || (between(entryRate(entry), [MAX_SUCCESS, MAX_DANGER]))),
+        'text-success': !!entryRate(entry) && between(entryRate(entry), [MIN_SUCCESS, MAX_SUCCESS]),
     }
 };
 

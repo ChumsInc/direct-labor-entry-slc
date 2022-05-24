@@ -20,6 +20,7 @@ import {Employee, Entry} from "../common-types";
 import {EntryAction} from "./actionTypes";
 import {entryDefaultSort, entrySorter} from "./utils";
 import {employeeSelected} from "../employees/actionTypes";
+import {docFetchSucceeded} from "../work-order";
 
 const workCenterFilterReducer = (state: string[] = [], action: EntryAction): string[] => {
     const {type, payload} = action;
@@ -39,6 +40,41 @@ const entry = (state: Entry = {...NEW_ENTRY}, action: EntryAction): Entry => {
             return {...payload.entry};
         }
         return state;
+    case docFetchSucceeded:
+        if (payload?.workOrder) {
+            const ops = payload.workOrder.operationDetail.filter(op => !!op.StdRatePiece);
+            if (ops.length === 1) {
+                const {WorkOrder, QtyOrdered, ParentWhse, ItemBillNumber} = payload.workOrder;
+                const {WorkCenter, idSteps} = ops[0];
+                return {
+                    ...state,
+                    DocumentNo: WorkOrder,
+                    Quantity: QtyOrdered,
+                    WarehouseCode: ParentWhse,
+                    ItemCode: ItemBillNumber,
+                    WorkCenter,
+                    idSteps
+                };
+            }
+            return state;
+        }
+        if (payload?.itOrders && payload.itOrders.length) {
+            const [it] = payload.itOrders;
+            const {PurchaseOrderNo, WarehouseCode, ItemCode, QuantityOrdered, WorkCenter, idSteps} = it;
+            if (!!WorkCenter && !!idSteps) {
+                return {
+                    ...state,
+                    DocumentNo: PurchaseOrderNo,
+                    Quantity: QuantityOrdered,
+                    WarehouseCode,
+                    ItemCode,
+                    WorkCenter,
+                    idSteps
+                }
+            }
+            return state;
+        }
+        return state;
     case entriesUpdateEntry:
         if (payload?.change) {
             return {...state, ...payload.change, changed: true};
@@ -50,7 +86,7 @@ const entry = (state: Entry = {...NEW_ENTRY}, action: EntryAction): Entry => {
 };
 
 const list = (state: Entry[] = [], action: EntryAction): Entry[] => {
-    const {type, status, payload} = action;
+    const {type, payload} = action;
     switch (type) {
     case entriesFetchListSucceeded:
         if (payload?.list) {
@@ -80,7 +116,7 @@ const list = (state: Entry[] = [], action: EntryAction): Entry[] => {
 };
 
 const isLoading = (state = false, action: EntryAction) => {
-    const {type, status} = action;
+    const {type} = action;
     switch (type) {
     case entriesFetchListRequested:
         return true;

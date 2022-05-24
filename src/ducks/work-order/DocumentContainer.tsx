@@ -19,7 +19,7 @@ const  DocumentContainer: React.FC<DocumentContainerProps> = ({onSelect}) => {
                 <div><strong>{workOrder.ParentWhse}/{workOrder.ItemBillNumber}</strong></div>
             )}
             {itOrders.map(it => (
-                <div><strong>{it.WarehouseCode}/{it.ItemCode}</strong></div>
+                <div key={it.PurchaseOrderNo}><strong>{it.WarehouseCode}/{it.ItemCode}</strong></div>
             ))}
             <ErrorBoundary>
                 <table className="table table-xs table-selectable ">

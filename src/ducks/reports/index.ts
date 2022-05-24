@@ -17,7 +17,7 @@ import {
 } from "./actionTypes";
 import {setDay, subWeeks} from "date-fns";
 import {WORK_CENTER_INH} from "./constants";
-import {ReportData, ReportGrouping} from "./types";
+import {ReportData, ReportGrouping, ReportGroupingId} from "./types";
 import {combineReducers} from "redux";
 import {appStorage, STORAGE_KEYS} from "../../utils/appStorage";
 
@@ -27,7 +27,7 @@ interface AppDefaults {
     workCenter: string,
     showInactive: boolean,
     employee: string,
-    operationId: number,
+    operationCode: string,
     grouping: ReportGrouping,
 }
 
@@ -37,7 +37,7 @@ const appDefaults: AppDefaults = {
     workCenter: WORK_CENTER_INH,
     showInactive: false,
     employee: '',
-    operationId: 0,
+    operationCode: '',
     grouping: {
         0: '',
         1: '',
@@ -59,7 +59,7 @@ const defaults: AppDefaults = {
     workCenter: appStorage.getItem(STORAGE_KEYS.reports.workCenter) || appDefaults.workCenter,
     showInactive: appStorage.getItem(STORAGE_KEYS.reports.showInactive) || appDefaults.showInactive,
     employee: appStorage.getItem(STORAGE_KEYS.reports.employee) || appDefaults.employee,
-    operationId: appStorage.getItem(STORAGE_KEYS.reports.operationId) || appDefaults.operationId,
+    operationCode: appStorage.getItem(STORAGE_KEYS.reports.operationCode) || appDefaults.operationCode,
     grouping: appStorage.getItem(STORAGE_KEYS.reports.grouping) || appDefaults.grouping,
 }
 
@@ -123,12 +123,12 @@ const filterEmployeeReducer = (state: string = defaults.employee, action: Report
     }
 }
 
-const filterOperationReducer = (state: number = defaults.operationId, action: ReportAction): number => {
+const filterOperationReducer = (state: string = defaults.operationCode, action: ReportAction): string => {
     const {type, payload} = action;
     switch (type) {
     case reportsFilterOperation:
-        appStorage.setItem(STORAGE_KEYS.reports.operationId, payload?.id || 0);
-        return payload?.id || 0;
+        appStorage.setItem(STORAGE_KEYS.reports.operationCode, payload?.value || '');
+        return payload?.value || '';
     default:
         return state;
     }
@@ -150,6 +150,13 @@ const groupByReducer = (state: ReportGrouping = defaults.grouping, action: Repor
     case reportsSetGroupBy:
         if (payload?.id !== undefined && payload?.value !== undefined) {
             const newState = {...state, [payload.id]: payload.value};
+            let i:ReportGroupingId = payload.id;
+            if (!payload.value) {
+                while (i < 6) {
+                    i += 1;
+                    newState[i as ReportGroupingId] = '';
+                }
+            }
             appStorage.setItem(STORAGE_KEYS.reports.grouping, newState);
             return newState;
         }

@@ -38,7 +38,7 @@ export const maxDateChangedAction = (date: string) => ({type: reportsSetMaxDate,
 export const workCenterChangedAction = (value: string) => ({type: reportsSetWorkCenter, payload: {value}});
 export const toggleShowInactiveAction = () => ({type: reportsToggleFilterInactive});
 export const filterEmployeeAction = (value: string) => ({type: reportsFilterEmployee, payload: {value}});
-export const filterOperationAction = (id: number) => ({type: reportsFilterOperation, payload: {id}});
+export const filterOperationAction = (value: string) => ({type: reportsFilterOperation, payload: {value}});
 export const filterItemAction = (value: string) => ({type: reportsFilterItem, payload: {value}});
 export const changeGroupByAction = (id: ReportGroupingId, value: string): ReportAction => ({
     type: reportsSetGroupBy,

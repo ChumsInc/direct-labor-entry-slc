@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {DateInput, FormColumn, InputGroup, ProgressBar, SpinnerButton} from "chums-ducks";
 import {selectCurrentEntry, selectEntryDate, selectLoading, selectSaving} from "./selectors";
 import {fetchDocumentAction, selectLoading as selectWOLoading} from "../work-order";
-import {Employee, Entry} from "../common-types";
+import {Employee, Entry, Step} from "../common-types";
 import {deleteEntryAction, newEntryAction, saveEntryAction, setEntryDateAction, updateEntryAction} from "./actions";
 import EmployeeSelect from "../employees/EmployeeSelect";
 import {REGEX_FILTER_EMPLOYEES_SLC} from "../employees/constants";
@@ -19,6 +19,14 @@ const SLCEntryForm: React.FC = () => {
     const loading = useSelector(selectLoading);
     const saving = useSelector(selectSaving);
     const loadingWO = useSelector(selectWOLoading)
+
+    useEffect(() => {
+        focusNextInputField();
+    }, []);
+
+    useEffect(() => {
+        focusNextInputField();
+    }, [entry.EmployeeNumber]);
 
     useEffect(() => {
         if (entry.WorkCenter === '') {
@@ -49,7 +57,7 @@ const SLCEntryForm: React.FC = () => {
     const onSaveEntry = (ev: FormEvent) => {
         ev.preventDefault();
         dispatch(saveEntryAction(entry));
-        minutesRef.current?.focus();
+        documentRef.current?.focus();
     }
 
     const onDeleteEntry = () => {
@@ -71,8 +79,8 @@ const SLCEntryForm: React.FC = () => {
         dispatch(updateEntryAction({[field]: ev.target.value || ''}))
     }
 
-    const onChangeStep = (ev: ChangeEvent<HTMLSelectElement>) => {
-        dispatch(updateEntryAction({idSteps: Number(ev.target.value)}));
+    const onChangeStep = (step: Step|null) => {
+        dispatch(updateEntryAction({idSteps: step?.id}));
     }
 
 
@@ -88,6 +96,7 @@ const SLCEntryForm: React.FC = () => {
 
     const onLoadDocument = () => {
         dispatch(fetchDocumentAction());
+        minutesRef.current?.focus();
     }
 
     const onSubmitLoadDocument = (ev: FormEvent) => {
@@ -116,8 +125,10 @@ const SLCEntryForm: React.FC = () => {
                     <InputGroup bsSize="sm">
                         <input type="text" className="form-control form-control-sm" maxLength={8}
                                ref={documentRef} value={entry.DocumentNo}
+                               disabled={!EmployeeNumber}
                                onChange={onChangeEntry('DocumentNo')}/>
                         <SpinnerButton spinning={loadingWO} type="button" color="outline-primary"
+                                       disabled={!EmployeeNumber}
                                        onClick={onLoadDocument}>Load WO/IT</SpinnerButton>
                     </InputGroup>
                 </FormColumn>
@@ -127,11 +138,13 @@ const SLCEntryForm: React.FC = () => {
                             <input type="number" value={Minutes || ''} className="form-control form-control-sm"
                                    required ref={minutesRef}
                                    placeholder="minutes"
+                                   disabled={!EmployeeNumber}
                                    onChange={onChangeNumericEntry('Minutes')}/>
                         </div>
                         <div className="col-6">
                             <input type="number" value={Quantity || ''} className="form-control form-control-sm"
                                    required placeholder="quantity"
+                                   disabled={!EmployeeNumber}
                                    onChange={onChangeNumericEntry('Quantity')}/>
                         </div>
                     </div>
@@ -143,11 +156,13 @@ const SLCEntryForm: React.FC = () => {
                         <div className="col-4">
                             <input type="text" value={entry.WarehouseCode} className="form-control form-control-sm"
                                    required placeholder="Warehouse"
+                                   disabled={!EmployeeNumber}
                                    onChange={onChangeEntry('WarehouseCode')}/>
                         </div>
                         <div className="col-8">
                             <input type="text" value={entry.ItemCode} className="form-control form-control-sm"
                                    required placeholder="Item"
+                                   disabled={!EmployeeNumber}
                                    onChange={onChangeEntry('ItemCode')}/>
                         </div>
                     </div>
@@ -158,6 +173,7 @@ const SLCEntryForm: React.FC = () => {
                     <div className="row g-1">
                         <div className="col-4">
                             <select className="form-select form-select-sm" value={entry.WorkCenter || ''}
+                                    disabled={!EmployeeNumber}
                                     onChange={onChangeEntry('WorkCenter')}>
                                 <option value="">Select W/C</option>
                                 <option value="INH">INH</option>
@@ -166,7 +182,7 @@ const SLCEntryForm: React.FC = () => {
                             </select>
                         </div>
                         <div className="col-8">
-                            <SelectSLCSteps workCenter={entry.WorkCenter} value={idSteps} onChange={onChangeStep}/>
+                            <SelectSLCSteps workCenter={entry.WorkCenter} id={idSteps} onChange={onChangeStep} required disabled={!EmployeeNumber}/>
                         </div>
                     </div>
 
@@ -194,7 +210,7 @@ const SLCEntryForm: React.FC = () => {
                 <FormColumn width={8} label="">
                     <div className="row g-3">
                         <div className="col-auto">
-                            <button type="submit" className="btn btn-sm btn-primary" disabled={loading || saving}>
+                            <button type="submit" className="btn btn-sm btn-primary" disabled={loading || saving || !EmployeeNumber}>
                                 Save
                             </button>
                         </div>

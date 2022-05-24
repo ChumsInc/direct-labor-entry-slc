@@ -24,6 +24,7 @@ export interface ReportData {
     StepCode: string,
     Description: string,
     StandardAllowedMinutes: number,
+    Rate: number,
 }
 
 export type HTMLReportType = 'employee-total'|'step-total';

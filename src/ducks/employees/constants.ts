@@ -48,3 +48,6 @@ export const newEmployee:Employee = {
     FullName: '',
     active: true,
 }
+
+export const SLCEmployeesRegex = /^[578][HS][T]*$/;
+export const SLCTempEmployeesRegex = /^[578]HT$/;

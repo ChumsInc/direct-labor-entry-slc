@@ -3,15 +3,17 @@ import {useDispatch, useSelector} from 'react-redux';
 import {format, parseISO} from 'date-fns';
 import numeral from 'numeral';
 import {
-    addPageSetAction,
+    addPageSetAction, ErrorBoundary,
     PagerDuck,
     selectPagedData,
     SortableTable,
     SortableTableField,
+    SortableTR,
     tableAddedAction
 } from "chums-ducks";
 import {ReportData} from "./types";
 import {selectDataLength, selectGroupBy, selectSortedData} from "./selectors";
+import {between, MAX_DANGER, MAX_SUCCESS, MIN_DANGER, MIN_SUCCESS} from "../entries/utils";
 
 const tableId = 'analysis-report';
 const _rate = ({Quantity = 0, Minutes = 0}) => !!Quantity ? Minutes / Quantity : 0;
@@ -61,7 +63,7 @@ const fieldsDefinition: FieldDefinitionObject = {
     EntryDate: {
         field: 'EntryDate',
         title: 'Date',
-        render: (row: ReportData) => format(parseISO(row.EntryDate), 'MM-dd-yyyy'),
+        render: (row: ReportData) => !!row.EntryDate && row.EntryDate.toLowerCase() !== 'total' ? format(parseISO(row.EntryDate), 'MM-dd-yyyy') : 'N/A',
         sortable: true
     },
     StandardAllowedMinutes: {
@@ -87,10 +89,18 @@ const fieldsDefinition: FieldDefinitionObject = {
 
 };
 
+const rowClassName = (row: ReportData) => {
+    return {
+        'text-danger': !between(row.Rate, [MIN_DANGER, MAX_DANGER]),
+        'text-warning': between(row.Rate, [MIN_DANGER, MAX_DANGER]) && !between(row.Rate, [MIN_SUCCESS, MAX_SUCCESS]),
+        'text-success': between(row.Rate, [MIN_SUCCESS, MAX_SUCCESS]),
+    }
+};
+
 const WorkCenter = fieldsDefinition.WorkCenter;
 const EntryDate = fieldsDefinition.EntryDate;
-const FirstName = fieldsDefinition.FirstName;
-const LastName = fieldsDefinition.LastName;
+// const FirstName = fieldsDefinition.FirstName;
+// const LastName = fieldsDefinition.LastName;
 const Name = fieldsDefinition.Name;
 const DocumentNo = fieldsDefinition.DocumentNo;
 const ItemCode = fieldsDefinition.ItemCode;
@@ -101,6 +111,21 @@ const StandardAllowedMinutes = fieldsDefinition.StandardAllowedMinutes;
 const UPHStd = fieldsDefinition.UPHStd;
 const AllowedMinutes = fieldsDefinition.AllowedMinutes;
 
+interface AnalysisTotal {
+    Minutes: number,
+    AllowedMinutes: number,
+    Quantity: number,
+    Rate: number,
+    UPH: number,
+}
+
+const totalInit: AnalysisTotal = {
+    Minutes: 0,
+    AllowedMinutes: 0,
+    Quantity: 0,
+    Rate: 0,
+    UPH: 0,
+};
 
 const AnalysisReport: React.FC = () => {
     const dispatch = useDispatch();
@@ -131,7 +156,7 @@ const AnalysisReport: React.FC = () => {
         case 'EmployeeNumber':
             return [Name];
         case 'StepCode':
-            return [StepCode, Description, StandardAllowedMinutes, UPHStd];
+            return [StepCode, Description];
         case 'DocumentNo':
             return [DocumentNo, ItemCode];
         case 'ItemCode':
@@ -141,7 +166,7 @@ const AnalysisReport: React.FC = () => {
         case 'idEntries':
             return [
                 WorkCenter, EntryDate, Name, DocumentNo, ItemCode,
-                WarehouseCode, StepCode, Description, StandardAllowedMinutes
+                WarehouseCode, StepCode, Description
             ];
         default:
             return [];
@@ -155,6 +180,10 @@ const AnalysisReport: React.FC = () => {
         .map(group => {
             fields.push(...groupFields(group));
         });
+
+    if ([group0, group1, group2, group3, group4, group5, group6].includes('StepCode')) {
+        fields.push(StandardAllowedMinutes, UPHStd);
+    }
 
     fields.push(fieldsDefinition.Minutes);
     fields.push(fieldsDefinition.Quantity);
@@ -176,14 +205,44 @@ const AnalysisReport: React.FC = () => {
     // }
     fields.push(fieldsDefinition.Rate);
 
+    const totals = data.reduce((total: AnalysisTotal, row) => {
+        total.Quantity += row.Quantity;
+        total.Minutes += row.Minutes;
+        total.AllowedMinutes += row.AllowedMinutes;
+        return total;
+    }, {...totalInit})
+    totals.UPH = _uph(totals);
+    totals.Rate = _rate(totals);
+
+    const tfoot = <ReportTFoot totals={totals} fields={fields}/>
+
     return (
         <div>
-            <SortableTable tableKey={tableId} keyField="idEntries" fields={fields} data={pagedData} size="xs"/>
+            <ErrorBoundary>
+                <SortableTable tableKey={tableId} keyField="idEntries" fields={fields} data={pagedData} size="xs"
+                               tfoot={tfoot} rowClassName={rowClassName}/>
+            </ErrorBoundary>
             <PagerDuck pageKey={tableId} dataLength={data.length} filtered={dataLength !== data.length}/>
         </div>
     )
 
 }
 
+interface ReportTFoot {
+    totals: AnalysisTotal,
+    fields: SortableTableField[],
+}
+
+const ReportTFoot: React.FC<ReportTFoot> = React.memo(({totals, fields}) => {
+    const [f1, ...otherFields] = fields;
+    console.log(f1);
+    return (
+        <tfoot>
+        <SortableTR fields={[fieldsDefinition.Name ,...otherFields]} row={{[fieldsDefinition.Name.field]: 'Grand Total', ...totals}}/>
+        </tfoot>
+    )
+});
 
 export default AnalysisReport;
+
+//dM7%AVJy

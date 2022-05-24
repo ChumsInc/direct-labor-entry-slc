@@ -31,5 +31,5 @@ module.exports = merge(common, {
         },
         watchFiles: 'src/**/*',
     },
-    devtool: 'source-map',
+    devtool: 'inline-source-map',
 });
