@@ -3,7 +3,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {format, parseISO} from 'date-fns';
 import numeral from 'numeral';
 import {
-    addPageSetAction, ErrorBoundary,
+    addPageSetAction,
+    ErrorBoundary,
     PagerDuck,
     selectPagedData,
     SortableTable,
@@ -49,7 +50,8 @@ const fieldsDefinition: FieldDefinitionObject = {
         field: 'Quantity',
         title: 'Quantity',
         className: 'right',
-        total: true, sortable: true,
+        total: true,
+        sortable: true,
         render: (row: ReportData) => numeral(row.Quantity).format('0,0')
     },
     FirstName: {field: 'FirstName', title: 'First Name', sortable: true},
@@ -73,17 +75,19 @@ const fieldsDefinition: FieldDefinitionObject = {
         render: (row: ReportData) => numeral(row.StandardAllowedMinutes).format('0.0000')
     },
     Rate: {
-        field: 'Rate', className: 'right', sortable: true, title: 'Rate',
-        render: (row: ReportData) => numeral(_ratePct(row)).format('0,0.0%')
+        field: 'Rate', className: 'right', sortable: true, title: 'Rate %',
+        render: (row: ReportData) => numeral(row.Rate).format('0,0.0%')
     },
     UPH: {
-        field: 'UPH', className: 'right', title: 'UPH',
-        render: (row: ReportData) => numeral(_uph(row)).format('0,0'),
+        field: 'UPH',
+        className: 'right',
+        title: 'UPH',
+        render: (row: ReportData) => numeral(row.UPH).format('0,0'),
         sortable: true
     },
     UPHStd: {
         field: 'UPHStd', title: 'Std UPH', className: 'right',
-        render: (row: ReportData) => numeral(_uphStd(row)).format('0,0'),
+        render: (row: ReportData) => numeral(row.UPHStd).format('0,0'),
         sortable: true
     },
 
@@ -235,10 +239,10 @@ interface ReportTFoot {
 
 const ReportTFoot: React.FC<ReportTFoot> = React.memo(({totals, fields}) => {
     const [f1, ...otherFields] = fields;
-    console.log(f1);
     return (
         <tfoot>
-        <SortableTR fields={[fieldsDefinition.Name ,...otherFields]} row={{[fieldsDefinition.Name.field]: 'Grand Total', ...totals}}/>
+        <SortableTR fields={[fieldsDefinition.Name, ...otherFields]}
+                    row={{[fieldsDefinition.Name.field]: 'Grand Total', ...totals}}/>
         </tfoot>
     )
 });

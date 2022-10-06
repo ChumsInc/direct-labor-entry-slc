@@ -4,6 +4,9 @@
 #app .table.table-selectable tbody tr.text-primary td {
   cursor: pointer;
 }
+#app .table tfoot tr td {
+  font-weight: bold;
+}
 @media print {
   #app .hidden-print {
     display: none;

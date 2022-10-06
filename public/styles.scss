@@ -9,6 +9,9 @@
         cursor: pointer;
       }
     }
+    tfoot tr td {
+      font-weight: bold;
+    }
   }
 
   @media print {

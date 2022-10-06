@@ -17,6 +17,10 @@ const sorter = (sortProps: ReportDataSorterProps) => (a: ReportData, b: ReportDa
     case "StandardAllowedMinutes":
     case "SAM":
     case "Minutes":
+    case "Quantity":
+    case 'Rate':
+    case 'UPH':
+    case 'UPHStd':
         return (a[field] === b[field] ? a.idEntries - b.idEntries : a[field] - b[field]) * (ascending ? 1 : -1);
     case "EntryDate":
         return (new Date(a[field]).valueOf() - new Date(b[field]).valueOf() || a.idEntries - b.idEntries) * (ascending ? 1 : -1);
