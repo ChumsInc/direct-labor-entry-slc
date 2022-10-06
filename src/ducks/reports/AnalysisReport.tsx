@@ -133,12 +133,6 @@ const totalInit: AnalysisTotal = {
 
 const AnalysisReport: React.FC = () => {
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(tableAddedAction({key: tableId, field: 'idEntries', ascending: true}));
-        dispatch(addPageSetAction({key: tableId}))
-    }, [])
-
     const data = useSelector(selectSortedData);
     const pagedData = useSelector(selectPagedData(tableId, data));
     const group0 = useSelector(selectGroupBy(0));
@@ -149,6 +143,12 @@ const AnalysisReport: React.FC = () => {
     const group5 = useSelector(selectGroupBy(5));
     const group6 = useSelector(selectGroupBy(6));
     const dataLength = useSelector(selectDataLength);
+
+    useEffect(() => {
+        dispatch(tableAddedAction({key: tableId, field: group0 || 'idEntries', ascending: true}));
+        dispatch(addPageSetAction({key: tableId}))
+    }, [])
+
 
 
     const groupFields = (group: string) => {

@@ -8,7 +8,7 @@ import {
     selectWorkCenter
 } from "./selectors";
 import {
-    fetchReportDataAction,
+    fetchReportDataAction, fetchReportExcelAction,
     filterEmployeeAction,
     filterItemAction,
     filterOperationAction,
@@ -35,6 +35,10 @@ const AnalysisFilters: React.FC = () => {
     const onSubmit = (ev: FormEvent) => {
         ev.preventDefault();
         dispatch(fetchReportDataAction())
+    }
+
+    const onDownload = () => {
+        dispatch(fetchReportExcelAction());
     }
 
     const onChangeGrouping = () => {
@@ -102,6 +106,10 @@ const AnalysisFilters: React.FC = () => {
                     <SpinnerButton type="submit" className="btn btn-sm btn-primary"
                                    spinning={loading}>Submit</SpinnerButton>
                 </div>
+                <div className="col-auto">
+                    <button type="button" className="btn btn-sm btn-outline-primary" onClick={onDownload}>Download</button>
+                </div>
+
             </div>
             <div className="row g-3 mt-1">
                 <div className="col-auto">Group By</div>
