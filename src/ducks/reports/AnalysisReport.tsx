@@ -216,7 +216,7 @@ const AnalysisReport: React.FC = () => {
         return total;
     }, {...totalInit})
     totals.UPH = _uph(totals);
-    totals.Rate = _rate(totals);
+    totals.Rate = _ratePct(totals);
 
     const tfoot = <ReportTFoot totals={totals} fields={fields}/>
 
