@@ -1,52 +1,54 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectCurrentEntry} from "../entries/selectors";
-import {selectWorkOrder} from "./index";
-import {WOOperationDetail} from "../common-types";
+import {selectWorkTicket} from "./selectors";
 import numeral from "numeral";
-import {updateEntryAction} from "../entries/actions";
+import {updateEntry} from "../entries/actions";
 import classNames from "classnames";
+import {useAppDispatch} from "../../app/configureStore";
+import {WorkTicketDetail} from "chums-types";
 
 export interface WorkOrderRowsProps {
     onSelect: () => void,
 }
 
 const WorkOrderRows: React.FC<WorkOrderRowsProps> = ({onSelect}) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const entry = useSelector(selectCurrentEntry);
-    const workOrder = useSelector(selectWorkOrder);
+    const workTicket = useSelector(selectWorkTicket);
 
-    if (!workOrder || !workOrder.operationDetail) {
+    if (!workTicket || !workTicket.operationDetail) {
         return null;
     }
 
-    const onSelectRow = (row: WOOperationDetail) => {
+    const onSelectRow = (row: WorkTicketDetail) => {
         if (!row.idSteps) {
             return;
         }
-        dispatch(updateEntryAction({
-            ...entry,
-            ItemCode: workOrder.ItemBillNumber,
-            WarehouseCode: workOrder.ParentWhse,
-            DocumentNo: workOrder.WorkOrder,
-            DocumentType: 'WO',
-            WorkCenter: row.WorkCenter,
+        dispatch(updateEntry({
+            ItemCode: workTicket.ParentItemCode ?? '',
+            WarehouseCode: workTicket.ParentWarehouseCode ?? '',
+            DocumentNo: workTicket.WorkTicketNo,
+            DocumentType: 'WT',
+            WorkCenter: row.WorkCenter ?? '',
             idSteps: row.idSteps,
+            StandardAllowedMinutes: row.StandardAllowedMinutes ?? 0,
+
         }));
         onSelect();
     }
 
     return (
         <>
-            {workOrder.operationDetail.map((row: WOOperationDetail, index: number) => (
+            {workTicket.operationDetail.map((row, index: number) => (
                 <tr key={index} onClick={() => onSelectRow(row)}
                     className={classNames({'text-danger': !row.idSteps, 'text-primary': !!row.idSteps})}
                     title={!!row.idSteps ? 'Select Entry' : 'Entry has no assigned step.'}>
                     <td>{row.WorkCenter}</td>
-                    <td>{row.OperationCode}</td>
-                    <td>{row.OperationDescription}</td>
+                    <td>{row.ActivityCode}</td>
+                    <td>{row.ActivityDesc}</td>
                     <td className="text-end">{numeral(row.StandardAllowedMinutes).format('0.0000')}</td>
-                    <td className="text-end">{numeral(row.StdRatePiece).format('0.0000')}</td>
+                    <td className="text-end">{numeral(row.UnitCost ?? 0).format('0.0000')}</td>
                 </tr>
             ))}
         </>

@@ -1,30 +1,35 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectCurrentEntry} from "../entries/selectors";
-import {selectITOrders} from "./index";
+import {selectITOrders} from "./selectors";
 import {ITOrder} from "../common-types";
 import numeral from "numeral";
-import {updateEntryAction} from "../entries/actions";
+import {updateEntry} from "../entries/actions";
 import classNames from "classnames";
+import {useAppDispatch} from "../../app/configureStore";
 
 export interface ITOrderRowsProps {
     onSelect: () => void,
 }
 
-const ITOrderRows: React.FC<ITOrderRowsProps> = ({onSelect}) => {
-    const dispatch = useDispatch();
+const ITOrderRows = ({onSelect}:ITOrderRowsProps) => {
+    const dispatch = useAppDispatch();
     const entry = useSelector(selectCurrentEntry);
     const itOrders = useSelector(selectITOrders);
 
     const onSelectRow = (row: ITOrder) => {
-        dispatch(updateEntryAction({
-            ...entry,
+        if (!entry) {
+            return;
+        }
+        dispatch(updateEntry({
             ItemCode: row.ItemCode,
             WarehouseCode: row.WarehouseCode,
             DocumentNo: row.PurchaseOrderNo,
             DocumentType: 'IT',
             WorkCenter: row.WorkCenter || '',
             idSteps: row.idSteps,
+            StandardAllowedMinutes: row.StandardAllowedMinutes,
+            Description: row.OperationDescription,
         }));
         onSelect();
     }

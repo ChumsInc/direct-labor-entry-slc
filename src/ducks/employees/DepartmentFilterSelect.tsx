@@ -1,14 +1,14 @@
 import React from "react";
-import {Select} from "chums-ducks";
-import {SelectProps} from "chums-ducks/dist/components/Select";
-import {useSelector} from "react-redux";
-import {selectVisibilityFilter} from "./selectors";
+import {Select, SelectProps} from "chums-components";
+import {useAppSelector} from "../../app/configureStore";
+import {selectEmployeeDepartment} from "./selectors";
 
 
-const DepartmentFilterSelect:React.FC<SelectProps> = ({bsSize= 'sm', ...props}) => {
-    const departmentFilter = useSelector(selectVisibilityFilter);
+const DepartmentFilterSelect = ({bsSize= 'sm', ...props}:SelectProps) => {
+    const departmentFilter = useAppSelector(selectEmployeeDepartment);
     return (
         <Select bsSize={bsSize} {...props} value={departmentFilter}>
+            <option value="all">All</option>
             <option value="slc">SLC</option>
             <option value="slc-temp">SLC Temps</option>
         </Select>

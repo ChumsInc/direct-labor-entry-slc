@@ -2,10 +2,15 @@ const {merge} = require('webpack-merge');
 const webpack = require('webpack');
 const common = require('./webpack.common.js');
 const path = require('path');
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 
 const localProxy = {
-    target: 'http://localhost:8081',
-    // ignorePath: false,
+    target: {
+        host: 'localhost',
+        protocol: 'http:',
+        port: 8081
+    },
+    ignorePath: false,
     changeOrigin: true,
     secure: false,
 };
@@ -14,22 +19,21 @@ module.exports = merge(common, {
     mode: 'development',
     devServer: {
         allowedHosts: 'auto',
-        static: [path.join(__dirname, 'public'), __dirname],
+        static: [
+            {directory: path.join(process.cwd(), 'public'), watch: false},
+            {directory: process.cwd(), watch: false}
+        ],
         hot: true,
-        proxy: {
-            '/api': {...localProxy},
-            '/images/': {...localProxy},
-            '/node-dev/': {...localProxy},
-            '/node-sage/': {...localProxy},
-            '/sage/': {...localProxy},
-            '/version': {...localProxy},
-        },
-        historyApiFallback: {
-            rewrites: [
-                {from: /^apps\/direct-labor/, to: '/'}
-            ]
-        },
+        proxy: [
+            {
+                context: ['/api'],
+                ...localProxy
+            }
+        ],
         watchFiles: 'src/**/*',
     },
-    devtool: 'inline-source-map',
+    devtool: 'eval-source-map',
+    plugins: [
+        // new BundleAnalyzerPlugin(),
+    ]
 });

@@ -26,6 +26,7 @@ export type DepartmentFilterList = {
 export const DEPARTMENTS:DepartmentFilterList = {
     'slc': 'SLC',
     "slc-temp": 'SLC Temps',
+    "all": 'All SLC Employees'
 };
 
 
@@ -33,9 +34,6 @@ export const DEPARTMENT_NAMES:DepartmentList = {
     '5H': 'Shipping/Warehouse',
     '5HT': 'Shipping/Warehouse Temp',
     '5S': 'Shipping/Warehouse',
-    '7H': 'Imprint',
-    '7HT': 'Imprint Temp',
-    '7S': 'Imprint',
     '8H': 'Work Cell',
     '8HT': 'Work Cell Temp',
 };
@@ -49,5 +47,5 @@ export const newEmployee:Employee = {
     active: true,
 }
 
-export const SLCEmployeesRegex = /^[578][HS][T]*$/;
-export const SLCTempEmployeesRegex = /^[578]HT$/;
+export const SLCEmployeesRegex = /^[58][HS][T]*$/;
+export const SLCTempEmployeesRegex = /^[58]HT$/;

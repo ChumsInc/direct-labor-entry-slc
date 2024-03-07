@@ -1,4 +1,4 @@
-import {SortableTableField, SorterProps} from "chums-ducks";
+import {WorkTicket} from "chums-types";
 
 export interface Employee {
     EmployeeNumber: string,
@@ -6,24 +6,26 @@ export interface Employee {
     LastName: string,
     FullName: string,
     active: boolean,
-    Department: string,
+    Department: DepartmentKey|string,
     changed?: boolean,
 }
 
-export interface EmployeeSorterProps extends SorterProps {
-    field: keyof Employee,
+export interface EmployeePostBody {
+    id: string;
+    firstName: string;
+    lastName: string;
+    department: string;
+    active: boolean;
 }
 
-export interface EmployeeTableField extends SortableTableField {
-    field: keyof Employee,
-}
+export type ActionStatus = 'idle'|'loading'|'saving'|'deleting';
 
-export type EmployeeFilter = 'slc'|'slc-temp';
+export type EmployeeFilter = 'slc'|'slc-temp'|'all';
 
-export type Department = '5H' | '5HT' | '5S' | '7H' | '7HT' | '7S' | '8H' | '8HT';
+export type DepartmentKey = '5H' | '5HT' | '5S' | '8H' | '8HT';
 
 export type DepartmentList = {
-    [key in Department]: string;
+    [key in DepartmentKey]: string;
 };
 
 
@@ -41,11 +43,18 @@ export interface BasicEntry {
     id: number,
     EmployeeNumber: string,
     EntryDate: string|null,
+    DocumentNo: string;
     LineNo: number,
     idSteps: number,
     Minutes: number,
     Quantity: number,
-    changed?: boolean,
+    WorkCenter: string;
+    StepCode: string;
+    Description?: string;
+    DocumentType?: string;
+    WarehouseCode?: string;
+    ItemCode?: string;
+    StandardAllowedMinutes?: string|number;
 }
 export type BasicEntryField = keyof BasicEntry;
 
@@ -54,67 +63,26 @@ export type BasicEntryProps = {
 };
 
 export interface Entry extends BasicEntry {
-    WorkCenter: string,
     FullName: string,
-    StepCode: string,
-    StandardAllowedMinutes: number,
-    AllowedMinutes: number,
+    StandardAllowedMinutes: string|number,
+    AllowedMinutes: string|number,
     UPH: number,
     StdUPH: number,
     Description: string,
-    DocumentNo: string,
     DocumentType: string,
     ItemCode: string,
     WarehouseCode: string,
     timestamp?: string,
 }
 
-export interface EntryTableField extends SortableTableField {
-    field: keyof Entry,
-}
-
-export interface BasicEntrySorterProps extends SorterProps {
-    field: keyof BasicEntry,
-}
-export interface EntrySorterProps extends SorterProps {
-    field: keyof Entry,
-}
-
 export interface EmployeeEntryTotal {
     EmployeeNumber: string,
     FullName: string,
-    Minutes: number,
-    AllowedMinutes: number,
-    Rate: number,
-}
-export interface EmployeeTotalSorterProps extends SorterProps {
-    field: keyof EmployeeEntryTotal,
-}
-export interface EmployeeTotalTableField extends SortableTableField {
-    field: keyof EmployeeEntryTotal,
+    Minutes: string|number,
+    AllowedMinutes: string|number,
+    Rate: string|number,
 }
 
-export interface WorkOrder {
-    Company: string,
-    WorkOrder: string,
-    ItemBillNumber: string,
-    ItemUM: string,
-    ParentWhse: string,
-    QtyOrdered: number,
-    QtyComplete: number,
-    operationDetail: WOOperationDetail[],
-}
-
-export interface WOOperationDetail {
-    Company: string,
-    WorkCenter: string,
-    OperationCode: string,
-    OperationDescription: string,
-    PlannedPieceCostDivisor: number,
-    StandardAllowedMinutes: number,
-    StdRatePiece: number,
-    idSteps: number,
-}
 
 export interface ITOrder {
     Company: string,
@@ -128,4 +96,13 @@ export interface ITOrder {
     StandardAllowedMinutes: number,
     OperationDescription: string,
     StepCost: number,
+}
+
+export interface EmployeeTotalList {
+    [key: string]: EmployeeEntryTotal,
+}
+
+export interface WorkTicketResponse {
+    workTicket: WorkTicket|null;
+    itOrder: ITOrder[];
 }

@@ -1,42 +1,110 @@
-import {
-    BasicEntry,
-    BasicEntrySorterProps,
-    EmployeeEntryTotal,
-    EmployeeTotalSorterProps,
-    Entry,
-    EntrySorterProps
-} from "../common-types";
+import {BasicEntry, EmployeeEntryTotal, EmployeeTotalList, Entry} from "../common-types";
+import {SortProps} from "chums-components";
+import Decimal from "decimal.js";
 
+export const friendlyDocumentNo = (value: string) => value.replace(/^0+/, '');
 
-export const entrySorter = (sort:EntrySorterProps) => (a:Entry, b:Entry) => {
-    const aVal = a[sort.field] || '';
-    const bVal = b[sort.field] || '';
-    return (aVal === bVal ? a.id - b.id : (aVal > bVal ? 1 : -1)) * (sort.ascending ? 1 : -1);
+export const entrySorter = (sort: SortProps<Entry>) => (a: Entry, b: Entry) => {
+    const {field, ascending} = sort;
+    const sortMod = ascending ? 1 : -1;
+    switch (field) {
+        case 'id':
+            return (a.id - b.id) * sortMod;
+        case 'Minutes':
+        case 'Quantity':
+        case 'AllowedMinutes':
+        case 'UPH':
+        case 'StdUPH':
+        case 'StandardAllowedMinutes':
+            return (
+                new Decimal(a[field]).eq(b[field])
+                    ? (a.id - b.id)
+                    : new Decimal(a[field]).sub(b[field]).toNumber()
+            ) * sortMod;
+        case 'WorkCenter':
+        case 'WarehouseCode':
+        case 'EmployeeNumber':
+        case 'Description':
+        case 'StepCode':
+            return (a[field].toLowerCase() === b[field].toLowerCase()
+                ? (a.id - b.id)
+                : (a[field].toLowerCase() > b[field].toLowerCase() ? 1 : -1)) * sortMod;
+        case 'DocumentNo':
+            return (a[field].toLowerCase() === b[field].toLowerCase()
+                ? (a.id - b.id)
+                : (friendlyDocumentNo(a[field]) > friendlyDocumentNo(b[field]) ? 1 : -1)) * sortMod;
+        default:
+            return (a.id - b.id) * sortMod;
+    }
 }
 
-export const basicEntrySorter = (sort:BasicEntrySorterProps) => (a:BasicEntry, b:BasicEntry) => {
-    const aVal = a[sort.field] || '';
-    const bVal = b[sort.field] || '';
-    return (aVal === bVal ? a.id - b.id : (aVal > bVal ? 1 : -1)) * (sort.ascending ? 1 : -1);
+export const basicEntrySorter = (sort: SortProps<BasicEntry>) => (a: BasicEntry, b: BasicEntry) => {
+    const {field, ascending} = sort;
+    const sortMod = ascending ? 1 : -1;
+    switch (field) {
+        case 'id':
+        case 'Minutes':
+        case 'Quantity':
+            return (a[field] === b[field]
+                ? (a.id - b.id)
+                : (a[field] - b[field])) * sortMod;
+        case 'EmployeeNumber':
+            return (a[field].toLowerCase() === b[field].toLowerCase()
+                ? (a.id - b.id)
+                : (a[field].toLowerCase() > b[field].toLowerCase() ? 1 : -1)) * sortMod;
+        default:
+            return (a.id - b.id) * sortMod;
+    }
 }
 
-export const entryDefaultSort:BasicEntrySorterProps = {field: 'id', ascending: true};
+export const entryDefaultSort: SortProps<BasicEntry> = {field: 'id', ascending: true};
 
 
-export const employeeTotalsSorter = (sort:EmployeeTotalSorterProps) => (a:EmployeeEntryTotal, b:EmployeeEntryTotal) => {
-    const aVal = a[sort.field] || '';
-    const bVal = b[sort.field] || '';
-    return (aVal === bVal ? (a.EmployeeNumber > b.EmployeeNumber ? 1 : -1) : (aVal > bVal ? 1 : -1)) * (sort.ascending ? 1 : -1);
+export const employeeTotalsSorter = (sort: SortProps<EmployeeEntryTotal>) => (a: EmployeeEntryTotal, b: EmployeeEntryTotal) => {
+    const {field, ascending} = sort;
+    const sortMod = ascending ? 1 : -1;
+    switch (field) {
+        case 'EmployeeNumber':
+        case 'FullName':
+            return ((a[field] === b[field])
+                ? (a.EmployeeNumber > b.EmployeeNumber ? 1 : -1)
+                : (a[field].toLowerCase() > b[field].toLowerCase() ? 1 : -1)) * sortMod;
+        case 'Minutes':
+        case 'AllowedMinutes':
+        case 'Rate':
+            return (
+                new Decimal(a[field]).eq(b[field])
+                ? (a.EmployeeNumber > b.EmployeeNumber ? 1 : -1)
+                : new Decimal(a[field]).sub( - b[field]).toNumber()
+            ) * sortMod;
+    }
+}
 
+export const buildEmployeeTotals = (list: Entry[], workCenters: string[] = []): EmployeeEntryTotal[] => {
+    const totals: EmployeeTotalList = {};
+    list
+        .filter(entry => workCenters.length === 0 || workCenters.includes(entry.WorkCenter))
+        .forEach(entry => {
+            const {EmployeeNumber, FullName, AllowedMinutes, Minutes} = entry;
+            if (!totals[EmployeeNumber]) {
+                totals[EmployeeNumber] = {EmployeeNumber, FullName, AllowedMinutes: 0, Minutes: 0, Rate: 0}
+            }
+            totals[EmployeeNumber].AllowedMinutes = new Decimal(totals[EmployeeNumber].AllowedMinutes).add(AllowedMinutes).toString();
+            totals[EmployeeNumber].Minutes = new Decimal(totals[EmployeeNumber].Minutes).add(Minutes).toString();
+            totals[EmployeeNumber].Rate = new Decimal(totals[EmployeeNumber].Minutes).eq(0)
+                ? 0
+                : new Decimal(totals[EmployeeNumber].AllowedMinutes).dividedBy(totals[EmployeeNumber].Minutes).toString();
+        });
+    return Object.values(totals);
 }
 
 
-export const rate = (entry:Entry) => entry.Quantity === 0 ? 0 : (entry.Minutes / entry.Quantity);
-export const isRateTooLow = (entry:Entry) => rate(entry) < (entry.StandardAllowedMinutes * 0.9);
-export const isRateTooHigh = (entry:Entry) => entry.StandardAllowedMinutes > 0 && rate(entry) > (entry.StandardAllowedMinutes * 1.1);
-export const isOutOfLimits = (entry:Entry) => entry.StandardAllowedMinutes > 0 && (rate(entry) > (entry.StandardAllowedMinutes * 1.5) || rate(entry) < (entry.StandardAllowedMinutes * 0.5));
+export const rate = (entry: Entry) => new Decimal(entry.Quantity).eq(0) ? new Decimal(0) : new Decimal(entry.Minutes).dividedBy(entry.Quantity);
+export const isRateTooLow = (entry: Entry) => rate(entry).lessThan(new Decimal(entry.StandardAllowedMinutes).times( 0.9));
+export const isRateTooHigh = (entry: Entry) => new Decimal(entry.StandardAllowedMinutes).gt(0) && rate(entry).greaterThan(new Decimal(entry.StandardAllowedMinutes).times( 1.1));
+export const isOutOfLimits = (entry: Entry) => new Decimal(entry.StandardAllowedMinutes).gt(0) && (rate(entry).gt(new Decimal(entry.StandardAllowedMinutes).times(1.5)) || rate(entry).lt(new Decimal(entry.StandardAllowedMinutes).times(0.5)));
 
-export const between = (value:number, limits:number[]) => {
+export const between = (value: number, limits: number[]) => {
     const min = Math.min(...limits);
     const max = Math.max(...limits);
     return value >= min && value < max;
@@ -46,3 +114,17 @@ export const MIN_DANGER = 0.5;
 export const MAX_DANGER = 1.75;
 export const MIN_SUCCESS = 0.75;
 export const MAX_SUCCESS = 1.25;
+
+
+export const NEW_ENTRY: BasicEntry = {
+    id: 0,
+    EmployeeNumber: '',
+    EntryDate: null,
+    LineNo: 1,
+    idSteps: 0,
+    Minutes: 0,
+    Quantity: 0,
+    DocumentNo: '',
+    StepCode: '',
+    WorkCenter: 'INH',
+};

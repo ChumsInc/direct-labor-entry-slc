@@ -2,7 +2,7 @@ import React, {ChangeEvent, Ref} from "react";
 import {Employee} from "../common-types";
 import {useSelector} from "react-redux";
 import {selectEmployeeList} from "./selectors";
-import {employeeSorter} from "./actionTypes";
+import {employeeSorter} from "./utils";
 
 
 export interface EmployeeSelectProps {
@@ -10,11 +10,10 @@ export interface EmployeeSelectProps {
     filter?: RegExp,
     onSelect: (employee: Employee | null) => void,
     required?: boolean,
-    myRef?: Ref<HTMLSelectElement>
     form?: string | undefined,
 }
 
-const EmployeeSelect: React.FC<EmployeeSelectProps> = ({value, filter, onSelect, required, myRef}) => {
+const EmployeeSelect = React.forwardRef(({value, filter, onSelect, required}:EmployeeSelectProps, ref:React.Ref<HTMLSelectElement>) => {
     const list = useSelector(selectEmployeeList);
     const visibleList = list.filter(emp => emp.active)
         .filter(emp => !filter || filter.test(emp.Department))
@@ -29,12 +28,12 @@ const EmployeeSelect: React.FC<EmployeeSelectProps> = ({value, filter, onSelect,
     return (
         <select className="form-select form-select-sm"
                 onChange={selectHandler}
-                onSelect={selectHandler} value={value} required={required} ref={myRef}>
+                onSelect={selectHandler} value={value} required={required} ref={ref}>
             <option value="">Select Employee</option>
             {visibleList.map(emp => <option value={emp.EmployeeNumber}
                                             key={emp.EmployeeNumber}>{emp.FullName}</option>)}
         </select>
     )
-}
+})
 
 export default EmployeeSelect;

@@ -1,48 +1,34 @@
-import {RootState} from "../index";
-import {EmployeeEntryTotal, EmployeeTotalSorterProps, Entry} from "../common-types";
-import {employeeTotalsSorter} from "./utils";
+import {RootState} from "../../app/configureStore";
+import {buildEmployeeTotals, employeeTotalsSorter, entrySorter} from "./utils";
+import {createSelector} from "@reduxjs/toolkit";
 
 
-export const selectLoading = (state: RootState): boolean => state.entries.isLoading;
-export const selectSaving = (state: RootState): boolean => state.entries.isLoading;
-export const selectEntryDate = (state: RootState): string => state.entries.entryDate;
-export const selectWorkCenterFilter = (state: RootState) => state.entries.workCenterFilter;
+export const selectEntriesActionStatus = (state: RootState) => state.entries.actionStatus;
+export const selectEntriesLoading = (state: RootState) => state.entries.actionStatus === 'loading';
+export const selectSaving = (state: RootState) => state.entries.actionStatus === 'saving';
+export const selectEntryDate = (state: RootState) => state.entries.entryDate;
+export const selectWorkCenterFilter = (state: RootState) => state.entries.workCenters;
+export const selectCurrentEntry = (state: RootState) => state.entries.current;
+export const selectEntryList = (state: RootState) => state.entries.list;
+export const selectEntryEmployee = (state: RootState) => state.entries.employee;
+export const selectEntrySort = (state: RootState) => state.entries.sort;
+export const selectEntryTotalsSort = (state: RootState) => state.entries.totalsSort;
+export const selectCurrentEmployee = (state: RootState) => state.entries.employee;
 
-export const selectCurrentEntry = (state: RootState): Entry => state.entries.entry;
-
-export const selectEntryList = (state: RootState) => {
-    return state.entries.list.sort((a, b) => a.id - b.id);
-}
-export const selectEmployeeEntryList = (state: RootState) => {
-    const employee = state.entries.employee;
-    return state.entries.list
-        .filter(entry => entry.EmployeeNumber === employee?.EmployeeNumber);
-}
-
-export const selectHurricaneEmployee = (state: RootState) => state.entries.employee;
-
-
-export const selectEmployeeTotals = (sort: EmployeeTotalSorterProps) => (state: RootState) => {
-    interface EmployeeTotalList {
-        [key: string]: EmployeeEntryTotal,
+export const selectEmployeeEntryList = createSelector(
+    [selectEntryList, selectEntryEmployee, selectEntrySort],
+    (list, employee, sort) => {
+        return list
+            .filter(entry => !employee || entry.EmployeeNumber === employee?.EmployeeNumber)
+            .sort(entrySorter(sort))
     }
+)
 
-    const totals: EmployeeTotalList = {};
 
-    const workCenters = selectWorkCenterFilter(state);
-
-    state.entries.list
-        .filter(entry => workCenters.length === 0 || workCenters.includes(entry.WorkCenter))
-        .forEach(entry => {
-            const {EmployeeNumber, FullName, AllowedMinutes, Minutes} = entry;
-            if (!totals[EmployeeNumber]) {
-                totals[EmployeeNumber] = {EmployeeNumber, FullName, AllowedMinutes: 0, Minutes: 0, Rate: 0}
-            }
-            totals[EmployeeNumber].AllowedMinutes += AllowedMinutes;
-            totals[EmployeeNumber].Minutes += Minutes;
-            totals[EmployeeNumber].Rate = !!totals[EmployeeNumber].Minutes
-                ? (totals[EmployeeNumber].AllowedMinutes / totals[EmployeeNumber].Minutes)
-                : 0;
-        });
-    return Object.values(totals).sort(employeeTotalsSorter(sort));
-}
+export const selectEmployeeTotals = createSelector(
+    [selectEntryList, selectWorkCenterFilter, selectEntryTotalsSort],
+    (list, wcFilter, sort) => {
+        return [...buildEmployeeTotals(list, wcFilter)]
+            .sort(employeeTotalsSorter(sort));
+    }
+)

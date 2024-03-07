@@ -2,23 +2,27 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import EmployeeTotals from "./EmployeeTotals";
 import {selectEntryDate} from "./selectors";
-import {fetchEntriesAction, selectWorkCenterAction, setEntryDateAction} from "./actions";
+import {loadEntries, setWorkCenters, setEntryDate} from "./actions";
 import SLCEntryForm from "./SLCEntryForm";
 import {previousSLCWorkDay} from "../../utils/workDays";
 import SLCEmployeeEntries from "./SLCEmployeeEntries";
+import {useAppDispatch} from "../../app/configureStore";
+import EntryDate from "./EntryDate";
 
 
-const SLCEntryTab: React.FC = () => {
-    const dispatch = useDispatch();
+const SLCEntryTab = () => {
+    const dispatch = useAppDispatch();
     const entryDate = useSelector(selectEntryDate);
 
     useEffect(() => {
-        dispatch(setEntryDateAction(previousSLCWorkDay()));
-        dispatch(selectWorkCenterAction(['INH', 'IMP', 'CON']));
+        dispatch(setEntryDate(previousSLCWorkDay()));
+        dispatch(setWorkCenters(['INH', 'IMP', 'CON']));
     }, [])
 
     useEffect(() => {
-        dispatch(fetchEntriesAction());
+        if (entryDate) {
+            dispatch(loadEntries(entryDate));
+        }
     }, [entryDate])
 
     return (
@@ -27,6 +31,7 @@ const SLCEntryTab: React.FC = () => {
                 <EmployeeTotals/>
             </div>
             <div className="col-6 col-md-4 col-xl-3">
+                <EntryDate />
                 <SLCEntryForm/>
             </div>
             <div className="col-6 col-md-8 col-xl-6">

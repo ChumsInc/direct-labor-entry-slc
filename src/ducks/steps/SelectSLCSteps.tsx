@@ -1,29 +1,40 @@
-import React, {ChangeEvent, useEffect} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {fetchSteps, selectLoading, selectSLCSteps} from "./index";
+import React, {ChangeEvent, useEffect, useState} from 'react';
+import {useSelector} from "react-redux";
+import {loadSteps} from "./actions";
 import {Step} from "../common-types";
+import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {selectStepsLoaded, selectStepsLoading, selectWorkCenterSteps} from "./selectors";
+import {stepSorter} from "./utils";
 
 export interface SelectSLCStepsProps {
     workCenter: string,
-    id?: number | null,
+    stepId?: number | null,
     value?: string | null,
-    onChange: (step: Step|null) => void,
+    onChange: (step: Step | null) => void,
     required?: boolean,
     disabled?: boolean,
 }
 
-const SelectSLCSteps: React.FC<SelectSLCStepsProps> = ({workCenter, value, id, onChange, required, disabled}) => {
-    const dispatch = useDispatch();
-    const steps = useSelector(selectSLCSteps(workCenter));
-    const loading = useSelector(selectLoading);
+const SelectSLCSteps = ({workCenter, value, stepId, onChange, required, disabled}: SelectSLCStepsProps) => {
+    const dispatch = useAppDispatch();
+    const list = useAppSelector(state => selectWorkCenterSteps(state, workCenter));
+    const loading = useSelector(selectStepsLoading);
+    const loaded = useSelector(selectStepsLoaded);
+    const [steps, setSteps] = useState<Step[]>([]);
 
     useEffect(() => {
-        if (!loading && !steps.length) {
-            dispatch(fetchSteps());
+        if (!loaded) {
+            dispatch(loadSteps());
         }
     }, []);
 
-    const changeHandler = (ev:ChangeEvent<HTMLSelectElement>) => {
+    useEffect(() => {
+        const steps = list.filter(step => !workCenter || step.workCenter === workCenter)
+            .sort(stepSorter({field: "stepCode", ascending: true}));
+        setSteps(steps);
+    }, [list, workCenter]);
+
+    const changeHandler = (ev: ChangeEvent<HTMLSelectElement>) => {
         if (!ev.target.value) {
             onChange(null);
         }
@@ -32,13 +43,13 @@ const SelectSLCSteps: React.FC<SelectSLCStepsProps> = ({workCenter, value, id, o
         onChange(step || null);
     }
 
-    if (!id && !!value) {
+    if (!stepId && !!value) {
         const [step] = steps.filter(s => s.stepCode === value);
-        id = step.id;
+        stepId = step.id;
     }
 
     return (
-        <select className="form-select form-select-sm" value={id || ''} onChange={changeHandler} required={required}
+        <select className="form-select form-select-sm" value={stepId || ''} onChange={changeHandler} required={required}
                 disabled={disabled}>
             <option value="">Select Step</option>
             {steps.map(step => (<option key={step.id} value={step.id}>{step.stepCode} - {step.description}</option>))}

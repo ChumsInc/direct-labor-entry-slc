@@ -1,14 +1,16 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import numeral from "numeral";
-import {selectTableSort, SortableTable, SpinnerButton, tableAddedAction} from "chums-ducks";
-import {EmployeeEntryTotal, EmployeeTotalSorterProps, EmployeeTotalTableField} from "../common-types";
+import {SortableTable, SortableTableField, SortProps, SpinnerButton} from "chums-components";
+import {EmployeeEntryTotal} from "../common-types";
 import {selectCurrentEmployee, selectEmployeeList} from "../employees/selectors";
-import {fetchEntriesAction, newEntryAction} from "./actions";
-import {selectEmployeeTotals, selectLoading} from "./selectors";
-import {selectEmployeeAction} from "../employees/actions";
+import {loadEntries, setEntryEmployee, setEntryTotalsSort, setNewEntry} from "./actions";
+import {selectEmployeeTotals, selectEntryDate, selectEntryTotalsSort, selectEntriesLoading} from "./selectors";
+import {setCurrentEmployee} from "../employees/actions";
+import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import Decimal from "decimal.js";
 
-const employeeTableFields: EmployeeTotalTableField[] = [
+const employeeTableFields: SortableTableField<EmployeeEntryTotal>[] = [
     {field: 'FullName', title: 'Name', sortable: true},
     {
         field: 'Minutes',
@@ -33,33 +35,48 @@ const employeeTableFields: EmployeeTotalTableField[] = [
     }
 ];
 
+const initialTotal:EmployeeEntryTotal = {EmployeeNumber: 'TOTAL', FullName: 'Total', Rate: 0, Minutes: 0, AllowedMinutes: 0};
+
 const tableId = 'hurricane-employee-totals';
 
 const EmployeeTotals: React.FC = () => {
-    const dispatch = useDispatch();
-    const sort = useSelector(selectTableSort(tableId));
-    const employeeTotals = useSelector(selectEmployeeTotals(sort as EmployeeTotalSorterProps));
+    const dispatch = useAppDispatch();
+    const date = useAppSelector(selectEntryDate);
+    const sort = useSelector(selectEntryTotalsSort);
+    const employeeTotals = useSelector(selectEmployeeTotals);
     const employees = useSelector(selectEmployeeList);
     const selected = useSelector(selectCurrentEmployee);
-    const isLoading = useSelector(selectLoading);
-    useEffect(() => {
-        dispatch(tableAddedAction({key: tableId, field: 'FullName', ascending: true}));
-    }, [])
+    const isLoading = useSelector(selectEntriesLoading);
 
-    const onReload = () => dispatch(fetchEntriesAction());
+    useEffect(() => {
+        onReload();
+    }, [date]);
+
+    const onReload = () => {
+        if (date) {
+            dispatch(loadEntries(date));
+        }
+    }
 
     const onSelectEmployee = (total: EmployeeEntryTotal) => {
         const [employee] = employees.filter(emp => emp.EmployeeNumber === total.EmployeeNumber);
-        dispatch(selectEmployeeAction(employee || null));
-        dispatch(newEntryAction());
+        dispatch(setEntryEmployee(employee || null));
     }
 
-    const total = employeeTotals.reduce((pv, cv) => {
+    const sortChangeHandler = (sort: SortProps) => {
+        dispatch(setEntryTotalsSort(sort));
+    }
+
+    const total: EmployeeEntryTotal = employeeTotals.reduce((pv, cv) => {
+        const minutes = new Decimal(pv.Minutes).add(cv.Minutes).toString();
+        const allowedMinutes = new Decimal(pv.AllowedMinutes).add(cv.AllowedMinutes).toString();
         return {
-            Minutes: pv.Minutes + cv.Minutes,
-            AllowedMinutes: pv.AllowedMinutes + cv.AllowedMinutes
+            ...cv,
+            Minutes: minutes,
+            AllowedMinutes: allowedMinutes,
+            Rate: new Decimal(minutes).eq(0) ? 0 : new Decimal(allowedMinutes).dividedBy(minutes).toString()
         };
-    }, {Minutes: 0, AllowedMinutes: 0});
+    }, {...initialTotal});
 
     const tfoot = (
         <tfoot>
@@ -67,7 +84,7 @@ const EmployeeTotals: React.FC = () => {
             <td>Total</td>
             <td className="text-end">{numeral(total.Minutes).format('0,0')}</td>
             <td className="text-end">{numeral(total.AllowedMinutes).format('0,0')}</td>
-            <td className="text-end">{numeral(!!total.Minutes ? total.AllowedMinutes / total.Minutes : 0).format('0.0%')}</td>
+            <td className="text-end">{numeral(total.Rate).format('0.0%')}</td>
         </tr>
         </tfoot>
     )
@@ -80,7 +97,7 @@ const EmployeeTotals: React.FC = () => {
                     <SpinnerButton spinning={isLoading} onClick={onReload} size="sm">Reload</SpinnerButton>
                 </div>
             </div>
-            <SortableTable tableKey={tableId} size="sm"
+            <SortableTable currentSort={sort} onChangeSort={sortChangeHandler} size="sm"
                            fields={employeeTableFields}
                            data={employeeTotals}
                            keyField="EmployeeNumber"

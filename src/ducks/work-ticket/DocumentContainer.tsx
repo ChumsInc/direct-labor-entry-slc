@@ -1,27 +1,28 @@
 import React from "react";
 import {useSelector} from "react-redux";
-import {selectITOrders, selectWorkOrder} from "./index";
 import WorkOrderRows from "./WorkOrderRows";
 import ITOrderRows from "./ITOrderRows";
-import {ErrorBoundary} from "chums-ducks";
+import {ErrorBoundary} from "react-error-boundary";
+import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
+import {selectITOrders, selectWorkTicket} from "./selectors";
 
 export interface DocumentContainerProps {
     onSelect: () => void,
 }
 
-const  DocumentContainer: React.FC<DocumentContainerProps> = ({onSelect}) => {
-    const workOrder = useSelector(selectWorkOrder);
+const  DocumentContainer = ({onSelect}:DocumentContainerProps) => {
+    const workTicket = useSelector(selectWorkTicket);
     const itOrders = useSelector(selectITOrders);
 
     return (
         <div>
-            {!!workOrder && (
-                <div><strong>{workOrder.ParentWhse}/{workOrder.ItemBillNumber}</strong></div>
+            {!!workTicket && (
+                <div><strong>{workTicket.ParentWarehouseCode}/{workTicket.ParentItemCode}</strong></div>
             )}
             {itOrders.map(it => (
                 <div key={it.PurchaseOrderNo}><strong>{it.WarehouseCode}/{it.ItemCode}</strong></div>
             ))}
-            <ErrorBoundary>
+            <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
                 <table className="table table-xs table-selectable ">
                     <thead>
                     <tr>

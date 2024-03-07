@@ -1,16 +1,17 @@
 import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import classNames from 'classnames';
-import {Alert, FormColumn, Select, SpinnerButton} from 'chums-ducks';
+import {Alert, FormColumn, Select, SpinnerButton} from 'chums-components';
 import {DEPARTMENT_NAMES, newEmployee} from './constants';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {selectCurrentEmployee, selectSaving} from "./selectors";
-import {Department, Employee} from "../common-types";
-import {saveEmployeeAction, selectEmployeeAction} from "./actions";
+import {DepartmentKey, Employee} from "../common-types";
+import {saveEmployee, setCurrentEmployee} from "./actions";
+import {useAppDispatch} from "../../app/configureStore";
 
 const reTemp = /^(TEMP|[0-9]*HT)$/;
 
 const EmployeeEdit: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const selected = useSelector(selectCurrentEmployee);
     const isSaving = useSelector(selectSaving);
 
@@ -26,7 +27,7 @@ const EmployeeEdit: React.FC = () => {
         if (employee?.changed && !window.confirm('Are you sure you want to lose your changes?')) {
             return;
         }
-        dispatch(selectEmployeeAction(newEmployee));
+        dispatch(setCurrentEmployee(newEmployee));
     }
 
     const onChangeEmployee = (field: keyof Employee) => (ev: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -47,7 +48,7 @@ const EmployeeEdit: React.FC = () => {
         if (!employee) {
             return;
         }
-        dispatch(saveEmployeeAction(employee));
+        dispatch(saveEmployee(employee));
     }
 
     if (!employee) {
@@ -69,7 +70,7 @@ const EmployeeEdit: React.FC = () => {
         .filter(key => isTemp ? /T$/.test(key) : /.*(?<!T)$/.test(key))
         .map((key) => {
             return (
-                <option key={key} value={key}>{DEPARTMENT_NAMES[key as Department]}</option>
+                <option key={key} value={key}>{DEPARTMENT_NAMES[key as DepartmentKey]}</option>
             );
         });
 
@@ -106,7 +107,7 @@ const EmployeeEdit: React.FC = () => {
                     </div>
                 </div>
             </FormColumn>
-            <FormColumn width={8} label="Department">
+            <FormColumn width={8} label="DepartmentKey">
                 <Select required={true} value={employee.Department || ''} bsSize="sm"
                         onChange={onChangeEmployee('Department')} disabled={!isTemp}>
                     <option/>

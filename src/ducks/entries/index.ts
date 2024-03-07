@@ -1,185 +1,154 @@
-import {combineReducers} from 'redux';
+import {entrySorter, NEW_ENTRY} from "./utils";
+import {ActionStatus, BasicEntry, Employee, EmployeeEntryTotal, Entry} from "../common-types";
+import {Editable} from "chums-types/src/generics";
+import {createReducer} from "@reduxjs/toolkit";
+import {SortProps} from "chums-components";
 import {
-    entriesDeleteFailed,
-    entriesDeleteRequested,
-    entriesDeleteSucceeded,
-    entriesFetchListFailed,
-    entriesFetchListRequested,
-    entriesFetchListSucceeded,
-    entriesFilterWorkCenter,
-    entriesSaveFailed,
-    entriesSaveRequested,
-    entriesSaveSucceeded,
-    entriesSelectEntry,
-    entriesSetEntryDate,
-    entriesUpdateEntry,
-    NEW_ENTRY
-} from "./constants";
-import {previousHurricaneWorkDay, previousSLCWorkDay} from "../../utils/workDays";
-import {Employee, Entry} from "../common-types";
-import {EntryAction} from "./actionTypes";
-import {entryDefaultSort, entrySorter} from "./utils";
-import {employeeSelected} from "../employees/actionTypes";
-import {docFetchSucceeded} from "../work-order";
+    loadEntries,
+    removeEntry,
+    saveEntry,
+    setCurrentEntry,
+    setEntriesSort,
+    setEntryDate,
+    setEntryEmployee,
+    setEntryTotalsSort,
+    setNewEntry,
+    setWorkCenters,
+    updateEntry
+} from "./actions";
+import {loadDocument} from "../work-ticket/actions";
+import Decimal from "decimal.js";
 
-const workCenterFilterReducer = (state: string[] = [], action: EntryAction): string[] => {
-    const {type, payload} = action;
-    switch (type) {
-    case entriesFilterWorkCenter:
-        return payload?.workCenters || [];
-    default:
-        return state;
+export interface EntriesState {
+    workCenters: string[];
+    list: Entry[];
+    current: (BasicEntry & Editable) | null;
+    actionStatus: ActionStatus;
+    entryDate: string | null;
+    employee: Employee | null;
+    sort: SortProps<Entry>;
+    totalsSort: SortProps<EmployeeEntryTotal>;
+}
+
+export const initialEntriesState: EntriesState = {
+    workCenters: [],
+    list: [],
+    current: null,
+    actionStatus: 'idle',
+    entryDate: null,
+    employee: null,
+    sort: {
+        field: 'id',
+        ascending: false,
+    },
+    totalsSort: {
+        field: 'FullName',
+        ascending: true,
     }
 }
 
-const entry = (state: Entry = {...NEW_ENTRY}, action: EntryAction): Entry => {
-    const {type, payload} = action;
-    switch (type) {
-    case entriesSelectEntry:
-        if (payload?.entry) {
-            return {...payload.entry};
-        }
-        return state;
-    case docFetchSucceeded:
-        if (payload?.workOrder) {
-            const ops = payload.workOrder.operationDetail.filter(op => !!op.StdRatePiece);
-            if (ops.length === 1) {
-                const {WorkOrder, QtyOrdered, ParentWhse, ItemBillNumber} = payload.workOrder;
-                const {WorkCenter, idSteps} = ops[0];
-                return {
-                    ...state,
-                    DocumentNo: WorkOrder,
-                    Quantity: QtyOrdered,
-                    WarehouseCode: ParentWhse,
-                    ItemCode: ItemBillNumber,
-                    WorkCenter,
-                    idSteps
-                };
+const entriesReducer = createReducer(initialEntriesState, (builder) => {
+    builder
+        .addCase(updateEntry, (state, action) => {
+            if (state.current) {
+                state.current = {...state.current, ...action.payload, changed: true};
             }
-            return state;
-        }
-        if (payload?.itOrders && payload.itOrders.length) {
-            const [it] = payload.itOrders;
-            const {PurchaseOrderNo, WarehouseCode, ItemCode, QuantityOrdered, WorkCenter, idSteps} = it;
-            if (!!WorkCenter && !!idSteps) {
-                return {
-                    ...state,
-                    DocumentNo: PurchaseOrderNo,
-                    Quantity: QuantityOrdered,
-                    WarehouseCode,
-                    ItemCode,
-                    WorkCenter,
-                    idSteps
+        })
+        .addCase(setEntryDate, (state, action) => {
+            if (action.payload !== state.entryDate) {
+                state.list = [];
+            }
+            state.entryDate = action.payload;
+        })
+        .addCase(setCurrentEntry, (state, action) => {
+            state.current = action.payload ?? null;
+        })
+        .addCase(setWorkCenters, (state, action) => {
+            state.workCenters = action.payload.sort();
+        })
+        .addCase(setEntriesSort, (state, action) => {
+            state.sort = action.payload;
+        })
+        .addCase(setEntryTotalsSort, (state, action) => {
+            state.totalsSort = action.payload;
+        })
+        .addCase(setEntryEmployee, (state, action) => {
+            state.employee = action.payload ?? null;
+            state.current = {
+                ...NEW_ENTRY,
+                EntryDate: state.entryDate,
+                EmployeeNumber: action.payload.EmployeeNumber ?? '',
+            }
+        })
+        .addCase(loadEntries.pending, (state, action) => {
+            state.actionStatus = 'loading';
+        })
+        .addCase(loadEntries.fulfilled, (state, action) => {
+            state.actionStatus = 'idle';
+            state.list = [...action.payload].sort(entrySorter(initialEntriesState.sort))
+        })
+        .addCase(loadEntries.rejected, (state) => {
+            state.actionStatus = 'idle';
+        })
+        .addCase(saveEntry.pending, (state) => {
+            state.actionStatus = 'saving';
+        })
+        .addCase(saveEntry.fulfilled, (state, action) => {
+            state.actionStatus = 'idle';
+            if (action.payload) {
+                state.list = [
+                    ...state.list.filter(entry => entry.id !== action.meta.arg.id),
+                    action.payload,
+                ].sort(entrySorter(initialEntriesState.sort));
+
+            } else {
+                state.list = state.list
+                    .filter(entry => entry.id !== action.meta.arg.id)
+                    .sort(entrySorter(initialEntriesState.sort));
+            }
+            state.current = {
+                ...NEW_ENTRY,
+                EntryDate: state.entryDate,
+                EmployeeNumber: state.employee?.EmployeeNumber ?? '',
+            }
+
+        })
+        .addCase(saveEntry.rejected, (state) => {
+            state.actionStatus = 'idle';
+        })
+        .addCase(removeEntry.pending, (state) => {
+            state.actionStatus = 'deleting';
+        })
+        .addCase(removeEntry.fulfilled, (state, action) => {
+            state.actionStatus = 'idle';
+            state.list = state.list
+                .filter(entry => entry.id !== action.meta.arg.id)
+                .sort(entrySorter(initialEntriesState.sort));
+        })
+        .addCase(removeEntry.rejected, (state) => {
+            state.actionStatus = 'idle';
+        })
+        .addCase(setNewEntry, (state) => {
+            if (state.entryDate) {
+                state.current = {
+                    ...NEW_ENTRY,
+                    EntryDate: state.entryDate,
+                    EmployeeNumber: state.employee?.EmployeeNumber ?? '',
                 }
             }
-            return state;
-        }
-        return state;
-    case entriesUpdateEntry:
-        if (payload?.change) {
-            return {...state, ...payload.change, changed: true};
-        }
-        return state;
-    default:
-        return state;
-    }
-};
+        })
+        .addCase(loadDocument.fulfilled, (state, action) => {
+            if (state.current) {
+                if (action.payload.workTicket) {
+                    state.current.DocumentNo = action.payload.workTicket.WorkTicketNo;
+                    state.current.Quantity = new Decimal(action.payload.workTicket.QuantityOrdered  ?? '0')
+                        .sub(action.payload.workTicket.QuantityCompleted ?? '0').toNumber();
+                    state.current.ItemCode = action.payload.workTicket.ParentItemCode ?? '';
+                    state.current.WarehouseCode = action.payload.workTicket.ParentWarehouseCode ?? '';
+                }
+            }
+        })
 
-const list = (state: Entry[] = [], action: EntryAction): Entry[] => {
-    const {type, payload} = action;
-    switch (type) {
-    case entriesFetchListSucceeded:
-        if (payload?.list) {
-            return [...payload.list].sort(entrySorter(entryDefaultSort));
-        }
-        return state;
-    case entriesSaveSucceeded:
-        if (payload?.savedEntry) {
-            return [
-                ...state.filter(e => e.id !== payload.savedEntry?.id),
-                {...payload.savedEntry}
-            ].sort(entrySorter(entryDefaultSort))
-        }
-        return state;
-    case entriesDeleteSucceeded:
-        if (payload?.id) {
-            return [
-                ...state.filter(e => e.id !== payload.id)
-            ].sort(entrySorter(entryDefaultSort));
-        }
-        return state;
-    case entriesSetEntryDate:
-        return [];
-    default:
-        return state;
-    }
-};
-
-const isLoading = (state = false, action: EntryAction) => {
-    const {type} = action;
-    switch (type) {
-    case entriesFetchListRequested:
-        return true;
-    case entriesFetchListSucceeded:
-    case entriesFetchListFailed:
-        return false;
-    default:
-        return state;
-    }
-};
-
-
-const isSaving = (state = false, action: EntryAction) => {
-    const {type} = action;
-    switch (type) {
-    case entriesSaveRequested:
-        return true;
-    case entriesSaveSucceeded:
-    case entriesSaveFailed:
-        return false;
-    case entriesDeleteRequested:
-        return true;
-    case entriesDeleteSucceeded:
-    case entriesDeleteFailed:
-        return false;
-    default:
-        return state;
-    }
-};
-
-const entryDate = (state: string = previousHurricaneWorkDay(), action: EntryAction) => {
-    const {type, payload} = action;
-    switch (type) {
-    case entriesSetEntryDate:
-        if (payload?.date) {
-            return payload.date;
-        }
-        return previousSLCWorkDay();
-    default:
-        return state;
-    }
-};
-
-const employee = (state: Employee | null = null, action: EntryAction): Employee | null => {
-    const {type, payload} = action;
-    switch (type) {
-    case employeeSelected:
-        if (payload?.employee) {
-            return {...payload.employee}
-        }
-        return null;
-    default:
-        return state;
-    }
-};
-
-
-export default combineReducers({
-    workCenterFilter: workCenterFilterReducer,
-    list,
-    isLoading,
-    isSaving,
-    entryDate,
-    entry,
-    employee,
 });
+
+export default entriesReducer;

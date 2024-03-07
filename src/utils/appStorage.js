@@ -33,7 +33,16 @@ export const STORAGE_KEYS = {
         workCenter: `${storePrefix}.reports.workCenter`,
         showInactive: `${storePrefix}.reports.showInactive`,
         employee: `${storePrefix}.reports.employee`,
-        operationCode: `${storePrefix}.reports.operationCode`,
-        grouping: `${storePrefix}.reports.grouping`,
+        operationCode: `${storePrefix}.reports.operationCode`
+    },
+    analysis: {
+        minDate: `${storePrefix}.analysis.minDate`,
+        maxDate: `${storePrefix}.analysis.maxDate`,
+        workCenter: `${storePrefix}.analysis.workCenter`,
+        showInactive: `${storePrefix}.analysis.showInactive`,
+        employee: `${storePrefix}.analysis.employee`,
+        operationCode: `${storePrefix}.analysis.operationCode`,
+        itemCode: `${storePrefix}.analysis.itemCode`,
+        grouping: `${storePrefix}.analysis.grouping`,
     },
 };

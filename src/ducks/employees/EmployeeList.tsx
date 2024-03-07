@@ -1,68 +1,76 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, {ChangeEvent, useState} from 'react';
+import {useSelector} from 'react-redux';
 import {DEPARTMENT_NAMES} from './constants';
-import {fetchEmployees, selectEmployeeAction, setEmployeeVisibilityFilter, showInactiveAction} from './actions';
-import {Department, Employee, EmployeeFilter, EmployeeSorterProps, EmployeeTableField} from "../common-types";
-import {selectCurrentEmployee, selectLoading, selectShowInactive, selectVisibleEmployees} from "./selectors";
 import {
-    addPageSetAction,
-    FormCheck,
-    PagerDuck,
-    selectPagedData,
-    selectTableSort,
-    SortableTable,
-    SpinnerButton,
-    tableAddedAction
-} from "chums-ducks";
+    loadEmployees,
+    setCurrentEmployee,
+    setEmployeeDepartment,
+    setEmployeeFilter, setEmployeesSort,
+    toggleShowInactiveEmployees
+} from './actions';
+import {DepartmentKey, Employee, EmployeeFilter} from "../common-types";
+import {
+    selectCurrentEmployee,
+    selectEmployeeFilter,
+    selectEmployeesSort,
+    selectLoading,
+    selectShowInactive,
+    selectVisibleEmployees
+} from "./selectors";
+import {FormCheck, SortableTable, SortProps, SpinnerButton, TablePagination} from "chums-components";
 import DepartmentFilterSelect from "./DepartmentFilterSelect";
 import classNames from "classnames";
+import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {SortableTableField} from "chums-components";
 
-const EMPLOYEE_FIELDS: EmployeeTableField[] = [
-    {field: 'FullName', title: 'Name'},
+const EMPLOYEE_FIELDS: SortableTableField<Employee>[] = [
+    {field: 'EmployeeNumber', title: '#', sortable: true},
+    {field: 'FullName', title: 'Name', sortable: true},
     {
         field: 'Department',
         title: 'Dept',
-        render: row => DEPARTMENT_NAMES[row.Department as Department] || row.Department
+        render: row => DEPARTMENT_NAMES[row.Department as DepartmentKey] ?? row.Department,
+        sortable: true,
     },
 ];
 
 const tableId = 'employee-list'
-const EmployeeList: React.FC = () => {
-    const dispatch = useDispatch();
-    const [filter, setFilter] = useState('');
+const EmployeeList = () => {
+    const dispatch = useAppDispatch();
+    const filter = useAppSelector(selectEmployeeFilter);
     const showInactive = useSelector(selectShowInactive);
     const selected = useSelector(selectCurrentEmployee);
     const loading = useSelector(selectLoading);
+    const sort = useAppSelector(selectEmployeesSort);
+    const list = useAppSelector(selectVisibleEmployees)
 
-    useEffect(() => {
-        dispatch(addPageSetAction({key: tableId}));
-        dispatch(tableAddedAction({key: tableId, field: 'FullName', ascending: true}));
-    }, []);
+    const [page, setPage] = useState<number>(0);
+    const [rowsPerPage, setRowsPerPage] = useState(25);
 
-    let listFilter = /^/;
-    try {
-        listFilter = new RegExp(filter, 'i');
-    } catch (error: unknown) {
-        listFilter = /^/;
+    const rowsPerPageChangeHandler = (rpp:number) => {
+        setPage(0);
+        setRowsPerPage(rpp);
     }
-    const sort: EmployeeSorterProps = useSelector(selectTableSort(tableId)) as EmployeeSorterProps;
-    const list = useSelector(selectVisibleEmployees(sort));
-    const filteredList = list.filter(emp => !filter || listFilter.test(emp.FullName) || listFilter.test(emp.FirstName) || listFilter.test(emp.LastName));
-    const pagedList = useSelector(selectPagedData(tableId, filteredList));
 
-    const onChangeEmployeeFilter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(setEmployeeVisibilityFilter(ev.target.value as EmployeeFilter));
+    const onChangeEmployeeDepartment = (ev: ChangeEvent<HTMLSelectElement>) => {
+        dispatch(setEmployeeDepartment(ev.target.value as EmployeeFilter));
+    }
+
+    const sortChangeHandler = (sort:SortProps) => {
+        dispatch(setEmployeesSort(sort))
+    }
 
     const onChangeFilter = (ev: ChangeEvent<HTMLInputElement>) => {
-        setFilter(ev.target.value);
+        dispatch(setEmployeeFilter(ev.target.value));
     }
 
-    const onSelectEmployee = (emp: Employee) => dispatch(selectEmployeeAction(emp));
+    const onSelectEmployee = (emp: Employee) => dispatch(setCurrentEmployee(emp));
 
     return (
         <div className="report-form">
             <div className="row g-3">
                 <div className="col-auto">
-                    <DepartmentFilterSelect onChange={onChangeEmployeeFilter}/>
+                    <DepartmentFilterSelect onChange={onChangeEmployeeDepartment}/>
                 </div>
                 <div className="col-auto">
                     <input type="search" className="form-control form-control-sm" value={filter}
@@ -71,21 +79,25 @@ const EmployeeList: React.FC = () => {
                 </div>
                 <div className="col-auto">
                     <FormCheck type="checkbox" label="Show Inactive" checked={showInactive}
-                               onClick={() => dispatch(showInactiveAction(!showInactive))}/>
+                               onClick={() => dispatch(toggleShowInactiveEmployees(!showInactive))}/>
                 </div>
                 <div className="col-auto">
                     <SpinnerButton spinning={loading} type="button"
-                                   onClick={() => dispatch(fetchEmployees())} color="outline-primary" size="sm">
+                                   onClick={() => dispatch(loadEmployees())} color="outline-primary" size="sm">
                         Reload
                     </SpinnerButton>
                 </div>
             </div>
-            <SortableTable tableKey={tableId} keyField="EmployeeNumber" fields={EMPLOYEE_FIELDS} data={pagedList}
+            <SortableTable keyField="EmployeeNumber" fields={EMPLOYEE_FIELDS} currentSort={sort}
+                           onChangeSort={sortChangeHandler}
+                           data={list.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
                            rowClassName={(row) => classNames({'table-warning': !row.active})}
                            selected={selected?.EmployeeNumber}
                            size="xs"
                            onSelectRow={onSelectEmployee}/>
-            <PagerDuck dataLength={list.length} pageKey={tableId} filtered={list.length !== filteredList.length}/>
+            <TablePagination page={page} onChangePage={setPage}
+                             rowsPerPage={rowsPerPage} onChangeRowsPerPage={rowsPerPageChangeHandler}
+                             count={list.length} />
         </div>
     )
 }

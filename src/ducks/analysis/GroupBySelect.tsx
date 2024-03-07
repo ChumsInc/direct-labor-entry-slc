@@ -1,10 +1,15 @@
 import React, {ChangeEvent} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {ReportGroupingId} from "./types";
+import {ReportData, ReportGroupingId} from "./types";
 import {selectGroupBy, selectLowerGroupBy} from "./selectors";
-import {changeGroupByAction} from "./actions";
+import {setReportGrouping} from "./actions";
+import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 
-const options = [
+export interface GroupOption {
+    value: keyof ReportData;
+    text: string;
+}
+
+const options: GroupOption[] = [
     {value: 'WorkCenter', text: 'Work Center'},
     {value: 'EntryDate', text: 'Entry Date'},
     {value: 'EmployeeNumber', text: 'Employee'},
@@ -19,13 +24,14 @@ export interface GroupBySelectProps {
     groupId: ReportGroupingId,
     onChange: () => void,
 }
-const GroupBySelect:React.FC<GroupBySelectProps> = ({groupId, onChange}) => {
-    const dispatch = useDispatch();
-    const value = useSelector(selectGroupBy(groupId));
-    const lower = useSelector(selectLowerGroupBy(groupId));
 
-    const changeHandler = (ev:ChangeEvent<HTMLSelectElement>) => {
-        dispatch(changeGroupByAction(groupId, ev.target.value));
+const GroupBySelect: React.FC<GroupBySelectProps> = ({groupId, onChange}) => {
+    const dispatch = useAppDispatch();
+    const value = useAppSelector((state) => selectGroupBy(state, groupId));
+    const lower = useAppSelector((state) => selectLowerGroupBy(state, groupId));
+
+    const changeHandler = (ev: ChangeEvent<HTMLSelectElement>) => {
+        dispatch(setReportGrouping({[groupId]: ev.target.value}));
         onChange();
     }
 

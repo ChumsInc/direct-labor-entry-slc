@@ -1,5 +1,8 @@
 const path = require('path');
 
+
+// require('dotenv').config();
+
 module.exports = {
     entry: './src/index.tsx',
     module: {
@@ -11,8 +14,8 @@ module.exports = {
             },
             {
                 test: /\.js$/,
+                use: ['babel-loader'],
                 exclude: /node_modules/,
-                use: ['babel-loader']
             },
             {
                 test: /\.css$/,
@@ -34,6 +37,7 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
+    plugins: [],
     optimization: {
         splitChunks: {
             cacheGroups: {
@@ -43,7 +47,7 @@ module.exports = {
                     chunks: 'all',
                 },
                 chums: {
-                    test: /[\\/]common-components[\\/]/,
+                    test: /[\\/](common|chums)-components[\\/]/,
                     name: 'chums',
                     chunks: 'all',
                 },

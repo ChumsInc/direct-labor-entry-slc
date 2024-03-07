@@ -1,21 +1,34 @@
-import React, {ChangeEvent, useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {fetchSteps, selectLoading, selectSLCSteps, stepSorter} from "./index";
+import React, {ChangeEvent, InputHTMLAttributes, useEffect, useId, useState} from "react";
 import {selectWorkCenter} from "../reports/selectors";
-import {InputGroup} from "chums-ducks";
+import {InputGroup} from "chums-components";
+import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {selectStepsList, selectStepsLoaded} from "./selectors";
+import {Step} from "../common-types";
+import {loadSteps} from "./actions";
+import {stepSorter} from "./utils";
 
-export interface StepInput {
+export interface StepInputProps extends InputHTMLAttributes<HTMLInputElement>{
     value: string,
-    onChange: (ev:ChangeEvent<HTMLInputElement>) => void,
+    onChange: (ev: ChangeEvent<HTMLInputElement>) => void,
 }
-const StepInput:React.FC<StepInput> = ({value, onChange}) => {
-    const dispatch = useDispatch();
-    const workCenter = useSelector(selectWorkCenter);
-    const steps = useSelector(selectSLCSteps(workCenter));
-    const loading = useSelector(selectLoading);
+
+const StepInput = ({value, onChange, ...rest}:StepInputProps) => {
+    const dispatch = useAppDispatch();
+    const workCenter = useAppSelector(selectWorkCenter);
+    const list = useAppSelector(selectStepsList);
+    const [steps, setSteps] = useState<Step[]>([])
+    const loaded = useAppSelector(selectStepsLoaded);
+    const id = useId();
+
     useEffect(() => {
-        if (!loading && !steps.length) {
-            dispatch(fetchSteps());
+        const steps = list.filter(step => !workCenter || step.workCenter === workCenter)
+            .sort(stepSorter({field: 'stepCode', ascending: true}));
+        setSteps(steps);
+    }, [workCenter, list]);
+
+    useEffect(() => {
+        if (!loaded) {
+            dispatch(loadSteps());
         }
     }, [])
 
@@ -23,10 +36,12 @@ const StepInput:React.FC<StepInput> = ({value, onChange}) => {
         <>
             <InputGroup bsSize="sm">
                 <label className="input-group-text  bi-diagram-3-fill"/>
-                <input type="search" className="form-control form-control-sm" value={value} onChange={onChange} list="step-search-list" placeholder="D/L Step"/>
+                <input type="search" className="form-control form-control-sm" value={value} onChange={onChange}
+                       {...rest}
+                       list={id} placeholder="D/L Step"/>
             </InputGroup>
-            <datalist id="step-search-list">
-                {steps.sort(stepSorter).map(step => <option key={step.id} value={step.stepCode}>{step.description}</option>)}
+            <datalist id={id}>
+                {steps.map(step => <option key={step.id} value={step.stepCode}>{step.description}</option>)}
             </datalist>
         </>
     )

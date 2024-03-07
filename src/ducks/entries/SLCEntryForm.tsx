@@ -1,24 +1,24 @@
 import React, {ChangeEvent, FormEvent, useEffect, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {DateInput, FormColumn, InputGroup, ProgressBar, SpinnerButton} from "chums-ducks";
-import {selectCurrentEntry, selectEntryDate, selectLoading, selectSaving} from "./selectors";
-import {fetchDocumentAction, selectLoading as selectWOLoading} from "../work-order";
-import {Employee, Entry, Step} from "../common-types";
-import {deleteEntryAction, newEntryAction, saveEntryAction, setEntryDateAction, updateEntryAction} from "./actions";
+import {useSelector} from 'react-redux';
+import {FormColumn, InputGroup, ProgressBar, SpinnerButton} from "chums-components";
+import {selectCurrentEntry, selectEntriesActionStatus, selectEntryEmployee} from "./selectors";
+import {BasicEntry, Employee, Step} from "../common-types";
+import {removeEntry, saveEntry, setEntryEmployee, setNewEntry, updateEntry} from "./actions";
 import EmployeeSelect from "../employees/EmployeeSelect";
 import {REGEX_FILTER_EMPLOYEES_SLC} from "../employees/constants";
 import SelectSLCSteps from "../steps/SelectSLCSteps";
-import DocumentContainer from "../work-order/DocumentContainer";
+import DocumentContainer from "../work-ticket/DocumentContainer";
 import numeral from "numeral";
-import {selectEmployeeAction} from "../employees/actions";
+import {selectWorkTicketLoading} from "../work-ticket/selectors";
+import {useAppDispatch} from "../../app/configureStore";
+import {loadDocument} from "../work-ticket/actions";
 
-const SLCEntryForm: React.FC = () => {
-    const dispatch = useDispatch();
-    const entryDate = useSelector(selectEntryDate);
+const SLCEntryForm = () => {
+    const dispatch = useAppDispatch();
     const entry = useSelector(selectCurrentEntry);
-    const loading = useSelector(selectLoading);
-    const saving = useSelector(selectSaving);
-    const loadingWO = useSelector(selectWOLoading)
+    const actionStatus = useSelector(selectEntriesActionStatus);
+    const workTicketLoading = useSelector(selectWorkTicketLoading);
+    const currentEmployee = useSelector(selectEntryEmployee);
 
     useEffect(() => {
         focusNextInputField();
@@ -26,76 +26,78 @@ const SLCEntryForm: React.FC = () => {
 
     useEffect(() => {
         focusNextInputField();
-    }, [entry.EmployeeNumber]);
-
-    useEffect(() => {
-        if (entry.WorkCenter === '') {
-            dispatch(updateEntryAction({...entry, WorkCenter: 'INH'}));
-        }
-    }, [entry.WorkCenter]);
+    }, [entry?.EmployeeNumber]);
 
     const employeeSelectRef = useRef<HTMLSelectElement>(null);
     const documentRef = useRef<HTMLInputElement>(null);
     const minutesRef = useRef<HTMLInputElement>(null);
 
-    const onChangeEntryDate = (date: Date | null) => {
-        dispatch(setEntryDateAction(date?.toISOString() || null));
-    }
-
     const onChangeEmployee = (employee?: Employee | null) => {
-        console.log('onChangeEmployee', employee)
-        dispatch(selectEmployeeAction(employee));
-        if (!employee) {
-            dispatch(newEntryAction());
-        } else {
-            dispatch(updateEntryAction({...entry, EmployeeNumber: employee?.EmployeeNumber || ''}));
+        if (entry) {
+            dispatch(updateEntry({...entry, EmployeeNumber: employee?.EmployeeNumber || ''}));
+            focusNextInputField();
         }
-
-        focusNextInputField();
+        if (!currentEmployee && !!employee) {
+            dispatch(setEntryEmployee(employee));
+        }
     }
 
     const onSaveEntry = (ev: FormEvent) => {
         ev.preventDefault();
-        dispatch(saveEntryAction(entry));
-        documentRef.current?.focus();
+        if (entry) {
+            dispatch(saveEntry(entry));
+            documentRef.current?.focus();
+        }
     }
 
     const onDeleteEntry = () => {
         if (!window.confirm('Are you sure you want to delete this entry?')) {
             return;
         }
-        dispatch(deleteEntryAction(entry));
+        if (!entry || !entry?.id) {
+            dispatch(setNewEntry());
+        } else {
+            dispatch(removeEntry(entry));
+        }
         focusNextInputField();
     }
+
     const onNewEntry = () => {
-        dispatch(newEntryAction());
+        dispatch(setNewEntry());
         focusNextInputField();
     }
-    const onChangeNumericEntry = (field: keyof Entry) => (ev: ChangeEvent<HTMLInputElement>) => {
-        dispatch(updateEntryAction({[field]: Number(ev.target.value) || 0}))
+
+    const onChangeEntry = (field: keyof BasicEntry) => (ev: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        switch (field) {
+            case 'Minutes':
+            case 'Quantity':
+                dispatch(updateEntry({[field]: Number(ev.target.value) || 0}))
+                return;
+            default:
+                dispatch(updateEntry({[field]: ev.target.value || ''}))
+        }
     }
 
-    const onChangeEntry = (field: keyof Entry) => (ev: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        dispatch(updateEntryAction({[field]: ev.target.value || ''}))
-    }
-
-    const onChangeStep = (step: Step|null) => {
-        dispatch(updateEntryAction({idSteps: step?.id}));
+    const onChangeStep = (step: Step | null) => {
+        dispatch(updateEntry({idSteps: step?.id}));
     }
 
 
     const focusNextInputField = () => {
-        if (!entry.EmployeeNumber && employeeSelectRef.current) {
+        if (!entry?.EmployeeNumber && employeeSelectRef.current) {
             return employeeSelectRef.current.focus();
         }
-        if (!entry.DocumentNo && documentRef.current) {
+        if (!entry?.DocumentNo && documentRef.current) {
             return documentRef.current.focus();
         }
         minutesRef.current?.focus();
     }
 
     const onLoadDocument = () => {
-        dispatch(fetchDocumentAction());
+        if (!entry?.DocumentNo) {
+            return;
+        }
+        dispatch(loadDocument(entry?.DocumentNo));
         minutesRef.current?.focus();
     }
 
@@ -104,22 +106,31 @@ const SLCEntryForm: React.FC = () => {
         onLoadDocument();
     }
 
+    if (!entry) {
+        return (
+            <div className="row g-3">
+                <div className="col-auto">
+                    <button type="button" className="btn btn-sm btn-outline-secondary"
+                            disabled={actionStatus !== 'idle'}
+                            onClick={onNewEntry}>
+                        New Entry
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
     const {id, EmployeeNumber, LineNo, idSteps, Minutes, Quantity, changed} = entry;
     return (
         <div>
             <form onSubmit={onSaveEntry} className="mb-3" id="entry-form--slc">
-                <FormColumn width={8} label="Date">
-                    <DateInput date={entryDate} onChangeDate={onChangeEntryDate}
-                               form="entry-form--slc"
-                               required={true}/>
-                </FormColumn>
                 <FormColumn width={8} label="Employee">
                     <EmployeeSelect filter={REGEX_FILTER_EMPLOYEES_SLC}
                                     value={EmployeeNumber}
                                     onSelect={onChangeEmployee}
                                     form="entry-form--slc"
                                     required={true}
-                                    myRef={employeeSelectRef}/>
+                                    ref={employeeSelectRef}/>
                 </FormColumn>
                 <FormColumn width={8} label="WO/IT">
                     <InputGroup bsSize="sm">
@@ -127,7 +138,7 @@ const SLCEntryForm: React.FC = () => {
                                ref={documentRef} value={entry.DocumentNo}
                                disabled={!EmployeeNumber}
                                onChange={onChangeEntry('DocumentNo')}/>
-                        <SpinnerButton spinning={loadingWO} type="button" color="outline-primary"
+                        <SpinnerButton spinning={workTicketLoading} type="button" color="outline-primary"
                                        disabled={!EmployeeNumber}
                                        onClick={onLoadDocument}>Load WO/IT</SpinnerButton>
                     </InputGroup>
@@ -139,13 +150,13 @@ const SLCEntryForm: React.FC = () => {
                                    required ref={minutesRef}
                                    placeholder="minutes"
                                    disabled={!EmployeeNumber}
-                                   onChange={onChangeNumericEntry('Minutes')}/>
+                                   onChange={onChangeEntry('Minutes')}/>
                         </div>
                         <div className="col-6">
                             <input type="number" value={Quantity || ''} className="form-control form-control-sm"
                                    required placeholder="quantity"
                                    disabled={!EmployeeNumber}
-                                   onChange={onChangeNumericEntry('Quantity')}/>
+                                   onChange={onChangeEntry('Quantity')}/>
                         </div>
                     </div>
                     <InputGroup bsSize="sm">
@@ -154,13 +165,14 @@ const SLCEntryForm: React.FC = () => {
                 <FormColumn width={8} label="Whse/Item">
                     <div className="row g-1">
                         <div className="col-4">
-                            <input type="text" value={entry.WarehouseCode} className="form-control form-control-sm"
+                            <input type="text" value={entry.WarehouseCode ?? ''}
+                                   className="form-control form-control-sm"
                                    required placeholder="Warehouse"
                                    disabled={!EmployeeNumber}
                                    onChange={onChangeEntry('WarehouseCode')}/>
                         </div>
                         <div className="col-8">
-                            <input type="text" value={entry.ItemCode} className="form-control form-control-sm"
+                            <input type="text" value={entry.ItemCode ?? ''} className="form-control form-control-sm"
                                    required placeholder="Item"
                                    disabled={!EmployeeNumber}
                                    onChange={onChangeEntry('ItemCode')}/>
@@ -182,7 +194,8 @@ const SLCEntryForm: React.FC = () => {
                             </select>
                         </div>
                         <div className="col-8">
-                            <SelectSLCSteps workCenter={entry.WorkCenter} id={idSteps} onChange={onChangeStep} required disabled={!EmployeeNumber}/>
+                            <SelectSLCSteps workCenter={entry.WorkCenter} stepId={idSteps}
+                                            onChange={onChangeStep} required disabled={!EmployeeNumber}/>
                         </div>
                     </div>
 
@@ -190,13 +203,13 @@ const SLCEntryForm: React.FC = () => {
                 <FormColumn width={8} label="SAM/Op">
                     <div className="row g-1">
                         <div className="col-4">
-                            <input type="text" value={numeral(entry.StandardAllowedMinutes).format('0,0.0000')}
+                            <input type="text" value={numeral(entry.StandardAllowedMinutes ?? 0).format('0,0.0000')}
                                    className="form-control form-control-sm"
                                    readOnly
                                    onChange={onChangeEntry('WarehouseCode')}/>
                         </div>
                         <div className="col-8">
-                            <input type="text" value={entry.Description} className="form-control form-control-sm"
+                            <input type="text" value={entry?.Description ?? ''} className="form-control form-control-sm"
                                    readOnly
                                    onChange={onChangeEntry('ItemCode')}/>
                         </div>
@@ -205,28 +218,31 @@ const SLCEntryForm: React.FC = () => {
                     </InputGroup>
                 </FormColumn>
                 <FormColumn width={8} label="">
-                    {loading && <ProgressBar striped={true} animated={true}/>}
+                    {actionStatus === 'loading' && <ProgressBar striped={true} animated={true}/>}
                 </FormColumn>
                 <FormColumn width={8} label="">
                     <div className="row g-3">
                         <div className="col-auto">
-                            <button type="submit" className="btn btn-sm btn-primary" disabled={loading || saving || !EmployeeNumber}>
+                            <SpinnerButton type="submit" size="sm"
+                                           spinning={actionStatus === 'saving'}
+                                           color="primary" disabled={actionStatus !== 'idle' || !EmployeeNumber}>
                                 Save
-                            </button>
+                            </SpinnerButton>
                         </div>
                         <div className="col-auto">
                             <button type="button" className="btn btn-sm btn-outline-secondary"
-                                    disabled={loading || saving}
+                                    disabled={actionStatus != 'idle'}
                                     onClick={onNewEntry}>
                                 New
                             </button>
                         </div>
                         <div className="col-auto">
-                            <button type="button" className="btn btn-sm btn-outline-danger"
-                                    onClick={onDeleteEntry}
-                                    disabled={id === 0 || loading || saving}>
+                            <SpinnerButton type="button" color="outline-danger" size="sm"
+                                           onClick={onDeleteEntry}
+                                           spinning={actionStatus === 'deleting'}
+                                           disabled={id === 0 || actionStatus !== 'idle'}>
                                 Delete
-                            </button>
+                            </SpinnerButton>
                         </div>
                     </div>
                 </FormColumn>

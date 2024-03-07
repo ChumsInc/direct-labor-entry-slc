@@ -1,52 +1,54 @@
 import React, {ChangeEvent, FormEvent} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {
     selectFilterEmployee,
     selectFilterItem,
     selectFilterOperation,
-    selectLoading,
+    selectReportLoading,
     selectWorkCenter
 } from "./selectors";
 import {
-    fetchReportDataAction, fetchReportExcelAction,
-    filterEmployeeAction,
-    filterItemAction,
-    filterOperationAction,
-    workCenterChangedAction
+    loadReportData,
+    loadReportExcel,
+    setFilterEmployee,
+    setFilterItem,
+    setFilterOperation,
+    setWorkCenter
 } from "./actions";
 import EmployeeSelect from "../employees/EmployeeSelect";
-import {InputGroup, SpinnerButton} from "chums-ducks";
+import {InputGroup, SpinnerButton} from "chums-components";
 import GroupBySelect from "./GroupBySelect";
 import ReportMinDate from "./ReportMinDate";
 import ReportMaxDate from "./ReportMaxDate";
 import {WORK_CENTERS} from "./constants";
 import StepInput from "../steps/StepInput";
+import {useAppDispatch} from "../../app/configureStore";
 
 const AnalysisFilters: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const workCenter = useSelector(selectWorkCenter);
     const employee = useSelector(selectFilterEmployee);
     const operation = useSelector(selectFilterOperation);
     const item = useSelector(selectFilterItem);
-    const loading = useSelector(selectLoading);
+    const loading = useSelector(selectReportLoading);
 
-    const onChangeWorkCenter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(workCenterChangedAction(ev.target.value));
+    const onChangeWorkCenter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(setWorkCenter(ev.target.value));
 
     const onSubmit = (ev: FormEvent) => {
         ev.preventDefault();
-        dispatch(fetchReportDataAction())
+        dispatch(loadReportData())
     }
 
     const onDownload = () => {
-        dispatch(fetchReportExcelAction());
+        dispatch(loadReportExcel());
     }
 
     const onChangeGrouping = () => {
-        dispatch(fetchReportDataAction());
+        dispatch(loadReportData());
     }
 
     const onChangeOperationFilter = (ev: ChangeEvent<HTMLInputElement>) => {
-        dispatch(filterOperationAction(ev.target.value || ''));
+        dispatch(setFilterOperation(ev.target.value || ''));
     }
 
     return (
@@ -83,22 +85,22 @@ const AnalysisFilters: React.FC = () => {
                 <div className="col-auto">
                     <InputGroup bsSize="sm">
                         <label className="input-group-text bi-person-fill"/>
-                        <EmployeeSelect value={employee}
-                                        onSelect={(emp) => dispatch(filterEmployeeAction(emp?.EmployeeNumber || ''))}/>
+                        <EmployeeSelect value={employee ?? ''}
+                                        onSelect={(emp) => dispatch(setFilterEmployee(emp?.EmployeeNumber || ''))}/>
                     </InputGroup>
 
                 </div>
 
                 <div className="col-auto">
-                    <StepInput value={operation} onChange={onChangeOperationFilter}/>
+                    <StepInput value={operation ?? ''} onChange={onChangeOperationFilter}/>
                 </div>
 
                 <div className="col-auto">
                     <InputGroup bsSize="sm">
                         <label className="input-group-text bi-upc"/>
-                        <input type="text" value={item} placeholder="item code"
+                        <input type="text" value={item ?? ''} placeholder="item code"
                                className="form-control form-control-sm"
-                               onChange={(ev) => dispatch(filterItemAction(ev.target.value))}/>
+                               onChange={(ev) => dispatch(setFilterItem(ev.target.value))}/>
                     </InputGroup>
                 </div>
 
@@ -107,7 +109,8 @@ const AnalysisFilters: React.FC = () => {
                                    spinning={loading}>Submit</SpinnerButton>
                 </div>
                 <div className="col-auto">
-                    <button type="button" className="btn btn-sm btn-outline-primary" onClick={onDownload}>Download</button>
+                    <button type="button" className="btn btn-sm btn-outline-primary" onClick={onDownload}>Download
+                    </button>
                 </div>
 
             </div>

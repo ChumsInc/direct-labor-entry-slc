@@ -1,30 +1,32 @@
 import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
-import {fetchEmployees} from './actions';
+import {loadEmployees} from './actions';
 
 import EmployeeList from './EmployeeList';
 import EmployeeEdit from './EmployeeEdit';
-import {ErrorBoundary} from "chums-ducks";
+import {ErrorBoundary} from "react-error-boundary";
+import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
+import {useAppDispatch} from "../../app/configureStore";
 
 const EmployeesTab: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     useEffect(() => {
-        dispatch(fetchEmployees())
+        dispatch(loadEmployees())
     })
 
-    const onReload = () => dispatch(fetchEmployees());
+    const onReload = () => dispatch(loadEmployees());
 
     return (
         <div>
             <h3>Employee List</h3>
-            <div className="row">
+            <div className="row g-3">
                 <div className="col-sm-6">
-                    <ErrorBoundary>
+                    <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
                         <EmployeeList/>
                     </ErrorBoundary>
                 </div>
                 <div className="col-sm-6">
-                    <ErrorBoundary>
+                    <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
                         <EmployeeEdit/>
                     </ErrorBoundary>
                 </div>

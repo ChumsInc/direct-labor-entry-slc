@@ -1,160 +1,90 @@
-import {combineReducers} from 'redux';
 
+import {Employee, EmployeeFilter, ActionStatus} from "../common-types";
+import {Editable} from "chums-types/src/generics";
+import {createReducer} from "@reduxjs/toolkit";
 import {
-    defaultEmployeeSort,
-    EmployeeAction,
-    employeeSelected,
-    employeesFetchListFailed,
-    employeesFetchListRequested,
-    employeesFetchListSucceeded,
-    employeeSorter,
-    employeesShowActive,
-    employeesShowInactive,
-    saveEmployeeFailed,
-    saveEmployeeRequested,
-    saveEmployeeSucceeded,
-    employeeSetVisibilityFilter
-} from './actionTypes';
-import {Employee, EmployeeFilter} from "../common-types";
+    loadEmployees,
+    saveEmployee,
+    setCurrentEmployee,
+    setEmployeeDepartment, setEmployeeFilter, setEmployeesSort,
+    toggleShowInactiveEmployees
+} from "./actions";
+import {SortProps} from "chums-components";
+import {employeeSorter} from "./utils";
 
-const defaultState = {
-    isFetching: false,
-};
-
-const listReducer = (state: Employee[] = [], action: EmployeeAction): Employee[] => {
-    const {type, payload, status} = action;
-    switch (type) {
-    case saveEmployeeSucceeded:
-        if (payload?.employee) {
-            return [
-                ...state.filter(e => e.EmployeeNumber !== payload.employee?.EmployeeNumber),
-                payload.employee,
-            ].sort(employeeSorter(defaultEmployeeSort))
-        }
-        return state;
-    case employeesFetchListSucceeded:
-        if (payload?.list) {
-            return [...payload.list].sort(employeeSorter(defaultEmployeeSort));
-        }
-        return state;
-    default:
-        return state;
-    }
-};
-
-
-const visibilityFilterReducer = (state: EmployeeFilter = 'slc', action: EmployeeAction): string => {
-    const {type, payload} = action;
-    switch (type) {
-    case employeeSetVisibilityFilter:
-        return payload?.filter || 'all';
-    default:
-        return state;
-    }
-};
-
-const showInactiveReducer = (state: boolean = false, action: EmployeeAction): boolean => {
-    switch (action.type) {
-    case employeesShowInactive:
-        return true;
-    case employeesShowActive:
-        return false;
-    default:
-        return state;
-    }
+export interface EmployeesState {
+    list: Employee[];
+    showInactive: boolean;
+    department: 'slc'|'slc-temp'|'all';
+    filter: string;
+    current: (Employee & Editable)|null;
+    actionStatus: ActionStatus;
+    loaded: boolean;
+    sort: SortProps<Employee>;
 }
 
-const isLoadingReducer = (state: boolean = false, action: EmployeeAction): boolean => {
-    const {type} = action;
-    switch (type) {
-    case employeesFetchListRequested:
-        return true;
-    case employeesFetchListSucceeded:
-    case employeesFetchListFailed:
-        return false;
-    default:
-        return state;
-    }
-};
-
-const selectedReducer = (state: Employee | null = null, action: EmployeeAction): Employee | null => {
-    const {type, payload, status} = action;
-    switch (type) {
-    case saveEmployeeSucceeded:
-        if (payload?.employee) {
-            return {...payload.employee};
-        }
-        return state;
-    case employeeSelected:
-        if (payload?.employee) {
-            return payload.employee;
-        }
-        return null;
-    case employeeSetVisibilityFilter:
-        return null;
-    default:
-        return state;
-    }
-};
-
-// const selectedSLCReducer = (state: Employee | null = null, action: EmployeeAction): Employee | null => {
-//     const {type, payload, status} = action;
-//     switch (type) {
-//     case saveEmployeeRequested:
-//         if (status === FETCH_SUCCESS && payload?.employee) {
-//             return {...payload.employee};
-//         }
-//         return state;
-//     case employeeSelected:
-//         if (payload?.employee) {
-//             return payload.employee;
-//         }
-//         return null;
-//     case UPDATE_SELECTED_EMPLOYEE:
-//         if (!!state && payload?.props) {
-//             return {...state, ...payload.props};
-//         }
-//         return state;
-//     case SET_EMPLOYEE_VISIBILITY_FILTER:
-//         return null;
-//     default:
-//         return state;
-//     }
-// };
-
-const isSavingReducer = (state: boolean = false, action: EmployeeAction) => {
-    const {type, status} = action;
-    switch (type) {
-    case saveEmployeeRequested:
-        return true;
-    case saveEmployeeSucceeded:
-    case saveEmployeeFailed:
-        return false;
-    default:
-        return state;
-    }
-};
-
-const loadedReducer = (state: boolean = false, action: EmployeeAction): boolean => {
-    const {type} = action;
-    switch (type) {
-    case employeesFetchListSucceeded:
-        return true;
-    default:
-        return state;
-    }
+export const initialEmployeesState:EmployeesState = {
+    list: [],
+    showInactive: false,
+    department: 'slc',
+    filter: '',
+    current: null,
+    actionStatus: "idle",
+    loaded: false,
+    sort: {field: 'EmployeeNumber', ascending: true},
 }
 
-export default combineReducers({
-    list: listReducer,
-    visibilityFilter: visibilityFilterReducer,
-    showInactive: showInactiveReducer,
-    isLoading: isLoadingReducer,
-    isSaving: isSavingReducer,
-    selected: selectedReducer,
-    // selectedSLC: selectedSLCReducer,
-    loaded: loadedReducer,
+const employeesReducer = createReducer(initialEmployeesState, builder => {
+    builder
+        .addCase(loadEmployees.pending, (state) => {
+            state.actionStatus = 'loading';
+        })
+        .addCase(loadEmployees.fulfilled, (state, action) => {
+            state.actionStatus = 'idle';
+            state.list = [...action.payload].sort(employeeSorter(initialEmployeesState.sort));
+            if (state.current) {
+                const [employee] = state.list.filter(emp => emp.EmployeeNumber === state.current?.EmployeeNumber);
+                state.current = employee ?? null;
+            }
+        })
+        .addCase(loadEmployees.rejected, (state) => {
+            state.actionStatus = 'idle';
+        })
+        .addCase(setCurrentEmployee, (state, action) => {
+            state.current = action.payload;
+        })
+        .addCase(toggleShowInactiveEmployees, (state, action) => {
+            state.showInactive = action.payload ?? !state.showInactive;
+        })
+        .addCase(saveEmployee.pending, (state) => {
+            state.actionStatus = 'saving';
+        })
+        .addCase(saveEmployee.fulfilled, (state, action) => {
+            state.actionStatus = 'idle';
+            state.current = action.payload;
+            if (action.payload) {
+                state.list = [
+                    ...state.list.filter(emp => emp.EmployeeNumber !== action.meta.arg.EmployeeNumber),
+                    action.payload,
+                ].sort(employeeSorter(initialEmployeesState.sort));
+            } else {
+                state.list = [
+                    ...state.list.filter(emp => emp.EmployeeNumber !== action.meta.arg.EmployeeNumber),
+                ].sort(employeeSorter(initialEmployeesState.sort));
+            }
+        })
+        .addCase(saveEmployee.rejected, (state) => {
+            state.actionStatus = 'idle'
+        })
+        .addCase(setEmployeeDepartment, (state, action) => {
+            state.department = action.payload;
+        })
+        .addCase(setEmployeeFilter, (state, action) => {
+            state.filter = action.payload;
+        })
+        .addCase(setEmployeesSort, (state, action) => {
+            state.sort = action.payload;
+        })
 });
 
-
-
+export default employeesReducer;

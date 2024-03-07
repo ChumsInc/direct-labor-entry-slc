@@ -1,15 +1,16 @@
 import React, {ChangeEvent, FormEvent, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {selectHTML} from "./selectors";
-import {fetchHTMLReportAction} from "./actions";
+import {loadHTMLReport} from "./actions";
 import {HTMLReportType} from "./types";
 import ReportMinDate from "./ReportMinDate";
 import ReportMaxDate from "./ReportMaxDate";
 import WorkCenterSelect from "./WorkCenterSelect";
+import {useAppDispatch} from "../../app/configureStore";
 
 
 const ReportTab: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const html = useSelector(selectHTML);
     const [reportType, setReportType] = useState<HTMLReportType>('employee-total')
 
@@ -17,7 +18,7 @@ const ReportTab: React.FC = () => {
 
     const onSubmit = (ev: FormEvent) => {
         ev.preventDefault();
-        dispatch(fetchHTMLReportAction(reportType))
+        dispatch(loadHTMLReport(reportType))
     }
 
     return (
