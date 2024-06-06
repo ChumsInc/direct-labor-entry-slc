@@ -3,20 +3,20 @@ import {selectWorkCenter} from "../reports/selectors";
 import {InputGroup} from "chums-components";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import {selectStepsList, selectStepsLoaded} from "./selectors";
-import {Step} from "../common-types";
 import {loadSteps} from "./actions";
 import {stepSorter} from "./utils";
+import {DLStep} from "chums-types";
 
-export interface StepInputProps extends InputHTMLAttributes<HTMLInputElement>{
+export interface StepInputProps extends InputHTMLAttributes<HTMLInputElement> {
     value: string,
     onChange: (ev: ChangeEvent<HTMLInputElement>) => void,
 }
 
-const StepInput = ({value, onChange, ...rest}:StepInputProps) => {
+const StepInput = ({value, onChange, ...rest}: StepInputProps) => {
     const dispatch = useAppDispatch();
     const workCenter = useAppSelector(selectWorkCenter);
     const list = useAppSelector(selectStepsList);
-    const [steps, setSteps] = useState<Step[]>([])
+    const [steps, setSteps] = useState<DLStep[]>([])
     const loaded = useAppSelector(selectStepsLoaded);
     const id = useId();
 

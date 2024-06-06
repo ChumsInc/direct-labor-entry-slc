@@ -1,7 +1,7 @@
 import {SortProps} from "chums-components";
-import {Step} from "../common-types";
+import {DLStep} from "chums-types";
 
-export const stepSorter = (sort: SortProps<Step>) => (a: Step, b: Step) => {
+export const stepSorter = (sort: SortProps<DLStep>) => (a: DLStep, b: DLStep) => {
     const {field, ascending} = sort;
     const sortMod = ascending ? 1 : -1;
     switch (field) {

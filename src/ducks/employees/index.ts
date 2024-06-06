@@ -1,29 +1,31 @@
-
-import {Employee, EmployeeFilter, ActionStatus} from "../common-types";
+import {ActionStatus} from "../common-types";
 import {Editable} from "chums-types/src/generics";
 import {createReducer} from "@reduxjs/toolkit";
 import {
     loadEmployees,
     saveEmployee,
     setCurrentEmployee,
-    setEmployeeDepartment, setEmployeeFilter, setEmployeesSort,
+    setEmployeeDepartment,
+    setEmployeeFilter,
+    setEmployeesSort,
     toggleShowInactiveEmployees
 } from "./actions";
 import {SortProps} from "chums-components";
 import {employeeSorter} from "./utils";
+import {DLEmployee} from "chums-types";
 
 export interface EmployeesState {
-    list: Employee[];
+    list: DLEmployee[];
     showInactive: boolean;
-    department: 'slc'|'slc-temp'|'all';
+    department: 'slc' | 'slc-temp' | 'all';
     filter: string;
-    current: (Employee & Editable)|null;
+    current: (DLEmployee & Editable) | null;
     actionStatus: ActionStatus;
     loaded: boolean;
-    sort: SortProps<Employee>;
+    sort: SortProps<DLEmployee>;
 }
 
-export const initialEmployeesState:EmployeesState = {
+export const initialEmployeesState: EmployeesState = {
     list: [],
     showInactive: false,
     department: 'slc',

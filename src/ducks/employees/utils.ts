@@ -1,7 +1,7 @@
 import {SortProps} from "chums-components";
-import {Employee} from "../common-types";
+import {DLEmployee} from "chums-types";
 
-export const employeeSorter = (sort:SortProps<Employee>) => (a:Employee, b:Employee) => {
+export const employeeSorter = (sort: SortProps<DLEmployee>) => (a: DLEmployee, b: DLEmployee) => {
     const {field, ascending} = sort;
     const sortMod = ascending ? 1 : -1;
     switch (field) {

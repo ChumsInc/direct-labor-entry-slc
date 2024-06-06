@@ -1,16 +1,16 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
 import {loadSteps} from "./actions";
-import {Step} from "../common-types";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import {selectStepsLoaded, selectStepsLoading, selectWorkCenterSteps} from "./selectors";
 import {stepSorter} from "./utils";
+import {DLStep} from "chums-types";
 
 export interface SelectSLCStepsProps {
     workCenter: string,
     stepId?: number | null,
     value?: string | null,
-    onChange: (step: Step | null) => void,
+    onChange: (step: DLStep | null) => void,
     required?: boolean,
     disabled?: boolean,
 }
@@ -20,7 +20,7 @@ const SelectSLCSteps = ({workCenter, value, stepId, onChange, required, disabled
     const list = useAppSelector(state => selectWorkCenterSteps(state, workCenter));
     const loading = useSelector(selectStepsLoading);
     const loaded = useSelector(selectStepsLoaded);
-    const [steps, setSteps] = useState<Step[]>([]);
+    const [steps, setSteps] = useState<DLStep[]>([]);
 
     useEffect(() => {
         if (!loaded) {

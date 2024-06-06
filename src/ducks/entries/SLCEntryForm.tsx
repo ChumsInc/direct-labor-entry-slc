@@ -2,7 +2,6 @@ import React, {ChangeEvent, FormEvent, useEffect, useRef} from 'react';
 import {useSelector} from 'react-redux';
 import {FormColumn, InputGroup, ProgressBar, SpinnerButton} from "chums-components";
 import {selectCurrentEntry, selectEntriesActionStatus, selectEntryEmployee} from "./selectors";
-import {BasicEntry, Employee, Step} from "../common-types";
 import {removeEntry, saveEntry, setEntryEmployee, setNewEntry, updateEntry} from "./actions";
 import EmployeeSelect from "../employees/EmployeeSelect";
 import {REGEX_FILTER_EMPLOYEES_SLC} from "../employees/constants";
@@ -12,6 +11,7 @@ import numeral from "numeral";
 import {selectWorkTicketLoading} from "../work-ticket/selectors";
 import {useAppDispatch} from "../../app/configureStore";
 import {loadDocument} from "../work-ticket/actions";
+import {BasicDLEntry, DLEmployee, DLStep} from "chums-types";
 
 const SLCEntryForm = () => {
     const dispatch = useAppDispatch();
@@ -32,7 +32,7 @@ const SLCEntryForm = () => {
     const documentRef = useRef<HTMLInputElement>(null);
     const minutesRef = useRef<HTMLInputElement>(null);
 
-    const onChangeEmployee = (employee?: Employee | null) => {
+    const onChangeEmployee = (employee?: DLEmployee | null) => {
         if (entry) {
             dispatch(updateEntry({...entry, EmployeeNumber: employee?.EmployeeNumber || ''}));
             focusNextInputField();
@@ -67,7 +67,7 @@ const SLCEntryForm = () => {
         focusNextInputField();
     }
 
-    const onChangeEntry = (field: keyof BasicEntry) => (ev: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const onChangeEntry = (field: keyof BasicDLEntry) => (ev: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         switch (field) {
             case 'Minutes':
             case 'Quantity':
@@ -78,7 +78,7 @@ const SLCEntryForm = () => {
         }
     }
 
-    const onChangeStep = (step: Step | null) => {
+    const onChangeStep = (step: DLStep | null) => {
         dispatch(updateEntry({idSteps: step?.id}));
     }
 

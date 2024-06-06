@@ -5,10 +5,11 @@ import {
     loadEmployees,
     setCurrentEmployee,
     setEmployeeDepartment,
-    setEmployeeFilter, setEmployeesSort,
+    setEmployeeFilter,
+    setEmployeesSort,
     toggleShowInactiveEmployees
 } from './actions';
-import {DepartmentKey, Employee, EmployeeFilter} from "../common-types";
+import {EmployeeFilter} from "../common-types";
 import {
     selectCurrentEmployee,
     selectEmployeeFilter,
@@ -17,19 +18,26 @@ import {
     selectShowInactive,
     selectVisibleEmployees
 } from "./selectors";
-import {FormCheck, SortableTable, SortProps, SpinnerButton, TablePagination} from "chums-components";
+import {
+    FormCheck,
+    SortableTable,
+    SortableTableField,
+    SortProps,
+    SpinnerButton,
+    TablePagination
+} from "chums-components";
 import DepartmentFilterSelect from "./DepartmentFilterSelect";
 import classNames from "classnames";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
-import {SortableTableField} from "chums-components";
+import {DLDepartmentKey, DLEmployee} from "chums-types";
 
-const EMPLOYEE_FIELDS: SortableTableField<Employee>[] = [
+const EMPLOYEE_FIELDS: SortableTableField<DLEmployee>[] = [
     {field: 'EmployeeNumber', title: '#', sortable: true},
     {field: 'FullName', title: 'Name', sortable: true},
     {
         field: 'Department',
         title: 'Dept',
-        render: row => DEPARTMENT_NAMES[row.Department as DepartmentKey] ?? row.Department,
+        render: row => DEPARTMENT_NAMES[row.Department as DLDepartmentKey] ?? row.Department,
         sortable: true,
     },
 ];
@@ -47,7 +55,7 @@ const EmployeeList = () => {
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState(25);
 
-    const rowsPerPageChangeHandler = (rpp:number) => {
+    const rowsPerPageChangeHandler = (rpp: number) => {
         setPage(0);
         setRowsPerPage(rpp);
     }
@@ -56,7 +64,7 @@ const EmployeeList = () => {
         dispatch(setEmployeeDepartment(ev.target.value as EmployeeFilter));
     }
 
-    const sortChangeHandler = (sort:SortProps) => {
+    const sortChangeHandler = (sort: SortProps) => {
         dispatch(setEmployeesSort(sort))
     }
 
@@ -64,7 +72,7 @@ const EmployeeList = () => {
         dispatch(setEmployeeFilter(ev.target.value));
     }
 
-    const onSelectEmployee = (emp: Employee) => dispatch(setCurrentEmployee(emp));
+    const onSelectEmployee = (emp: DLEmployee) => dispatch(setCurrentEmployee(emp));
 
     return (
         <div className="report-form">
@@ -97,7 +105,7 @@ const EmployeeList = () => {
                            onSelectRow={onSelectEmployee}/>
             <TablePagination page={page} onChangePage={setPage}
                              rowsPerPage={rowsPerPage} onChangeRowsPerPage={rowsPerPageChangeHandler}
-                             count={list.length} />
+                             count={list.length}/>
         </div>
     )
 }

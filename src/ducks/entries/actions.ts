@@ -1,25 +1,25 @@
-import {BasicEntry, Employee, EmployeeEntryTotal, Entry} from "../common-types";
 import {selectEntriesActionStatus} from "./selectors";
 import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
 import {deleteEntry, fetchEntries, postEntry} from "./api";
 import {RootState} from "../../app/configureStore";
 import dayjs from "dayjs";
 import {SortProps} from "chums-components";
+import {BasicDLEntry, DLEmployee, DLEntry, EmployeeDLEntryTotal} from "chums-types";
 
 export const API_PATH_ENTRIES = '/api/operations/production/dl/entry/:EntryDate';
 export const API_PATH_SAVE_ENTRY = '/api/operations/production/dl/entry';
 export const API_PATH_DELETE_ENTRY = '/api/operations/production/dl/entry/:id';
 
 
-export const updateEntry = createAction<Partial<Entry>>('entries/updateCurrent');
-export const setEntryDate = createAction<string|null>('entries/setEntryDate');
-export const setCurrentEntry = createAction<Entry | null>('entries/setCurrent');
+export const updateEntry = createAction<Partial<DLEntry>>('entries/updateCurrent');
+export const setEntryDate = createAction<string | null>('entries/setEntryDate');
+export const setCurrentEntry = createAction<DLEntry | null>('entries/setCurrent');
 export const setWorkCenters = createAction<string[]>('entries/setWorkCenters')
-export const setEntriesSort = createAction<SortProps<Entry>>('entries/setSort');
-export const setEntryTotalsSort = createAction<SortProps<EmployeeEntryTotal>>('entries/setTotalSort');
-export const setEntryEmployee = createAction<Employee>('entries/setEmployee');
+export const setEntriesSort = createAction<SortProps<DLEntry>>('entries/setSort');
+export const setEntryTotalsSort = createAction<SortProps<EmployeeDLEntryTotal>>('entries/setTotalSort');
+export const setEntryEmployee = createAction<DLEmployee>('entries/setEmployee');
 
-export const loadEntries = createAsyncThunk<Entry[], string>(
+export const loadEntries = createAsyncThunk<DLEntry[], string>(
     'entries/loadList',
     async (arg) => {
         return await fetchEntries(arg);
@@ -62,7 +62,7 @@ export const setNewEntry = createAction('entries/setNewEntry');
 //     }
 // }
 
-export const saveEntry = createAsyncThunk<Entry | null, BasicEntry>(
+export const saveEntry = createAsyncThunk<DLEntry | null, BasicDLEntry>(
     'entries/saveEntry',
     async (arg) => {
         return await postEntry(arg);
@@ -75,7 +75,7 @@ export const saveEntry = createAsyncThunk<Entry | null, BasicEntry>(
     }
 )
 
-export const removeEntry = createAsyncThunk<void, BasicEntry|Entry>(
+export const removeEntry = createAsyncThunk<void, BasicDLEntry | DLEntry>(
     'entries/removeEntry',
     async (arg) => {
         return deleteEntry(arg.id);

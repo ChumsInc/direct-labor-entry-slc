@@ -4,9 +4,9 @@ import {Alert, FormColumn, Select, SpinnerButton} from 'chums-components';
 import {DEPARTMENT_NAMES, newEmployee} from './constants';
 import {useSelector} from 'react-redux';
 import {selectCurrentEmployee, selectSaving} from "./selectors";
-import {DepartmentKey, Employee} from "../common-types";
 import {saveEmployee, setCurrentEmployee} from "./actions";
 import {useAppDispatch} from "../../app/configureStore";
+import {DLDepartmentKey, DLEmployee, Editable} from "chums-types";
 
 const reTemp = /^(TEMP|[0-9]*HT)$/;
 
@@ -15,7 +15,7 @@ const EmployeeEdit: React.FC = () => {
     const selected = useSelector(selectCurrentEmployee);
     const isSaving = useSelector(selectSaving);
 
-    const [employee, setEmployee] = useState<Employee>(selected || newEmployee);
+    const [employee, setEmployee] = useState<DLEmployee & Editable>(selected || newEmployee);
 
     useEffect(() => {
         if (!isSaving) {
@@ -30,7 +30,7 @@ const EmployeeEdit: React.FC = () => {
         dispatch(setCurrentEmployee(newEmployee));
     }
 
-    const onChangeEmployee = (field: keyof Employee) => (ev: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const onChangeEmployee = (field: keyof DLEmployee) => (ev: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         if (!employee || !reTemp.test(employee.Department)) {
             return;
         }
@@ -70,7 +70,7 @@ const EmployeeEdit: React.FC = () => {
         .filter(key => isTemp ? /T$/.test(key) : /.*(?<!T)$/.test(key))
         .map((key) => {
             return (
-                <option key={key} value={key}>{DEPARTMENT_NAMES[key as DepartmentKey]}</option>
+                <option key={key} value={key}>{DEPARTMENT_NAMES[key as DLDepartmentKey]}</option>
             );
         });
 

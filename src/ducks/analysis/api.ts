@@ -19,7 +19,7 @@ export async function fetchReportData(arg: FetchReportDataArgs): Promise<ReportD
             .replace(':maxDate', dayjs(arg.maxDate).format('YYYYMMDD'))
             .replace(':queryString', arg.options.toString());
         const res = await fetchJSON<{ result: ReportData[] }>(url, {cache: 'no-cache'});
-        return res.result ?? [];
+        return res?.result ?? [];
     } catch (err: unknown) {
         if (err instanceof Error) {
             console.debug("fetchReportData()", err.message);

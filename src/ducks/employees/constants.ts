@@ -1,4 +1,5 @@
-import {DepartmentList, Employee, EmployeeFilter} from "../common-types";
+import {DepartmentList, EmployeeFilter} from "../common-types";
+import {DLEmployee} from "chums-types";
 
 export const FILTER_EMP_ALL = 'FILTER_EMP_ALL';
 export const FILTER_EMP_SLC = 'FILTER_EMP_SLC';
@@ -14,23 +15,23 @@ export const REGEX_FILTER_EMPLOYEES_SLC_TEMP = /^[578]HT$/;
 
 export const EMPLOYEE_FILTERS = {
     [FILTER_EMP_ALL]: () => true,
-    [FILTER_EMP_HURRICANE]: (employee:Employee) => REGEX_FILTER_EMPLOYEES_HURR.test(employee.Department),
-    [FILTER_EMP_HURRICANE_TEMP]: (employee:Employee) => REGEX_FILTER_EMPLOYEES_HURR_TEMP.test(employee.Department),
-    [FILTER_EMP_SLC]: (employee:Employee) => REGEX_FILTER_EMPLOYEES_SLC.test(employee.Department),
-    [FILTER_EMP_SLC_TEMP]: (employee:Employee) => REGEX_FILTER_EMPLOYEES_SLC_TEMP.test(employee.Department),
+    [FILTER_EMP_HURRICANE]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_HURR.test(employee.Department),
+    [FILTER_EMP_HURRICANE_TEMP]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_HURR_TEMP.test(employee.Department),
+    [FILTER_EMP_SLC]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_SLC.test(employee.Department),
+    [FILTER_EMP_SLC_TEMP]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_SLC_TEMP.test(employee.Department),
 };
 
 export type DepartmentFilterList = {
     [key in EmployeeFilter]: string;
 };
-export const DEPARTMENTS:DepartmentFilterList = {
+export const DEPARTMENTS: DepartmentFilterList = {
     'slc': 'SLC',
     "slc-temp": 'SLC Temps',
     "all": 'All SLC Employees'
 };
 
 
-export const DEPARTMENT_NAMES:DepartmentList = {
+export const DEPARTMENT_NAMES: DepartmentList = {
     '5H': 'Shipping/Warehouse',
     '5HT': 'Shipping/Warehouse Temp',
     '5S': 'Shipping/Warehouse',
@@ -38,7 +39,7 @@ export const DEPARTMENT_NAMES:DepartmentList = {
     '8HT': 'Work Cell Temp',
 };
 
-export const newEmployee:Employee = {
+export const newEmployee: DLEmployee = {
     EmployeeNumber: '',
     Department: 'TEMP',
     FirstName: '',

@@ -1,15 +1,16 @@
-import {ActionStatus, Step} from "../common-types";
+import {ActionStatus} from "../common-types";
 import {createReducer} from "@reduxjs/toolkit";
 import {loadSteps} from "./actions";
 import {SortProps} from "chums-components";
 import {stepSorter} from "./utils";
 import {reSLCWorkCenter} from "../../contants";
+import {DLStep} from "chums-types";
 
 export interface StepsState {
-    list: Step[];
+    list: DLStep[];
     status: ActionStatus;
     loaded: boolean;
-    sort: SortProps<Step>
+    sort: SortProps<DLStep>
 }
 
 export const initialState: StepsState = {

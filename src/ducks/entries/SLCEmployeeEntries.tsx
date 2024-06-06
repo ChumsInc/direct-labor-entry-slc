@@ -7,16 +7,16 @@ import {
     selectCurrentEmployee,
     selectCurrentEntry,
     selectEmployeeEntryList,
+    selectEntriesLoading,
     selectEntryDate,
-    selectEntrySort,
-    selectEntriesLoading
+    selectEntrySort
 } from "./selectors";
-import {Entry} from "../common-types";
 import {loadEntries, setCurrentEntry, setEntriesSort} from "./actions";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import Decimal from "decimal.js";
+import {DLEntry} from "chums-types";
 
-const entryTableFields: SortableTableField<Entry>[] = [
+const entryTableFields: SortableTableField<DLEntry>[] = [
     {field: 'WorkCenter', title: 'W/C', sortable: true},
     {field: 'StepCode', title: 'Operation', sortable: true},
     {field: 'Description', title: 'Description', className: 'dle--entry-description', sortable: true},
@@ -39,7 +39,7 @@ const entryTableFields: SortableTableField<Entry>[] = [
     {
         field: 'AllowedMinutes',
         title: 'Rate',
-        render: (entry: Entry) => numeral(rate(entry)).format('0.0000'),
+        render: (entry: DLEntry) => numeral(rate(entry)).format('0.0000'),
         className: 'right',
         sortable: true
     },
@@ -61,18 +61,18 @@ const entryTableFields: SortableTableField<Entry>[] = [
     {
         field: 'AllowedMinutes',
         title: 'Rate %',
-        render: (row) => numeral(row.StdUPH ? row.UPH / row.StdUPH : 1).format('0.0%'),
+        render: (row) => numeral(row.StdUPH ? new Decimal(row.UPH).dividedBy(row.StdUPH).toString() : 1).format('0.0%'),
         className: 'right border-left',
         sortable: true
     },
 ];
 
-const entryRate = (entry: Entry) => {
+const entryRate = (entry: DLEntry) => {
     return new Decimal(entry.AllowedMinutes).eq(0) ? 0 : new Decimal(entry.Minutes).dividedBy(entry.AllowedMinutes).toNumber();
 }
 
 
-const rowClassName = (entry: Entry) => {
+const rowClassName = (entry: DLEntry) => {
     return {
         'text-danger': entryRate(entry) !== 0 && (entryRate(entry) < MIN_DANGER || entryRate(entry) > MAX_DANGER),
         'text-warning': entryRate(entry) !== 0 && (between(entryRate(entry), [MIN_DANGER, MIN_SUCCESS]) || (between(entryRate(entry), [MAX_SUCCESS, MAX_DANGER]))),
@@ -81,12 +81,13 @@ const rowClassName = (entry: Entry) => {
 };
 
 export interface EntryTotal {
-    Minutes: number|string;
-    Quantity: number|string;
-    AllowedMinutes: number|string;
-    ratePct: number|string;
+    Minutes: number | string;
+    Quantity: number | string;
+    AllowedMinutes: number | string;
+    ratePct: number | string;
 }
-const initialTotal:EntryTotal = {Minutes: 0, Quantity: 0, AllowedMinutes: 0, ratePct: 0}
+
+const initialTotal: EntryTotal = {Minutes: 0, Quantity: 0, AllowedMinutes: 0, ratePct: 0}
 
 const SLCEmployeeEntries = () => {
     const dispatch = useAppDispatch();
@@ -116,7 +117,7 @@ const SLCEmployeeEntries = () => {
         setRowsPerPage(rpp);
     }
 
-    const onSelectEntry = (entry: Entry) => {
+    const onSelectEntry = (entry: DLEntry) => {
         dispatch(setCurrentEntry(entry));
     }
 

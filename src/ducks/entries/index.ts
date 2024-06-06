@@ -1,5 +1,5 @@
 import {entrySorter, NEW_ENTRY} from "./utils";
-import {ActionStatus, BasicEntry, Employee, EmployeeEntryTotal, Entry} from "../common-types";
+import {ActionStatus} from "../common-types";
 import {Editable} from "chums-types/src/generics";
 import {createReducer} from "@reduxjs/toolkit";
 import {SortProps} from "chums-components";
@@ -18,16 +18,17 @@ import {
 } from "./actions";
 import {loadDocument} from "../work-ticket/actions";
 import Decimal from "decimal.js";
+import {BasicDLEntry, DLEmployee, DLEntry, EmployeeDLEntryTotal} from "chums-types";
 
 export interface EntriesState {
     workCenters: string[];
-    list: Entry[];
-    current: (BasicEntry & Editable) | null;
+    list: DLEntry[];
+    current: (BasicDLEntry & Editable) | null;
     actionStatus: ActionStatus;
     entryDate: string | null;
-    employee: Employee | null;
-    sort: SortProps<Entry>;
-    totalsSort: SortProps<EmployeeEntryTotal>;
+    employee: DLEmployee | null;
+    sort: SortProps<DLEntry>;
+    totalsSort: SortProps<EmployeeDLEntryTotal>;
 }
 
 export const initialEntriesState: EntriesState = {
@@ -141,7 +142,7 @@ const entriesReducer = createReducer(initialEntriesState, (builder) => {
             if (state.current) {
                 if (action.payload.workTicket) {
                     state.current.DocumentNo = action.payload.workTicket.WorkTicketNo;
-                    state.current.Quantity = new Decimal(action.payload.workTicket.QuantityOrdered  ?? '0')
+                    state.current.Quantity = new Decimal(action.payload.workTicket.QuantityOrdered ?? '0')
                         .sub(action.payload.workTicket.QuantityCompleted ?? '0').toNumber();
                     state.current.ItemCode = action.payload.workTicket.ParentItemCode ?? '';
                     state.current.WarehouseCode = action.payload.workTicket.ParentWarehouseCode ?? '';

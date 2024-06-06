@@ -1,29 +1,28 @@
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import numeral from "numeral";
 import {SortableTable, SortableTableField, SortProps, SpinnerButton} from "chums-components";
-import {EmployeeEntryTotal} from "../common-types";
 import {selectCurrentEmployee, selectEmployeeList} from "../employees/selectors";
-import {loadEntries, setEntryEmployee, setEntryTotalsSort, setNewEntry} from "./actions";
-import {selectEmployeeTotals, selectEntryDate, selectEntryTotalsSort, selectEntriesLoading} from "./selectors";
-import {setCurrentEmployee} from "../employees/actions";
+import {loadEntries, setEntryEmployee, setEntryTotalsSort} from "./actions";
+import {selectEmployeeTotals, selectEntriesLoading, selectEntryDate, selectEntryTotalsSort} from "./selectors";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import Decimal from "decimal.js";
+import {EmployeeDLEntryTotal} from "chums-types";
 
-const employeeTableFields: SortableTableField<EmployeeEntryTotal>[] = [
+const employeeTableFields: SortableTableField<EmployeeDLEntryTotal>[] = [
     {field: 'FullName', title: 'Name', sortable: true},
     {
         field: 'Minutes',
         title: 'Minutes',
         sortable: true,
-        render: (row: EmployeeEntryTotal) => numeral(row.Minutes).format('0,0'),
+        render: (row: EmployeeDLEntryTotal) => numeral(row.Minutes).format('0,0'),
         className: 'text-end'
     },
     {
         field: 'AllowedMinutes',
         title: 'Allowed',
         sortable: true,
-        render: (row: EmployeeEntryTotal) => numeral(row.AllowedMinutes).format('0,0'),
+        render: (row: EmployeeDLEntryTotal) => numeral(row.AllowedMinutes).format('0,0'),
         className: 'right'
     },
     {
@@ -35,7 +34,13 @@ const employeeTableFields: SortableTableField<EmployeeEntryTotal>[] = [
     }
 ];
 
-const initialTotal:EmployeeEntryTotal = {EmployeeNumber: 'TOTAL', FullName: 'Total', Rate: 0, Minutes: 0, AllowedMinutes: 0};
+const initialTotal: EmployeeDLEntryTotal = {
+    EmployeeNumber: 'TOTAL',
+    FullName: 'Total',
+    Rate: 0,
+    Minutes: 0,
+    AllowedMinutes: 0
+};
 
 const tableId = 'hurricane-employee-totals';
 
@@ -58,7 +63,7 @@ const EmployeeTotals: React.FC = () => {
         }
     }
 
-    const onSelectEmployee = (total: EmployeeEntryTotal) => {
+    const onSelectEmployee = (total: EmployeeDLEntryTotal) => {
         const [employee] = employees.filter(emp => emp.EmployeeNumber === total.EmployeeNumber);
         dispatch(setEntryEmployee(employee || null));
     }
@@ -67,7 +72,7 @@ const EmployeeTotals: React.FC = () => {
         dispatch(setEntryTotalsSort(sort));
     }
 
-    const total: EmployeeEntryTotal = employeeTotals.reduce((pv, cv) => {
+    const total: EmployeeDLEntryTotal = employeeTotals.reduce((pv, cv) => {
         const minutes = new Decimal(pv.Minutes).add(cv.Minutes).toString();
         const allowedMinutes = new Decimal(pv.AllowedMinutes).add(cv.AllowedMinutes).toString();
         return {

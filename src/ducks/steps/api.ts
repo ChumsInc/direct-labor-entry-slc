@@ -1,12 +1,12 @@
-import {Step} from "../common-types";
 import {fetchJSON} from "chums-components";
+import {DLStep} from "chums-types";
 
-export async function fetchSteps():Promise<Step[]> {
+export async function fetchSteps(): Promise<DLStep[]> {
     try {
         const url = '/api/operations/production/dl/steps';
-        const res = await fetchJSON<{steps: Step[]}>(url, {cache: 'no-cache'});
-        return res.steps ?? [];
-    } catch(err:unknown) {
+        const res = await fetchJSON<{ steps: DLStep[] }>(url, {cache: 'no-cache'});
+        return res?.steps ?? [];
+    } catch (err: unknown) {
         if (err instanceof Error) {
             console.debug("fetchSteps()", err.message);
             return Promise.reject(err);

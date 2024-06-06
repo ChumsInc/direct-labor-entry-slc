@@ -1,19 +1,24 @@
-import React, {ChangeEvent, Ref} from "react";
-import {Employee} from "../common-types";
+import React, {ChangeEvent} from "react";
 import {useSelector} from "react-redux";
 import {selectEmployeeList} from "./selectors";
 import {employeeSorter} from "./utils";
+import {DLEmployee} from "chums-types";
 
 
 export interface EmployeeSelectProps {
     value?: string,
     filter?: RegExp,
-    onSelect: (employee: Employee | null) => void,
+    onSelect: (employee: DLEmployee | null) => void,
     required?: boolean,
     form?: string | undefined,
 }
 
-const EmployeeSelect = React.forwardRef(({value, filter, onSelect, required}:EmployeeSelectProps, ref:React.Ref<HTMLSelectElement>) => {
+const EmployeeSelect = React.forwardRef(({
+                                             value,
+                                             filter,
+                                             onSelect,
+                                             required
+                                         }: EmployeeSelectProps, ref: React.Ref<HTMLSelectElement>) => {
     const list = useSelector(selectEmployeeList);
     const visibleList = list.filter(emp => emp.active)
         .filter(emp => !filter || filter.test(emp.Department))

@@ -7,7 +7,7 @@ export async function fetchWorkTicket(arg:string):Promise<WorkTicket|null> {
         const url = '/api/operations/production/work-ticket/chums/:document'
             .replace(':document', encodeURIComponent(arg.padStart(12, '0')));
         const res = await fetchJSON<{workTicket:WorkTicket|null}>(url, {cache: 'no-cache'});
-        return res.workTicket ?? null;
+        return res?.workTicket ?? null;
     } catch(err:unknown) {
         if (err instanceof Error) {
             console.debug("fetchWorkTicket()", err.message);
@@ -23,7 +23,7 @@ export async function fetchInventoryTransfer(arg:string):Promise<ITOrder[]> {
         const url = '/api/operations/production/wo/chums/it/:document'
             .replace(':document', encodeURIComponent(arg.padStart(7, '0')));
         const res = await fetchJSON<{result: ITOrder[]}>(url, {cache: 'no-cache'});
-        return res.result ?? [];
+        return res?.result ?? [];
     } catch(err:unknown) {
         if (err instanceof Error) {
             console.debug("fetchInventoryTransfer()", err.message);
