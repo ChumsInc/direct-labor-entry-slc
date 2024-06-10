@@ -1,17 +1,14 @@
-import dayjs from "dayjs";
 import {fetchJSON} from "chums-components";
 import {reSLCWorkCenter} from "../../contants";
 import {BasicDLEntry, DLEntry} from "chums-types";
-
-export const API_PATH_ENTRIES = '/api/operations/production/dl/entry/:EntryDate';
-export const API_PATH_SAVE_ENTRY = '/api/operations/production/dl/entry';
-export const API_PATH_DELETE_ENTRY = '/api/operations/production/dl/entry/:id';
+import {FetchEntriesProps, KeyedObject} from "../common-types";
+import {searchParams} from "../../utils/fetch";
 
 
-export async function fetchEntries(arg: string): Promise<DLEntry[]> {
+export async function fetchEntries(arg: FetchEntriesProps): Promise<DLEntry[]> {
     try {
-        const url = API_PATH_ENTRIES
-            .replace(':EntryDate', encodeURIComponent(dayjs(arg).format('YYYY-MM-DD')));
+        const params = searchParams(arg as KeyedObject);
+        const url = `/api/operations/production/dl/entries${encodeURIComponent(arg.id ?? '')}.json?${params.toString()}`;
         const res = await fetchJSON<{ result: DLEntry[] }>(url, {cache: 'no-cache'});
         return (res?.result ?? []).filter(entry => reSLCWorkCenter.test(entry.WorkCenter));
     } catch (err: unknown) {
@@ -27,7 +24,10 @@ export async function fetchEntries(arg: string): Promise<DLEntry[]> {
 export async function postEntry(arg: BasicDLEntry): Promise<DLEntry | null> {
     try {
         const body = JSON.stringify(arg);
-        const res = await fetchJSON<{ result: DLEntry[] }>(API_PATH_SAVE_ENTRY, {method: 'POST', body});
+        const url = arg.id === 0
+            ? '/api/operations/production/dl/entries.json'
+            : `/api/operations/production/dl/entries/${encodeURIComponent(arg.id)}.json`
+        const res = await fetchJSON<{ result: DLEntry[] }>(url, {method: arg.id === 0 ? 'POST' : 'PUT', body});
         const [savedEntry] = res?.result ?? [];
         return savedEntry ?? null;
     } catch (err: unknown) {
@@ -42,7 +42,7 @@ export async function postEntry(arg: BasicDLEntry): Promise<DLEntry | null> {
 
 export async function deleteEntry(arg: number): Promise<void> {
     try {
-        const url = API_PATH_DELETE_ENTRY.replace(':id', encodeURIComponent(arg));
+        const url = `/api/operations/production/dl/entries/${encodeURIComponent(arg)}.json`;
         await fetchJSON(url, {method: 'DELETE'});
     } catch (err: unknown) {
         if (err instanceof Error) {

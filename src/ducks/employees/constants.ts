@@ -1,34 +1,7 @@
-import {DepartmentList, EmployeeFilter} from "../common-types";
+import {DepartmentList} from "../common-types";
 import {DLEmployee} from "chums-types";
 
-export const FILTER_EMP_ALL = 'FILTER_EMP_ALL';
-export const FILTER_EMP_SLC = 'FILTER_EMP_SLC';
-export const FILTER_EMP_SLC_TEMP = 'FILTER_EMP_SLC_TEMP';
-export const FILTER_EMP_HURRICANE = 'FILTER_EMP_HURRICANE';
-export const FILTER_EMP_HURRICANE_TEMP = 'FILTER_EMP_HURRICANE_TEMP';
-
-export const REGEX_FILTER_EMPLOYEES_ALL = /^/;
-export const REGEX_FILTER_EMPLOYEES_HURR = /^3[HS][T]*$/;
-export const REGEX_FILTER_EMPLOYEES_HURR_TEMP = /^3HT$/;
 export const REGEX_FILTER_EMPLOYEES_SLC = /^[578][HS][T]*$/;
-export const REGEX_FILTER_EMPLOYEES_SLC_TEMP = /^[578]HT$/;
-
-export const EMPLOYEE_FILTERS = {
-    [FILTER_EMP_ALL]: () => true,
-    [FILTER_EMP_HURRICANE]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_HURR.test(employee.Department),
-    [FILTER_EMP_HURRICANE_TEMP]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_HURR_TEMP.test(employee.Department),
-    [FILTER_EMP_SLC]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_SLC.test(employee.Department),
-    [FILTER_EMP_SLC_TEMP]: (employee: DLEmployee) => REGEX_FILTER_EMPLOYEES_SLC_TEMP.test(employee.Department),
-};
-
-export type DepartmentFilterList = {
-    [key in EmployeeFilter]: string;
-};
-export const DEPARTMENTS: DepartmentFilterList = {
-    'slc': 'SLC',
-    "slc-temp": 'SLC Temps',
-    "all": 'All SLC Employees'
-};
 
 
 export const DEPARTMENT_NAMES: DepartmentList = {

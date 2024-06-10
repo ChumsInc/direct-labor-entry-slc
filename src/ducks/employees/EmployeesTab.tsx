@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {useDispatch} from 'react-redux';
 import {loadEmployees} from './actions';
 
 import EmployeeList from './EmployeeList';
@@ -8,13 +7,12 @@ import {ErrorBoundary} from "react-error-boundary";
 import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
 import {useAppDispatch} from "../../app/configureStore";
 
-const EmployeesTab: React.FC = () => {
+const EmployeesTab = () => {
     const dispatch = useAppDispatch();
     useEffect(() => {
         dispatch(loadEmployees())
-    })
+    }, [])
 
-    const onReload = () => dispatch(loadEmployees());
 
     return (
         <div>

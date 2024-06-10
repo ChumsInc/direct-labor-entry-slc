@@ -1,4 +1,4 @@
-import {WorkTicket, DLDepartmentKey, EmployeeDLEntryTotal} from "chums-types";
+import {WorkTicket, DLDepartmentKey, EmployeeDLEntryTotal, DLStep} from "chums-types";
 
 export interface EmployeePostBody {
     id: string;
@@ -38,4 +38,19 @@ export interface EmployeeTotalList {
 export interface WorkTicketResponse {
     workTicket: WorkTicket|null;
     itOrder: ITOrder[];
+}
+
+export type MinimalStep = Pick<DLStep, 'id'|'standardAllowedMinutes'|'stepCode'|'description'|'workCenter'>
+
+export interface FetchEntriesProps {
+    id?: number;
+    entryDate?: string;
+    minDate?: string;
+    maxDate?: string;
+    employeeNo?: string;
+    workCenter?: string;
+}
+
+export interface KeyedObject {
+    [key:string]: string|number|bigint|boolean|undefined;
 }

@@ -2,7 +2,7 @@ import {ActionStatus, ITOrder} from "../common-types";
 import {WorkTicket} from 'chums-types'
 import {createReducer} from "@reduxjs/toolkit";
 import {loadDocument, setWorkTicketNo} from "./actions";
-import {saveEntry} from "../entries/actions";
+import {removeEntry, saveEntry, setNewEntry} from "../entries/actions";
 
 export interface WorkTicketState {
     workTicket: WorkTicket | null;
@@ -49,6 +49,16 @@ const workTicketReducer = createReducer(initialState, (builder) => {
         .addCase(saveEntry.fulfilled, (state) => {
             state.itOrders = [];
             state.workTicket = null;
+        })
+        .addCase(setNewEntry, (state) => {
+            state.documentNo = '';
+            state.workTicket = null;
+            state.itOrders = [];
+        })
+        .addCase(removeEntry.fulfilled, (state) => {
+            state.documentNo = '';
+            state.workTicket = null;
+            state.itOrders = [];
         })
 });
 

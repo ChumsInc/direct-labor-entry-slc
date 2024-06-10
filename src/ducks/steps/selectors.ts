@@ -15,10 +15,10 @@ export const selectWorkCenterSteps = createSelector(
     }
 )
 
-export const selectStepByID = createSelector(
-    [selectStepsList, (state: RootState, id: number) => id],
-    (list, id) => {
-        const [step] = list.filter(step => step.id === id);
-        return step ?? null;
-    }
-)
+// export const selectStepByID = createSelector(
+//     [selectStepsList, (state: RootState, id: number) => id],
+//     (list, id) => {
+//         const [step] = list.filter(step => step.id === id);
+//         return step ?? null;
+//     }
+// )

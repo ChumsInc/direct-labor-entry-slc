@@ -54,7 +54,7 @@ const defaultGrouping: ReportGrouping = {
     6: ''
 }
 
-export function isReportGrouping(grouping: any | ReportGrouping): grouping is ReportGrouping {
+export function isReportGrouping(grouping: null | ReportGrouping): grouping is ReportGrouping {
     const keys: ReportGroupingId[] = [0, 1, 2, 3, 4, 5, 6];
     return !!grouping
         && typeof grouping === 'object'

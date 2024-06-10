@@ -11,8 +11,6 @@ import {
 import {RootState} from "../../app/configureStore";
 import {fetchHTMLReport} from "./api";
 
-export const API_PATH_REPORT = '/api/operations/production/dl/report/data/:minDate/:maxDate?:queryString';
-
 export const setMinDate = createAction('reports/setMinDate', (arg: string) => {
     return {
         payload: setStorageMinDate(arg)
@@ -31,23 +29,23 @@ export const setWorkCenter = createAction('reports/setWorkCenter', (wc: string) 
         payload: wc,
     }
 })
-
-export const toggleShowInactive = createAction('reports/toggleShowInactive', (arg: boolean | undefined) => {
-    const show = getStorageShowInactive();
-    setStorageShowInactive(arg ?? show);
-    return {
-        payload: arg ?? show
-    }
-})
-
-export const setFilterEmployee = createAction('reports/setEmployeeFilter', (arg: string) => {
-    return {
-        payload: arg,
-    }
-})
-
-export const setFilterOperation = createAction<string>('reports/setOperationFilter')
-export const setFilterItem = createAction<string>('reports/setItemFilter');
+//
+// export const toggleShowInactive = createAction('reports/toggleShowInactive', (arg: boolean | undefined) => {
+//     const show = getStorageShowInactive();
+//     setStorageShowInactive(arg ?? show);
+//     return {
+//         payload: arg ?? show
+//     }
+// })
+//
+// export const setFilterEmployee = createAction('reports/setEmployeeFilter', (arg: string) => {
+//     return {
+//         payload: arg,
+//     }
+// })
+//
+// export const setFilterOperation = createAction<string>('reports/setOperationFilter')
+// export const setFilterItem = createAction<string>('reports/setItemFilter');
 
 export const loadHTMLReport = createAsyncThunk<string | null, HTMLReportType>(
     'reports/loadHTML',

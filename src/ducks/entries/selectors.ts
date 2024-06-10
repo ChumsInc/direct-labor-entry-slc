@@ -5,7 +5,6 @@ import {createSelector} from "@reduxjs/toolkit";
 
 export const selectEntriesActionStatus = (state: RootState) => state.entries.actionStatus;
 export const selectEntriesLoading = (state: RootState) => state.entries.actionStatus === 'loading';
-export const selectSaving = (state: RootState) => state.entries.actionStatus === 'saving';
 export const selectEntryDate = (state: RootState) => state.entries.entryDate;
 export const selectWorkCenterFilter = (state: RootState) => state.entries.workCenters;
 export const selectCurrentEntry = (state: RootState) => state.entries.current;

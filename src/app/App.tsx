@@ -10,12 +10,15 @@ import AnalysisTab from "../ducks/analysis/AnalysisTab";
 import {appStorage, STORAGE_KEYS} from "../utils/appStorage";
 import {ErrorBoundary} from "react-error-boundary";
 import ErrorBoundaryFallbackAlert from "../ducks/alerts/ErrorBoundaryFallbackAlert";
+import VersionNo from "../ducks/version/VersionNo";
+import ChangeLog from "../ducks/version/ChangeLog";
 
 
 const TAB_SLC_ENTRY = 'slcEntry';
 const TAB_REPORTS = 'reports';
 const TAB_EMPLOYEES = 'employees';
 const TAB_ANALYSIS = 'analysis';
+const TAB_ABOUT = 'about';
 
 const currentTab = appStorage.getItem(STORAGE_KEYS.TAB);
 
@@ -23,7 +26,8 @@ const appTabs:Tab[] = [
     {id: TAB_SLC_ENTRY, title: 'SLC Entry'},
     {id: TAB_REPORTS, title: 'Reports'},
     {id: TAB_ANALYSIS, title: 'Analysis'},
-    {id: TAB_EMPLOYEES, title: 'Employees'}
+    {id: TAB_EMPLOYEES, title: 'Employees'},
+    {id: TAB_ABOUT, title: <VersionNo />},
 ]
 const App = () => {
     const dispatch = useAppDispatch();
@@ -54,6 +58,9 @@ const App = () => {
                 )}
                 {tab === TAB_ANALYSIS && (
                     <AnalysisTab/>
+                )}
+                {tab === TAB_ABOUT && (
+                    <ChangeLog/>
                 )}
             </div>
         </ErrorBoundary>

@@ -1,5 +1,5 @@
 import React from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {selectCurrentEntry} from "../entries/selectors";
 import {selectITOrders} from "./selectors";
 import {ITOrder} from "../common-types";
@@ -12,7 +12,7 @@ export interface ITOrderRowsProps {
     onSelect: () => void,
 }
 
-const ITOrderRows = ({onSelect}:ITOrderRowsProps) => {
+const ITOrderRows = ({onSelect}: ITOrderRowsProps) => {
     const dispatch = useAppDispatch();
     const entry = useSelector(selectCurrentEntry);
     const itOrders = useSelector(selectITOrders);

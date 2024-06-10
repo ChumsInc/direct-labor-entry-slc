@@ -1,10 +1,9 @@
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import EmployeeTotals from "./EmployeeTotals";
 import {selectEntryDate} from "./selectors";
-import {loadEntries, setWorkCenters, setEntryDate} from "./actions";
+import {loadEntries, setWorkCenters} from "./actions";
 import SLCEntryForm from "./SLCEntryForm";
-import {previousSLCWorkDay} from "../../utils/workDays";
 import SLCEmployeeEntries from "./SLCEmployeeEntries";
 import {useAppDispatch} from "../../app/configureStore";
 import EntryDate from "./EntryDate";
@@ -15,13 +14,12 @@ const SLCEntryTab = () => {
     const entryDate = useSelector(selectEntryDate);
 
     useEffect(() => {
-        dispatch(setEntryDate(previousSLCWorkDay()));
         dispatch(setWorkCenters(['INH', 'IMP', 'CON']));
     }, [])
 
     useEffect(() => {
         if (entryDate) {
-            dispatch(loadEntries(entryDate));
+            dispatch(loadEntries({entryDate}));
         }
     }, [entryDate])
 
@@ -31,7 +29,8 @@ const SLCEntryTab = () => {
                 <EmployeeTotals/>
             </div>
             <div className="col-6 col-md-4 col-xl-3">
-                <EntryDate />
+                <EntryDate/>
+                <hr/>
                 <SLCEntryForm/>
             </div>
             <div className="col-6 col-md-8 col-xl-6">

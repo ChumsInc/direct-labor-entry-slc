@@ -88,7 +88,7 @@ const analysisReducer = createReducer(initialState, (builder) => {
             state.actionStatus = 'idle';
             state.data = action.payload;
         })
-        .addCase(loadReportData.rejected, (state, action) => {
+        .addCase(loadReportData.rejected, (state) => {
             state.actionStatus = 'idle';
         })
 });

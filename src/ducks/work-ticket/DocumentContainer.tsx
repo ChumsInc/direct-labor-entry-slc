@@ -1,6 +1,6 @@
 import React from "react";
 import {useSelector} from "react-redux";
-import WorkOrderRows from "./WorkOrderRows";
+import WorkTicketSteps from "./WorkTicketSteps";
 import ITOrderRows from "./ITOrderRows";
 import {ErrorBoundary} from "react-error-boundary";
 import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
@@ -27,14 +27,14 @@ const  DocumentContainer = ({onSelect}:DocumentContainerProps) => {
                     <thead>
                     <tr>
                         <th>W/C</th>
-                        <th>Op Code</th>
+                        <th>Activity</th>
                         <th>Description</th>
                         <th className="text-end">SAM</th>
                         <th className="text-end">Cost</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <WorkOrderRows onSelect={onSelect}/>
+                    <WorkTicketSteps onSelect={onSelect}/>
                     <ITOrderRows onSelect={onSelect}/>
                     </tbody>
                 </table>

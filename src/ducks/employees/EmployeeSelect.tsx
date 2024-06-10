@@ -1,4 +1,4 @@
-import React, {ChangeEvent} from "react";
+import React, {ChangeEvent, forwardRef} from "react";
 import {useSelector} from "react-redux";
 import {selectEmployeeList} from "./selectors";
 import {employeeSorter} from "./utils";
@@ -13,12 +13,12 @@ export interface EmployeeSelectProps {
     form?: string | undefined,
 }
 
-const EmployeeSelect = React.forwardRef(({
-                                             value,
-                                             filter,
-                                             onSelect,
-                                             required
-                                         }: EmployeeSelectProps, ref: React.Ref<HTMLSelectElement>) => {
+export default forwardRef(function EmployeeSelect({
+                            value,
+                            filter,
+                            onSelect,
+                            required
+                        }:EmployeeSelectProps, ref:React.Ref<HTMLSelectElement>) {
     const list = useSelector(selectEmployeeList);
     const visibleList = list.filter(emp => emp.active)
         .filter(emp => !filter || filter.test(emp.Department))
@@ -40,5 +40,3 @@ const EmployeeSelect = React.forwardRef(({
         </select>
     )
 })
-
-export default EmployeeSelect;

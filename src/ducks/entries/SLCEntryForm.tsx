@@ -11,7 +11,8 @@ import numeral from "numeral";
 import {selectWorkTicketLoading} from "../work-ticket/selectors";
 import {useAppDispatch} from "../../app/configureStore";
 import {loadDocument} from "../work-ticket/actions";
-import {BasicDLEntry, DLEmployee, DLStep} from "chums-types";
+import {BasicDLEntry, DLEmployee} from "chums-types";
+import {MinimalStep} from "../common-types";
 
 const SLCEntryForm = () => {
     const dispatch = useAppDispatch();
@@ -78,8 +79,14 @@ const SLCEntryForm = () => {
         }
     }
 
-    const onChangeStep = (step: DLStep | null) => {
-        dispatch(updateEntry({idSteps: step?.id}));
+    const onChangeStep = (step: MinimalStep | null) => {
+        if (!entry || !step) {
+            return;
+        }
+        dispatch(updateEntry({
+            idSteps: step.id,
+            StandardAllowedMinutes: step.standardAllowedMinutes
+        }));
     }
 
 
@@ -101,11 +108,6 @@ const SLCEntryForm = () => {
         minutesRef.current?.focus();
     }
 
-    const onSubmitLoadDocument = (ev: FormEvent) => {
-        ev.preventDefault();
-        onLoadDocument();
-    }
-
     if (!entry) {
         return (
             <div className="row g-3">
@@ -120,13 +122,22 @@ const SLCEntryForm = () => {
         )
     }
 
-    const {id, EmployeeNumber, LineNo, idSteps, Minutes, Quantity, changed} = entry;
+    const entryStep = (entry: BasicDLEntry): MinimalStep => {
+        return {
+            id: entry.idSteps ?? 0,
+            stepCode: entry.StepCode,
+            description: entry.Description ?? '',
+            workCenter: entry.WorkCenter,
+            standardAllowedMinutes: entry.StandardAllowedMinutes ?? 0,
+        }
+    }
+
     return (
         <div>
             <form onSubmit={onSaveEntry} className="mb-3" id="entry-form--slc">
                 <FormColumn width={8} label="Employee">
                     <EmployeeSelect filter={REGEX_FILTER_EMPLOYEES_SLC}
-                                    value={EmployeeNumber}
+                                    value={entry.EmployeeNumber}
                                     onSelect={onChangeEmployee}
                                     form="entry-form--slc"
                                     required={true}
@@ -136,26 +147,26 @@ const SLCEntryForm = () => {
                     <InputGroup bsSize="sm">
                         <input type="text" className="form-control form-control-sm" maxLength={8}
                                ref={documentRef} value={entry.DocumentNo}
-                               disabled={!EmployeeNumber}
+                               disabled={!entry.EmployeeNumber}
                                onChange={onChangeEntry('DocumentNo')}/>
                         <SpinnerButton spinning={workTicketLoading} type="button" color="outline-primary"
-                                       disabled={!EmployeeNumber}
+                                       disabled={!entry.EmployeeNumber}
                                        onClick={onLoadDocument}>Load WO/IT</SpinnerButton>
                     </InputGroup>
                 </FormColumn>
                 <FormColumn width={8} label="Minutes/Qty">
                     <div className="row g-1">
                         <div className="col-6">
-                            <input type="number" value={Minutes || ''} className="form-control form-control-sm"
+                            <input type="number" value={entry.Minutes || ''} className="form-control form-control-sm"
                                    required ref={minutesRef}
                                    placeholder="minutes"
-                                   disabled={!EmployeeNumber}
+                                   disabled={!entry.EmployeeNumber}
                                    onChange={onChangeEntry('Minutes')}/>
                         </div>
                         <div className="col-6">
-                            <input type="number" value={Quantity || ''} className="form-control form-control-sm"
+                            <input type="number" value={entry.Quantity || ''} className="form-control form-control-sm"
                                    required placeholder="quantity"
-                                   disabled={!EmployeeNumber}
+                                   disabled={!entry.EmployeeNumber}
                                    onChange={onChangeEntry('Quantity')}/>
                         </div>
                     </div>
@@ -168,13 +179,13 @@ const SLCEntryForm = () => {
                             <input type="text" value={entry.WarehouseCode ?? ''}
                                    className="form-control form-control-sm"
                                    required placeholder="Warehouse"
-                                   disabled={!EmployeeNumber}
+                                   disabled={!entry.EmployeeNumber}
                                    onChange={onChangeEntry('WarehouseCode')}/>
                         </div>
                         <div className="col-8">
                             <input type="text" value={entry.ItemCode ?? ''} className="form-control form-control-sm"
                                    required placeholder="Item"
-                                   disabled={!EmployeeNumber}
+                                   disabled={!entry.EmployeeNumber}
                                    onChange={onChangeEntry('ItemCode')}/>
                         </div>
                     </div>
@@ -185,7 +196,7 @@ const SLCEntryForm = () => {
                     <div className="row g-1">
                         <div className="col-4">
                             <select className="form-select form-select-sm" value={entry.WorkCenter || ''}
-                                    disabled={!EmployeeNumber}
+                                    disabled={!entry.EmployeeNumber}
                                     onChange={onChangeEntry('WorkCenter')}>
                                 <option value="">Select W/C</option>
                                 <option value="INH">INH</option>
@@ -194,8 +205,9 @@ const SLCEntryForm = () => {
                             </select>
                         </div>
                         <div className="col-8">
-                            <SelectSLCSteps workCenter={entry.WorkCenter} stepId={idSteps}
-                                            onChange={onChangeStep} required disabled={!EmployeeNumber}/>
+                            <SelectSLCSteps workCenter={entry.WorkCenter} stepId={entry.idSteps}
+                                            step={!entry.idSteps ? entryStep(entry) : null}
+                                            onChange={onChangeStep} required disabled={!entry.EmployeeNumber}/>
                         </div>
                     </div>
 
@@ -225,7 +237,7 @@ const SLCEntryForm = () => {
                         <div className="col-auto">
                             <SpinnerButton type="submit" size="sm"
                                            spinning={actionStatus === 'saving'}
-                                           color="primary" disabled={actionStatus !== 'idle' || !EmployeeNumber}>
+                                           color="primary" disabled={actionStatus !== 'idle' || !entry.EmployeeNumber}>
                                 Save
                             </SpinnerButton>
                         </div>
@@ -240,7 +252,7 @@ const SLCEntryForm = () => {
                             <SpinnerButton type="button" color="outline-danger" size="sm"
                                            onClick={onDeleteEntry}
                                            spinning={actionStatus === 'deleting'}
-                                           disabled={id === 0 || actionStatus !== 'idle'}>
+                                           disabled={entry.id === 0 || actionStatus !== 'idle'}>
                                 Delete
                             </SpinnerButton>
                         </div>

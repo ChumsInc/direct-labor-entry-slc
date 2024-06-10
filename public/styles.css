@@ -1,8 +1,8 @@
+#app .table.table-selectable tbody tr td {
+  cursor: pointer;
+}
 #app .table.table-selectable tbody tr.text-danger td {
   cursor: not-allowed;
-}
-#app .table.table-selectable tbody tr.text-primary td {
-  cursor: pointer;
 }
 #app .table tfoot tr td {
   font-weight: bold;

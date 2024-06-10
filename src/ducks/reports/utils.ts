@@ -3,15 +3,6 @@ import dayjs from "dayjs";
 import {LocalStore} from 'chums-components';
 import {subWeeks} from "date-fns/subWeeks";
 import {setDay} from "date-fns/setDay";
-import {RootState} from "../../app/configureStore";
-import {FetchReportDataArgs} from "./api";
-import {
-    selectFilterEmployee,
-    selectFilterOperation,
-    selectMaxDate,
-    selectMinDate,
-    selectWorkCenter
-} from "./selectors";
 
 export function getStorageMinDate(): string {
     const minDate = LocalStore.getItem<string>(STORAGE_KEYS.reports.minDate);

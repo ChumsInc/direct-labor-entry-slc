@@ -108,7 +108,7 @@ const SLCEmployeeEntries = () => {
     useEffect(() => {
         setPage(0);
         if (date) {
-            dispatch(loadEntries(date))
+            dispatch(loadEntries({entryDate: date, employeeNo: employee?.EmployeeNumber}))
         }
     }, [employee]);
 

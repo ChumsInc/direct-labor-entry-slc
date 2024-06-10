@@ -10,11 +10,11 @@ import {useAppSelector} from "../../app/configureStore";
 import {ErrorBoundary} from 'react-error-boundary'
 import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
 import {setReportSort} from "./actions";
+import Decimal from "decimal.js";
 
-const _rate = ({Quantity = 0, Minutes = 0}) => !!Quantity ? Minutes / Quantity : 0;
-const _uph = ({Quantity = 0, Minutes = 0}) => !!Quantity ? 60 / _rate({Quantity, Minutes}) : 0;
-const _uphStd = ({StandardAllowedMinutes = 0}) => !!StandardAllowedMinutes ? 60 / StandardAllowedMinutes : 0;
-const _ratePct = ({AllowedMinutes = 0, Minutes = 0}) => !!Minutes ? AllowedMinutes / Minutes : 0;
+const _rate = ({Quantity = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Quantity).eq(0) ? 0 : new Decimal(Minutes).div(Quantity).toString();
+const _uph = ({Quantity = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Quantity).eq(0) ? 0 : new Decimal(60).div(_rate({Quantity, Minutes})).toString();
+const _ratePct = ({AllowedMinutes = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Minutes).eq(0) ? 0 : new Decimal(AllowedMinutes).div(Minutes).toString();
 
 interface ReportDataField extends SortableTableField<ReportData> {
     total?: boolean,
@@ -137,11 +137,11 @@ const groupFields = (group: keyof ReportData): ReportDataField[] => {
 }
 
 interface AnalysisTotal {
-    Minutes: number,
-    AllowedMinutes: number,
-    Quantity: number,
-    Rate: number,
-    UPH: number,
+    Minutes: number|string,
+    AllowedMinutes: number|string,
+    Quantity: number|string,
+    Rate: number|string,
+    UPH: number|string,
 }
 
 const totalInit: AnalysisTotal = {
@@ -200,10 +200,13 @@ const AnalysisReport: React.FC = () => {
 
     useEffect(() => {
         const totals = data.reduce((total: AnalysisTotal, row) => {
-            total.Quantity += row.Quantity;
-            total.Minutes += row.Minutes;
-            total.AllowedMinutes += row.AllowedMinutes;
-            return total;
+            return {
+                Quantity: new Decimal(total.Quantity).add(row.Quantity).toString(),
+                Minutes: new Decimal(total.Minutes).add(row.Minutes).toString(),
+                AllowedMinutes: new Decimal(total.AllowedMinutes).add(row.AllowedMinutes).toString(),
+                UPH: 0,
+                Rate: 0,
+            };
         }, {...totalInit})
         totals.UPH = _uph(totals);
         totals.Rate = _ratePct(totals);
@@ -245,15 +248,15 @@ interface ReportTFoot {
     fields: SortableTableField[],
 }
 
-const ReportTFoot: React.FC<ReportTFoot> = React.memo(({totals, fields}) => {
-    const [f1, ...otherFields] = fields;
+const ReportTFoot = ({totals, fields}:ReportTFoot) => {
+    const [, ...otherFields] = fields;
     return (
         <tfoot>
         <DataTableRow fields={[fieldsDefinition.FullName, ...otherFields]}
                       row={{[fieldsDefinition.FullName.field]: 'Grand Total', ...totals}}/>
         </tfoot>
     )
-});
+};
 
 export default AnalysisReport;
 

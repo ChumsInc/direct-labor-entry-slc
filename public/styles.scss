@@ -2,11 +2,11 @@
 #app {
   .table {
     &.table-selectable tbody tr {
+      td {
+        cursor: pointer;
+      }
      &.text-danger  td {
         cursor: not-allowed;
-      }
-      &.text-primary  td {
-        cursor: pointer;
       }
     }
     tfoot tr td {

@@ -33,7 +33,7 @@ const stepsReducer = createReducer(initialState, (builder) => {
                 .sort(stepSorter({...initialState.sort}));
             state.loaded = true;
         })
-        .addCase(loadSteps.rejected, (state, action) => {
+        .addCase(loadSteps.rejected, (state) => {
             state.status = 'idle';
         })
 });

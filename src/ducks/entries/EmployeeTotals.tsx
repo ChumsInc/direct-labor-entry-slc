@@ -42,8 +42,6 @@ const initialTotal: EmployeeDLEntryTotal = {
     AllowedMinutes: 0
 };
 
-const tableId = 'hurricane-employee-totals';
-
 const EmployeeTotals: React.FC = () => {
     const dispatch = useAppDispatch();
     const date = useAppSelector(selectEntryDate);
@@ -59,7 +57,7 @@ const EmployeeTotals: React.FC = () => {
 
     const onReload = () => {
         if (date) {
-            dispatch(loadEntries(date));
+            dispatch(loadEntries({entryDate: date}));
         }
     }
 

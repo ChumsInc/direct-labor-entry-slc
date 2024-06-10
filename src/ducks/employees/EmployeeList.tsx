@@ -42,7 +42,7 @@ const EMPLOYEE_FIELDS: SortableTableField<DLEmployee>[] = [
     },
 ];
 
-const tableId = 'employee-list'
+
 const EmployeeList = () => {
     const dispatch = useAppDispatch();
     const filter = useAppSelector(selectEmployeeFilter);
@@ -87,7 +87,7 @@ const EmployeeList = () => {
                 </div>
                 <div className="col-auto">
                     <FormCheck type="checkbox" label="Show Inactive" checked={showInactive}
-                               onClick={() => dispatch(toggleShowInactiveEmployees(!showInactive))}/>
+                               onChange={(ev) => dispatch(toggleShowInactiveEmployees(ev.target.checked))}/>
                 </div>
                 <div className="col-auto">
                     <SpinnerButton spinning={loading} type="button"
@@ -110,6 +110,3 @@ const EmployeeList = () => {
     )
 }
 export default EmployeeList;
-
-
-// uf4!eMpU14^tCIgI

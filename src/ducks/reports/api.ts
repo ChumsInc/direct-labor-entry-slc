@@ -12,23 +12,23 @@ export interface FetchReportDataArgs {
     options: URLSearchParams;
 }
 
-export async function fetchReportData(arg: FetchReportDataArgs): Promise<ReportData[]> {
-    try {
-        const url = API_PATH_REPORT
-            .replace(':minDate', dayjs(arg.minDate).format('YYYYMMDD'))
-            .replace(':maxDate', dayjs(arg.maxDate).format('YYYYMMDD'))
-            .replace(':queryString', arg.options.toString());
-        const res = await fetchJSON<{ result: ReportData[] }>(url, {cache: 'no-cache'});
-        return res?.result ?? [];
-    } catch (err: unknown) {
-        if (err instanceof Error) {
-            console.debug("fetchReportData()", err.message);
-            return Promise.reject(err);
-        }
-        console.debug("fetchReportData()", err);
-        return Promise.reject(new Error('Error in fetchReportData()'));
-    }
-}
+// export async function fetchReportData(arg: FetchReportDataArgs): Promise<ReportData[]> {
+//     try {
+//         const url = API_PATH_REPORT
+//             .replace(':minDate', dayjs(arg.minDate).format('YYYYMMDD'))
+//             .replace(':maxDate', dayjs(arg.maxDate).format('YYYYMMDD'))
+//             .replace(':queryString', arg.options.toString());
+//         const res = await fetchJSON<{ result: ReportData[] }>(url, {cache: 'no-cache'});
+//         return res?.result ?? [];
+//     } catch (err: unknown) {
+//         if (err instanceof Error) {
+//             console.debug("fetchReportData()", err.message);
+//             return Promise.reject(err);
+//         }
+//         console.debug("fetchReportData()", err);
+//         return Promise.reject(new Error('Error in fetchReportData()'));
+//     }
+// }
 
 const htmlReportURL = (reportType: HTMLReportType) => {
     switch (reportType) {
