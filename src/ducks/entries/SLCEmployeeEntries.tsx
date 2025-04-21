@@ -121,7 +121,7 @@ const SLCEmployeeEntries = () => {
         dispatch(setCurrentEntry(entry));
     }
 
-    const sortChangeHandler = (sort: SortProps) => {
+    const sortChangeHandler = (sort: SortProps<DLEntry>) => {
         setPage(0);
         dispatch(setEntriesSort(sort));
     }

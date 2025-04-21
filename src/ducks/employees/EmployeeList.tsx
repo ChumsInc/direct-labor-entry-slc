@@ -64,7 +64,7 @@ const EmployeeList = () => {
         dispatch(setEmployeeDepartment(ev.target.value as EmployeeFilter));
     }
 
-    const sortChangeHandler = (sort: SortProps) => {
+    const sortChangeHandler = (sort: SortProps<DLEmployee>) => {
         dispatch(setEmployeesSort(sort))
     }
 
@@ -72,7 +72,9 @@ const EmployeeList = () => {
         dispatch(setEmployeeFilter(ev.target.value));
     }
 
-    const onSelectEmployee = (emp: DLEmployee) => dispatch(setCurrentEmployee(emp));
+    const onSelectEmployee = (emp: DLEmployee | null) => {
+        dispatch(setCurrentEmployee(emp));
+    }
 
     return (
         <div className="report-form">

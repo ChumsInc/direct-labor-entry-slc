@@ -7,7 +7,7 @@ import {loadEntries, setEntryEmployee, setEntryTotalsSort} from "./actions";
 import {selectEmployeeTotals, selectEntriesLoading, selectEntryDate, selectEntryTotalsSort} from "./selectors";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import Decimal from "decimal.js";
-import {EmployeeDLEntryTotal} from "chums-types";
+import {DLEntry, EmployeeDLEntryTotal} from "chums-types";
 
 const employeeTableFields: SortableTableField<EmployeeDLEntryTotal>[] = [
     {field: 'FullName', title: 'Name', sortable: true},
@@ -66,7 +66,7 @@ const EmployeeTotals: React.FC = () => {
         dispatch(setEntryEmployee(employee || null));
     }
 
-    const sortChangeHandler = (sort: SortProps) => {
+    const sortChangeHandler = (sort: SortProps<EmployeeDLEntryTotal>) => {
         dispatch(setEntryTotalsSort(sort));
     }
 

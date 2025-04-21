@@ -22,7 +22,7 @@ export const selectAllGroupBy = (state: RootState) => state.analysis.groupBy;
 export const selectGroupBy = (state: RootState, id: ReportGroupingId) => state.analysis.groupBy[id];
 
 export const selectLowerGroupBy = createSelector(
-    [selectAllGroupBy, selectGroupBy],
+    [selectAllGroupBy, (state, id) => id],
     (list, id) => {
         return Object.keys(list)
             .sort()
@@ -32,10 +32,8 @@ export const selectLowerGroupBy = createSelector(
 )
 
 export const selectSortedData = createSelector(
-    [selectReportData, selectReportSort, selectFilterItem],
-    (data, sort, item) => {
-        return data
-            .filter(row => !item || row.ItemCode.startsWith(item))
-            .sort(reportSorter(sort))
+    [selectReportData, selectReportSort],
+    (data, sort) => {
+        return [...data].sort(reportSorter(sort))
     }
 )

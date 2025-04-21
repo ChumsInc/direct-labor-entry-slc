@@ -16,12 +16,14 @@ const _rate = ({Quantity = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decima
 const _uph = ({Quantity = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Quantity).eq(0) ? 0 : new Decimal(60).div(_rate({Quantity, Minutes})).toString();
 const _ratePct = ({AllowedMinutes = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Minutes).eq(0) ? 0 : new Decimal(AllowedMinutes).div(Minutes).toString();
 
-interface ReportDataField extends SortableTableField<ReportData> {
-    total?: boolean,
+interface AnalysisField extends SortableTableField<ReportData> {
+    total?: boolean;
 }
 
+
+
 type FieldDefinitionObject = {
-    [key in keyof ReportData]: ReportDataField;
+    [key in keyof ReportData]: AnalysisField;
 };
 
 const fieldsDefinition: FieldDefinitionObject = {
@@ -31,7 +33,8 @@ const fieldsDefinition: FieldDefinitionObject = {
         field: 'Minutes',
         title: 'Minutes',
         className: 'right',
-        total: true, sortable: true,
+        total: true,
+        sortable: true,
         render: (row: ReportData) => numeral(row.Minutes).format('0,0')
     },
     AllowedMinutes: {
@@ -104,7 +107,7 @@ const rowClassName = (row: ReportData) => {
     }
 };
 
-const groupFields = (group: keyof ReportData): ReportDataField[] => {
+const groupFields = (group: keyof ReportData): AnalysisField[] => {
     switch (group) {
         case 'WorkCenter':
             return [fieldsDefinition.WorkCenter];
@@ -160,7 +163,7 @@ const AnalysisReport: React.FC = () => {
 
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(25)
-    const [fields, setFields] = useState<ReportDataField[]>([]);
+    const [fields, setFields] = useState<AnalysisField[]>([]);
     const [totals, setTotals] = useState<AnalysisTotal>({...totalInit});
 
     useEffect(() => {
@@ -168,7 +171,7 @@ const AnalysisReport: React.FC = () => {
     }, [data, grouping, sort]);
 
     useEffect(() => {
-        const fields: ReportDataField[] = [];
+        const fields: AnalysisField[] = [];
         Object.keys(grouping)
             .map(key => +key as ReportGroupingId)
             .filter(key => !!grouping[key])
@@ -213,7 +216,7 @@ const AnalysisReport: React.FC = () => {
         setTotals(totals);
     }, [data]);
 
-    const sortChangeHandler = (sort: SortProps) => {
+    const sortChangeHandler = (sort: SortProps<ReportData>) => {
         setPage(0);
         dispatch(setReportSort(sort));
     }
@@ -245,7 +248,7 @@ const AnalysisReport: React.FC = () => {
 
 interface ReportTFoot {
     totals: AnalysisTotal,
-    fields: SortableTableField[],
+    fields: AnalysisField[],
 }
 
 const ReportTFoot = ({totals, fields}:ReportTFoot) => {
@@ -253,7 +256,7 @@ const ReportTFoot = ({totals, fields}:ReportTFoot) => {
     return (
         <tfoot>
         <DataTableRow fields={[fieldsDefinition.FullName, ...otherFields]}
-                      row={{[fieldsDefinition.FullName.field]: 'Grand Total', ...totals}}/>
+                      row={{[fieldsDefinition.FullName.field]: 'Grand Total', ...(totals as ReportData)}}/>
         </tfoot>
     )
 };

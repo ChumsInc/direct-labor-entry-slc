@@ -1,43 +1,44 @@
 import {STORAGE_KEYS} from "../../utils/appStorage";
 import dayjs from "dayjs";
+import weekday from 'dayjs/plugin/weekday'
 import {LocalStore} from 'chums-components';
-import {subWeeks} from "date-fns/subWeeks";
-import {setDay} from "date-fns/setDay";
+
+dayjs.extend(weekday);
 
 export function getStorageMinDate(): string {
-    const minDate = LocalStore.getItem<string>(STORAGE_KEYS.reports.minDate);
+    const minDate = LocalStore.getItem<string | null>(STORAGE_KEYS.reports.minDate, null);
     if (minDate && dayjs(minDate).isValid()) {
         return minDate;
     }
-    return setDay(subWeeks(new Date(), 1), 1).toISOString()
+    return dayjs().subtract(1, 'week').weekday(1).toISOString()
 }
 
 export function setStorageMinDate(date: string): string {
     if (!date || !dayjs(date).isValid()) {
-        date = setDay(subWeeks(new Date(), 1), 1).toISOString();
+        date = dayjs().subtract(1, 'week').weekday(1).toISOString();
     }
     LocalStore.setItem<string>(STORAGE_KEYS.reports.minDate, date);
     return date;
 }
 
 export function getStorageMaxDate(): string {
-    const maxDate = LocalStore.getItem<string>(STORAGE_KEYS.reports.maxDate);
+    const maxDate = LocalStore.getItem<string | null>(STORAGE_KEYS.reports.maxDate, null);
     if (maxDate && dayjs(maxDate).isValid()) {
         return maxDate;
     }
-    return setDay(subWeeks(new Date(), 1), 5).toISOString()
+    return dayjs().subtract(1, "week").weekday(5).toISOString();
 }
 
 export function setStorageMaxDate(date: string): string {
     if (!date || !dayjs(date).isValid()) {
-        date = setDay(subWeeks(new Date(), 1), 5).toISOString();
+        date = dayjs().subtract(1, "week").weekday(5).toISOString();
     }
     LocalStore.setItem<string>(STORAGE_KEYS.reports.maxDate, date);
     return date;
 }
 
 export function getStorageWorkCenter(): string | null {
-    return LocalStore.getItem<string>(STORAGE_KEYS.reports.workCenter) ?? null;
+    return LocalStore.getItem<string | null>(STORAGE_KEYS.reports.workCenter, null);
 }
 
 export function setStorageWorkCenter(wc: string) {
@@ -45,7 +46,7 @@ export function setStorageWorkCenter(wc: string) {
 }
 
 export function getStorageShowInactive() {
-    return LocalStore.getItem<boolean>(STORAGE_KEYS.reports.showInactive) ?? false;
+    return LocalStore.getItem<boolean>(STORAGE_KEYS.reports.showInactive, false);
 }
 
 export function setStorageShowInactive(show: boolean) {
@@ -53,7 +54,7 @@ export function setStorageShowInactive(show: boolean) {
 }
 
 export function getStorageEmployee(): string {
-    return LocalStore.getItem<string>(STORAGE_KEYS.reports.employee) ?? '';
+    return LocalStore.getItem<string>(STORAGE_KEYS.reports.employee, '');
 }
 
 export function setStorageEmployee(emp: string) {
@@ -61,7 +62,7 @@ export function setStorageEmployee(emp: string) {
 }
 
 export function getStorageOperationCode(): string {
-    return LocalStore.getItem<string>(STORAGE_KEYS.reports.operationCode) ?? '';
+    return LocalStore.getItem<string>(STORAGE_KEYS.reports.operationCode, '');
 }
 
 export function setStorageOperationCode(opCode: string) {
