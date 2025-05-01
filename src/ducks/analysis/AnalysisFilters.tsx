@@ -103,7 +103,7 @@ const AnalysisFilters = () => {
                 </div>
 
                 <div className="col-auto">
-                    <StepInput value={operation ?? ''} onChange={onChangeOperationFilter}/>
+                    <StepInput value={operation ?? ''} workCenter={workCenter} onChange={onChangeOperationFilter}/>
                 </div>
 
                 <div className="col-auto">

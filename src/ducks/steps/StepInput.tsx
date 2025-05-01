@@ -10,12 +10,12 @@ import {FormControl, FormControlProps} from "react-bootstrap";
 
 export interface StepInputProps extends Omit<FormControlProps, 'value' | 'onChange' | 'id' | 'list'> {
     value: string,
+    workCenter: string,
     onChange: (ev: ChangeEvent<HTMLInputElement>) => void,
 }
 
-const StepInput = ({value, onChange, ...rest}: StepInputProps) => {
+const StepInput = ({value, onChange, workCenter, ...rest}: StepInputProps) => {
     const dispatch = useAppDispatch();
-    const workCenter = useAppSelector(selectWorkCenter);
     const list = useAppSelector(selectStepsList);
     const [steps, setSteps] = useState<DLStep[]>([])
     const loaded = useAppSelector(selectStepsLoaded);

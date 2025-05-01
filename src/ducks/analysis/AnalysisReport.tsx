@@ -83,7 +83,9 @@ const fieldsDefinition: FieldDefinitionObject = {
         render: (row: ReportData) => numeral(row.StandardAllowedMinutes).format('0.0000')
     },
     Rate: {
-        field: 'Rate', className: 'text-end', sortable: true, title: 'Rate %',
+        field: 'Rate',
+        align: 'end',
+        sortable: true, title: 'Rate %',
         render: (row: ReportData) => numeral(row.Rate).format('0,0.0%')
     },
     UPH: {
