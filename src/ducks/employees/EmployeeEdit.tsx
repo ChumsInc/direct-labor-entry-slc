@@ -1,12 +1,14 @@
 import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import classNames from 'classnames';
-import {Alert, FormColumn, Select, SpinnerButton} from 'chums-components';
 import {DEPARTMENT_NAMES, newEmployee} from './constants';
 import {useSelector} from 'react-redux';
 import {selectCurrentEmployee, selectSaving} from "./selectors";
 import {saveEmployee, setCurrentEmployee} from "./actions";
 import {useAppDispatch} from "../../app/configureStore";
 import {DLDepartmentKey, DLEmployee, Editable} from "chums-types";
+import Alert from "react-bootstrap/Alert";
+import {Col, Form, FormSelect, Row, Stack} from "react-bootstrap";
+import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
 
 const reTemp = /^(TEMP|[0-9]*HT)$/;
 
@@ -52,7 +54,7 @@ const EmployeeEdit: React.FC = () => {
     }
 
     if (!employee) {
-        return (<Alert color="info">Select Employee</Alert>);
+        return (<Alert variant="info">Select Employee</Alert>);
     }
 
     const isTemp = reTemp.test(employee.Department);
@@ -75,57 +77,59 @@ const EmployeeEdit: React.FC = () => {
         });
 
     return (
-        <form onSubmit={onSubmit}>
-            <FormColumn label="ID/Status" width={8}>
-                <div className="row g-3">
-                    <div className="col-auto">
+        <Form onSubmit={onSubmit}>
+            <Form.Group as={Row}>
+                <Form.Label column sm={4}>ID / Status</Form.Label>
+                <Col sm={8}>
+                    <Stack gap={3} direction="horizontal">
                         <input type="text" value={employee.EmployeeNumber || 'New'}
                                className="form-control form-control-sm" readOnly/>
-                    </div>
-                    <div className="col-auto">
                         <button type="button" className={btnActive} onClick={() => onSetActive(true)}
                                 disabled={readOnly}>
                             Active
                         </button>
-                        {' '}
                         <button type="button" className={btnInactive} onClick={() => onSetActive(false)}
                                 disabled={readOnly}>
                             Inactive
                         </button>
-                    </div>
-                </div>
-            </FormColumn>
-            <FormColumn label="First / Last Name">
-                <div className="row g-3">
-                    <div className="col">
+                    </Stack>
+                </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+                <Form.Label column sm={4}>First / Last Name</Form.Label>
+                <Col sm={8}>
+                    <Stack gap={3} direction="horizontal">
                         <input type="text" className="form-control form-control-sm" readOnly={readOnly}
+                               placeholder="First Name" aria-label="First Name"
                                value={employee.FirstName} onChange={onChangeEmployee('FirstName')}/>
-                    </div>
-                    <div className="col">
                         <input type="text" className="form-control form-control-sm" readOnly={readOnly}
+                               placeholder="Last Name" aria-label="Last Name"
                                value={employee.LastName} onChange={onChangeEmployee('LastName')}/>
-                    </div>
-                </div>
-            </FormColumn>
-            <FormColumn width={8} label="DepartmentKey">
-                <Select required={true} value={employee.Department || ''} bsSize="sm"
-                        onChange={onChangeEmployee('Department')} disabled={!isTemp}>
-                    <option/>
-                    {deptOptions}
-                </Select>
-            </FormColumn>
-            <FormColumn width={8} label="">
-                <SpinnerButton type="submit" spinning={isSaving} className="btn btn-primary" size="sm"
-                               disabled={readOnly}>Save</SpinnerButton>
-                {' '}
+                    </Stack>
+                </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+                <Form.Label column sm={4}>Department</Form.Label>
+                <Col sm={8}>
+                    <FormSelect required={true} value={employee.Department || ''} size="sm"
+                                onChange={onChangeEmployee('Department')} disabled={!isTemp}>
+                        <option/>
+                        {deptOptions}
+                    </FormSelect>
+                </Col>
+            </Form.Group>
+            <Stack gap={3} direction="horizontal" className="justify-content-end">
                 <button type="button" className="btn btn-sm btn-outline-secondary" onClick={onNewEmployee}>New
                     Employee
                 </button>
-            </FormColumn>
+
+                <SpinnerButton type="submit" spinning={isSaving} variant="primary" size="sm" spinnerProps={{size: "sm"}}
+                               disabled={readOnly}>Save</SpinnerButton>
+            </Stack>
             {employee?.changed && (
-                <Alert color="warning">Don't forget to save your changes</Alert>
+                <Alert variant="warning">Don't forget to save your changes</Alert>
             )}
-        </form>
+        </Form>
     )
 }
 

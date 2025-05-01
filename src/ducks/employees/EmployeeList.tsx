@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useState} from 'react';
+import React, {ChangeEvent, useId, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {DEPARTMENT_NAMES} from './constants';
 import {
@@ -18,18 +18,13 @@ import {
     selectShowInactive,
     selectVisibleEmployees
 } from "./selectors";
-import {
-    FormCheck,
-    SortableTable,
-    SortableTableField,
-    SortProps,
-    SpinnerButton,
-    TablePagination
-} from "chums-components";
 import DepartmentFilterSelect from "./DepartmentFilterSelect";
 import classNames from "classnames";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import {DLDepartmentKey, DLEmployee} from "chums-types";
+import {SortableTable, SortableTableField, SortProps, TablePagination} from "@chumsinc/sortable-tables";
+import {FormCheck} from "react-bootstrap";
+import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
 
 const EMPLOYEE_FIELDS: SortableTableField<DLEmployee>[] = [
     {field: 'EmployeeNumber', title: '#', sortable: true},
@@ -51,6 +46,7 @@ const EmployeeList = () => {
     const loading = useSelector(selectLoading);
     const sort = useAppSelector(selectEmployeesSort);
     const list = useAppSelector(selectVisibleEmployees)
+    const idShowInactive = useId();
 
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -88,12 +84,13 @@ const EmployeeList = () => {
                            onChange={onChangeFilter}/>
                 </div>
                 <div className="col-auto">
-                    <FormCheck type="checkbox" label="Show Inactive" checked={showInactive}
+                    <FormCheck type="checkbox" label="Show Inactive" id={idShowInactive}
+                               checked={showInactive}
                                onChange={(ev) => dispatch(toggleShowInactiveEmployees(ev.target.checked))}/>
                 </div>
                 <div className="col-auto">
-                    <SpinnerButton spinning={loading} type="button"
-                                   onClick={() => dispatch(loadEmployees())} color="outline-primary" size="sm">
+                    <SpinnerButton spinning={loading} type="button" spinnerProps={{size: 'sm'}}
+                                   onClick={() => dispatch(loadEmployees())} variant="outline-primary" size="sm">
                         Reload
                     </SpinnerButton>
                 </div>
@@ -106,7 +103,7 @@ const EmployeeList = () => {
                            size="xs"
                            onSelectRow={onSelectEmployee}/>
             <TablePagination page={page} onChangePage={setPage}
-                             rowsPerPage={rowsPerPage} onChangeRowsPerPage={rowsPerPageChangeHandler}
+                             rowsPerPage={rowsPerPage} rowsPerPageProps={{onChange: rowsPerPageChangeHandler}}
                              count={list.length}/>
         </div>
     )

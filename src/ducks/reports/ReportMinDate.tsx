@@ -1,11 +1,11 @@
 import React, {ChangeEvent} from 'react';
-import {format} from "date-fns";
 import {useDispatch, useSelector} from "react-redux";
 import {selectMaxDate, selectMinDate} from "./selectors";
 import {inputDate} from "../../utils/date";
 import {setMaxDate, setMinDate} from "./actions";
+import dayjs from "dayjs";
 
-const ReportMinDate:React.FC = () => {
+const ReportMinDate: React.FC = () => {
     const dispatch = useDispatch();
     const minDate = useSelector(selectMinDate);
     const maxDate = useSelector(selectMaxDate);
@@ -23,7 +23,7 @@ const ReportMinDate:React.FC = () => {
     }
 
     return (
-        <input type="date" value={format(new Date(minDate), 'y-MM-dd')}
+        <input type="date" value={dayjs(minDate).format('YYYY-MM-DD')}
                className="form-control form-control-sm" onChange={onChangeMinDate}/>
     )
 }

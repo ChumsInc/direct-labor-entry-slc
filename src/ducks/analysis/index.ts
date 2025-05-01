@@ -12,15 +12,18 @@ import {
     getStorageWorkCenter
 } from "./utils";
 import {createReducer} from "@reduxjs/toolkit";
-import {SortProps} from "chums-components";
+import {SortProps} from "@chumsinc/sortable-tables";
 import {
-    setMaxDate,
-    setMinDate,
-    setWorkCenter,
     loadReportData,
     setFilterEmployee,
-    toggleShowInactive,
-    setFilterOperation, setFilterItem, setReportGrouping, setReportSort
+    setFilterItem,
+    setFilterOperation,
+    setMaxDate,
+    setMinDate,
+    setReportGrouping,
+    setReportSort,
+    setWorkCenter,
+    toggleShowInactive
 } from "./actions";
 
 export interface ReportsState {

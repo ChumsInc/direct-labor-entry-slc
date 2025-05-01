@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {format, parseISO} from 'date-fns';
+import dayjs from "dayjs";
 import numeral from 'numeral';
-import {DataTableRow, SortableTable, SortableTableField, SortProps, TablePagination,} from "chums-components";
+import {DataTableRow, SortableTable, SortableTableField, SortProps, TablePagination,} from "@chumsinc/sortable-tables";
 import {ReportData, ReportGroupingId} from "./types";
 import {selectAllGroupBy, selectReportSort, selectSortedData} from "./selectors";
 import {between, MAX_DANGER, MAX_SUCCESS, MIN_DANGER, MIN_SUCCESS} from "../entries/utils";
 import {useAppSelector} from "../../app/configureStore";
 import {ErrorBoundary} from 'react-error-boundary'
-import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
+import ErrorBoundaryFallbackAlert from "../../components/ErrorBoundaryFallbackAlert";
 import {setReportSort} from "./actions";
 import Decimal from "decimal.js";
 
@@ -41,7 +41,7 @@ const fieldsDefinition: FieldDefinitionObject = {
     Minutes: {
         field: 'Minutes',
         title: 'Minutes',
-        className: 'text-end',
+        align: 'end',
         total: true,
         sortable: true,
         render: (row: ReportData) => numeral(row.Minutes).format('0,0')
@@ -49,14 +49,14 @@ const fieldsDefinition: FieldDefinitionObject = {
     AllowedMinutes: {
         field: 'AllowedMinutes',
         title: 'Std Minutes',
-        className: 'text-end',
+        align: 'end',
         total: true, sortable: true,
         render: (row: ReportData) => numeral(row.AllowedMinutes).format('0,0')
     },
     Quantity: {
         field: 'Quantity',
         title: 'Quantity',
-        className: 'text-end',
+        align: 'end',
         total: true,
         sortable: true,
         render: (row: ReportData) => numeral(row.Quantity).format('0,0')
@@ -72,13 +72,14 @@ const fieldsDefinition: FieldDefinitionObject = {
     EntryDate: {
         field: 'EntryDate',
         title: 'Date',
-        render: (row: ReportData) => !!row.EntryDate && row.EntryDate.toLowerCase() !== 'total' ? format(parseISO(row.EntryDate), 'MM-dd-yyyy') : 'N/A',
+        render: (row: ReportData) => !!row.EntryDate && row.EntryDate.toLowerCase() !== 'total' ? dayjs(row.EntryDate).format('MM-DD-YYYY') : 'N/A',
         sortable: true
     },
     StandardAllowedMinutes: {
         field: 'StandardAllowedMinutes',
         title: 'SAM',
-        className: 'text-end', sortable: true,
+        align: 'end',
+        sortable: true,
         render: (row: ReportData) => numeral(row.StandardAllowedMinutes).format('0.0000')
     },
     Rate: {
@@ -87,7 +88,7 @@ const fieldsDefinition: FieldDefinitionObject = {
     },
     UPH: {
         field: 'UPH',
-        className: 'text-end',
+        align: 'end',
         title: 'UPH',
         render: (row: ReportData) => numeral(row.UPH).format('0,0'),
         sortable: true
@@ -95,21 +96,21 @@ const fieldsDefinition: FieldDefinitionObject = {
     UPHHistoric: {
         field: 'SAM',
         title: 'Std UPH',
-        className: 'text-end',
+        align: 'end',
         sortable: true,
         render: (row) => row.SAM ? numeral(new Decimal(60).div(row.SAM)).format('0,0') : 'N/A',
     },
     UPHStd: {
         field: 'UPHStd',
         title: 'Current Std UPH',
-        className: 'text-end',
+        align: 'end',
         render: (row: ReportData) => row.UPHStd ? numeral(row.UPHStd).format('0,0') : 'N/A',
         sortable: true
     },
     SAM: {
         field: 'SAM',
         title: 'SAM',
-        className: 'text-end',
+        align: 'end',
         sortable: true,
         render: (row) => numeral(row.StandardAllowedMinutes).format('0,0.0%'),
     },
@@ -257,7 +258,7 @@ const AnalysisReport: React.FC = () => {
                     size="xs"
                     tfoot={tfoot} rowClassName={rowClassName}/>
                 <TablePagination page={page} onChangePage={setPage}
-                                 rowsPerPage={rowsPerPage} onChangeRowsPerPage={rowsPerPageChangeHandler}
+                                 rowsPerPage={rowsPerPage} rowsPerPageProps={{onChange: rowsPerPageChangeHandler}}
                                  count={data.length}/>
             </ErrorBoundary>
         </div>

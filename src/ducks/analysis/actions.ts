@@ -14,9 +14,10 @@ import {
 import {RootState} from "../../app/configureStore";
 import {fetchReportData} from "./api";
 import dayjs from "dayjs";
-import {SortProps} from "chums-components";
+import {SortProps} from "@chumsinc/sortable-tables";
 
-export const API_PATH_REPORT = '/api/operations/production/dl/report/data/:minDate/:maxDate?:queryString';
+export const API_PATH_REPORT = '/api/operations/production/dl/report/data.json?:queryString';
+export const API_PATH_REPORT_XLSX = '/api/operations/production/dl/report/data.xlsx?:queryString';
 
 export const setMinDate = createAction('analysis/setMinDate', (arg: string) => {
     return {
@@ -83,11 +84,9 @@ export const loadReportExcel = createAsyncThunk<void, void>(
     'analysis/loadReportExcel',
     (_, {getState}) => {
         const state = getState() as RootState;
-        const arg = buildReportArgs(state);
-        const url = API_PATH_REPORT
-            .replace(':minDate', dayjs(arg.minDate).format('YYYYMMDD'))
-            .replace(':maxDate', dayjs(arg.maxDate).format('YYYYMMDD'))
-            .replace(':queryString', arg.options.toString());
+        const options = buildReportArgs(state);
+        const url = API_PATH_REPORT_XLSX
+            .replace(':queryString', options.toString());
         window.open(url, '_blank');
     },
     {

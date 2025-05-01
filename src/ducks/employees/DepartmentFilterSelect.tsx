@@ -1,17 +1,17 @@
 import React from "react";
-import {Select, SelectProps} from "chums-components";
 import {useAppSelector} from "../../app/configureStore";
 import {selectEmployeeDepartment} from "./selectors";
+import {FormSelect, FormSelectProps} from "react-bootstrap";
 
 
-const DepartmentFilterSelect = ({bsSize= 'sm', ...props}:SelectProps) => {
+const DepartmentFilterSelect = ({size, ...props}: FormSelectProps) => {
     const departmentFilter = useAppSelector(selectEmployeeDepartment);
     return (
-        <Select bsSize={bsSize} {...props} value={departmentFilter}>
+        <FormSelect size={size} {...props} value={departmentFilter}>
             <option value="all">All</option>
             <option value="slc">SLC</option>
             <option value="slc-temp">SLC Temps</option>
-        </Select>
+        </FormSelect>
     )
 }
 export default DepartmentFilterSelect;

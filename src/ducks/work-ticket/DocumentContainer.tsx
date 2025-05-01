@@ -3,7 +3,7 @@ import {useSelector} from "react-redux";
 import WorkTicketSteps from "./WorkTicketSteps";
 import ITOrderRows from "./ITOrderRows";
 import {ErrorBoundary} from "react-error-boundary";
-import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
+import ErrorBoundaryFallbackAlert from "../../components/ErrorBoundaryFallbackAlert";
 import {selectITOrders, selectWorkTicket} from "./selectors";
 
 export interface DocumentContainerProps {

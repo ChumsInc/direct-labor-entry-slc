@@ -3,7 +3,7 @@ import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
 import {deleteEntry, fetchEntries, postEntry} from "./api";
 import {RootState} from "../../app/configureStore";
 import dayjs from "dayjs";
-import {SortProps} from "chums-components";
+import {SortProps} from "@chumsinc/sortable-tables";
 import {BasicDLEntry, DLEmployee, DLEntry, EmployeeDLEntryTotal} from "chums-types";
 import {FetchEntriesProps} from "../common-types";
 

@@ -1,4 +1,4 @@
-import {SortProps} from "chums-components";
+import {SortProps} from "@chumsinc/sortable-tables";
 import {MinimalStep} from "../common-types";
 import {DLBasicStep, DLStep} from "chums-types";
 

@@ -1,8 +1,8 @@
 import {entrySorter, NEW_ENTRY} from "./utils";
 import {ActionStatus} from "../common-types";
-import {Editable} from "chums-types/src/generics";
+import {BasicDLEntry, DLEmployee, DLEntry, Editable, EmployeeDLEntryTotal} from "chums-types";
 import {createReducer} from "@reduxjs/toolkit";
-import {LocalStore, SortProps} from "chums-components";
+import {LocalStore} from "@chumsinc/ui-utils";
 import {
     loadEntries,
     removeEntry,
@@ -18,9 +18,9 @@ import {
 } from "./actions";
 import {loadDocument} from "../work-ticket/actions";
 import Decimal from "decimal.js";
-import {BasicDLEntry, DLEmployee, DLEntry, EmployeeDLEntryTotal} from "chums-types";
 import {storeEntryDate} from "../../contants";
 import {previousSLCWorkDay} from "../../utils/workDays";
+import {SortProps} from "@chumsinc/sortable-tables";
 
 export interface EntriesState {
     workCenters: string[];
@@ -33,7 +33,7 @@ export interface EntriesState {
     totalsSort: SortProps<EmployeeDLEntryTotal>;
 }
 
-const defaultSort:SortProps<DLEntry> = {field: 'id', ascending: false};
+const defaultSort: SortProps<DLEntry> = {field: 'id', ascending: false};
 
 export const initialEntriesState = (): EntriesState => ({
     workCenters: [],

@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import {selectChangeLog, selectLoadingChangeLog} from "./selectors";
-import {LoadingProgressBar} from "chums-components";
+import ProgressBar from "react-bootstrap/ProgressBar";
 import {loadChangeLog} from "./actions";
 import VersionNo from "./VersionNo";
 
@@ -21,7 +21,7 @@ const ChangeLog = () => {
                     <h1 className="card-header"><VersionNo/></h1>
                     <div className="card-body">
                         <div className="card-text">
-                            {loading && <LoadingProgressBar animated striped/>}
+                            {loading && <ProgressBar animated striped now={100}/>}
                             <div className="font-monospace">
                                 <pre style={{whiteSpace: 'pre-wrap'}}>{changeLog}</pre>
                             </div>

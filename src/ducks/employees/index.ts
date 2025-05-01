@@ -10,7 +10,7 @@ import {
     setEmployeesSort,
     toggleShowInactiveEmployees
 } from "./actions";
-import {SortProps} from "chums-components";
+import {SortProps} from "@chumsinc/sortable-tables";
 import {employeeSorter} from "./utils";
 import {DLEmployee} from "chums-types";
 

@@ -1,4 +1,4 @@
-import {fetchHTML, fetchJSON} from "chums-components";
+import {fetchHTML, fetchJSON} from "@chumsinc/ui-utils";
 
 export async function fetchVersion():Promise<string|null> {
     try {

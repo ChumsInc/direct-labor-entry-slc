@@ -1,5 +1,4 @@
-import {configureStore, combineReducers} from '@reduxjs/toolkit';
-import alertsReducer from "../ducks/alerts";
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import employeesReducer from "../ducks/employees";
 import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import entriesReducer from "../ducks/entries";
@@ -8,10 +7,11 @@ import workTicketReducer from "../ducks/work-ticket";
 import stepsReducer from "../ducks/steps";
 import analysisReducer from "../ducks/analysis";
 import versionReducer from "../ducks/version";
+import {alertsSlice} from "@chumsinc/alert-list";
 
 
 const rootReducer = combineReducers({
-    alerts: alertsReducer,
+    [alertsSlice.reducerPath]: alertsSlice.reducer,
     analysis: analysisReducer,
     employees: employeesReducer,
     entries: entriesReducer,

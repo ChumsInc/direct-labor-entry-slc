@@ -1,10 +1,10 @@
 import {EmployeePostBody} from "../common-types";
-import {fetchJSON} from "chums-components";
+import {fetchJSON} from "@chumsinc/ui-utils";
 import {SLCEmployeesRegex} from "./constants";
 import {DLEmployee} from "chums-types";
 
-export const API_PATH_EMPLOYEES = '/api/operations/production/dl/employees';
-export const API_PATH_SAVE_EMPLOYEE = '/api/operations/production/dl/employee';
+export const API_PATH_EMPLOYEES = '/api/operations/production/dl/employees.json';
+export const API_PATH_SAVE_EMPLOYEE = '/api/operations/production/dl/employee.json';
 
 export async function fetchEmployees(): Promise<DLEmployee[]> {
     try {

@@ -1,9 +1,9 @@
-import {fetchJSON} from "chums-components";
+import {fetchJSON} from "@chumsinc/ui-utils";
 import {DLStep} from "chums-types";
 
 export async function fetchSteps(): Promise<DLStep[]> {
     try {
-        const url = '/api/operations/production/dl/steps';
+        const url = '/api/operations/production/dl/steps.json';
         const res = await fetchJSON<{ steps: DLStep[] }>(url, {cache: 'no-cache'});
         return res?.steps ?? [];
     } catch (err: unknown) {

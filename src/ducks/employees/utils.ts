@@ -1,4 +1,4 @@
-import {SortProps} from "chums-components";
+import {SortProps} from "@chumsinc/sortable-tables";
 import {DLEmployee} from "chums-types";
 
 export const employeeSorter = (sort: SortProps<DLEmployee>) => (a: DLEmployee, b: DLEmployee) => {

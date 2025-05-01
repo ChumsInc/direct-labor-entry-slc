@@ -1,10 +1,9 @@
-import {HTMLReportType, ReportData} from "./types";
+import {HTMLReportType} from "./types";
 import dayjs from "dayjs";
-import {fetchHTML, fetchJSON} from "chums-components";
+import {fetchHTML} from "@chumsinc/ui-utils";
 
-export const API_PATH_REPORT = '/api/operations/production/dl/report/data/:minDate/:maxDate?:queryString';
-export const API_PATH_REPORT_EMPLOYEE_TOTAL = '/api/operations/production/dl/report/employee-total/:minDate/:maxDate/:workCenter/render';
-export const API_PATH_REPORT_STEP_TOTAL = '/api/operations/production/dl/report/step-total/:minDate/:maxDate/:workCenter/render';
+export const API_PATH_REPORT_EMPLOYEE_TOTAL = '/api/operations/production/dl/report/employee-total/:workCenter.html?:searchParams';
+export const API_PATH_REPORT_STEP_TOTAL = '/api/operations/production/dl/report/step-total/:workCenter.html?:searchParams';
 
 export interface FetchReportDataArgs {
     minDate: string;
@@ -50,10 +49,12 @@ export interface FetchHTMLReportArgs {
 
 export async function fetchHTMLReport(arg: FetchHTMLReportArgs): Promise<string | null> {
     try {
+        const params = new URLSearchParams();
+        params.set('minDate', dayjs(arg.minDate).format('YYYY-MM-DD'));
+        params.set('maxDate', dayjs(arg.maxDate).format('YYYY-MM-DD'));
         const url = htmlReportURL(arg.reportType)
-            .replace(':minDate', dayjs(arg.minDate).format('YYYYMMDD'))
-            .replace(':maxDate', dayjs(arg.maxDate).format('YYYYMMDD'))
-            .replace(':workCenter', encodeURIComponent(arg.workCenter));
+            .replace(':workCenter', encodeURIComponent(arg.workCenter))
+            .replace(':searchParams', params.toString());
         return await fetchHTML(url) ?? null;
     } catch (err: unknown) {
         if (err instanceof Error) {

@@ -1,6 +1,8 @@
-import {subBusinessDays} from 'date-fns'
+import dayjs from "dayjs";
 
-export const previousSLCWorkDay = ():string => {
-    const date = subBusinessDays(new Date(), 1);
-    return new Date(date).toISOString();
+export const previousSLCWorkDay = (): string => {
+    const day = dayjs();
+    return day.day() <= 1
+        ? day.subtract(1, 'week').day(5).format('YYYY-MM-DD')
+        : day.subtract(1, 'day').format('YYYY-MM-DD');
 };

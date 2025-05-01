@@ -4,7 +4,7 @@ import {loadEmployees} from './actions';
 import EmployeeList from './EmployeeList';
 import EmployeeEdit from './EmployeeEdit';
 import {ErrorBoundary} from "react-error-boundary";
-import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
+import ErrorBoundaryFallbackAlert from "../../components/ErrorBoundaryFallbackAlert";
 import {useAppDispatch} from "../../app/configureStore";
 
 const EmployeesTab = () => {

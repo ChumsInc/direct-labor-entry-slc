@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FormEvent} from "react";
+import React, {ChangeEvent, FormEvent, useId} from "react";
 import {useSelector} from "react-redux";
 import {
     selectFilterEmployee,
@@ -16,21 +16,28 @@ import {
     setWorkCenter
 } from "./actions";
 import EmployeeSelect from "../employees/EmployeeSelect";
-import {InputGroup, SpinnerButton} from "chums-components";
 import GroupBySelect from "./GroupBySelect";
 import ReportMinDate from "./ReportMinDate";
 import ReportMaxDate from "./ReportMaxDate";
 import {WORK_CENTERS} from "./constants";
 import StepInput from "../steps/StepInput";
 import {useAppDispatch} from "../../app/configureStore";
+import InputGroup from "react-bootstrap/InputGroup";
+import {FormControl, FormSelect} from "react-bootstrap";
+import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
 
-const AnalysisFilters: React.FC = () => {
+const AnalysisFilters = () => {
     const dispatch = useAppDispatch();
     const workCenter = useSelector(selectWorkCenter);
     const employee = useSelector(selectFilterEmployee);
     const operation = useSelector(selectFilterOperation);
     const item = useSelector(selectFilterItem);
     const loading = useSelector(selectReportLoading);
+    const idMinDate = useId();
+    const idMaxDate = useId();
+    const idWorkCenter = useId();
+    const idEmployee = useId();
+    const idItemCode = useId();
 
     const onChangeWorkCenter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(setWorkCenter(ev.target.value));
 
@@ -57,36 +64,40 @@ const AnalysisFilters: React.FC = () => {
             <div className="row g-3">
 
                 <div className="col-auto">
-                    <InputGroup bsSize="sm">
-                        <label className="input-group-text">From</label>
-                        <ReportMinDate/>
+                    <InputGroup size="sm">
+                        <InputGroup.Text as="label" htmlFor={idMinDate}>From</InputGroup.Text>
+                        <ReportMinDate id={idMinDate}/>
                     </InputGroup>
                 </div>
 
 
                 <div className="col-auto">
-                    <InputGroup bsSize="sm">
-                        <label className="input-group-text">To</label>
-                        <ReportMaxDate/>
+                    <InputGroup size="sm">
+                        <InputGroup.Text as="label" htmlFor={idMaxDate}>To</InputGroup.Text>
+                        <ReportMaxDate id={idMaxDate}/>
                     </InputGroup>
                 </div>
 
 
                 <div className="col-auto">
-                    <InputGroup bsSize="sm">
-                        <label className="input-group-text bi-house-door-fill"/>
-                        <select value={workCenter} onChange={onChangeWorkCenter} className="form-select form-select-sm">
+                    <InputGroup size="sm">
+                        <InputGroup.Text as="label" htmlFor={idWorkCenter} aria-label="Work Center">
+                            <span className="bi-house-door-fill" aria-hidden/>
+                        </InputGroup.Text>
+                        <FormSelect value={workCenter} onChange={onChangeWorkCenter} size="sm" id={idWorkCenter}>
                             <option value="%">All</option>
                             {WORK_CENTERS.map(wc => (<option key={wc.code} value={wc.code}>{wc.description}</option>))}
-                        </select>
+                        </FormSelect>
                     </InputGroup>
                 </div>
 
                 <div className="col-auto">
-                    <InputGroup bsSize="sm">
-                        <label className="input-group-text bi-person-fill"/>
-                        <EmployeeSelect value={employee ?? ''}
-                                        onSelect={(emp) => dispatch(setFilterEmployee(emp?.EmployeeNumber || ''))}/>
+                    <InputGroup size="sm">
+                        <InputGroup.Text as="label" htmlFor={idEmployee} aria-label="Employee">
+                            <span className="bi-person-fill" aria-hidden/>
+                        </InputGroup.Text>
+                        <EmployeeSelect value={employee ?? ''} id={idEmployee}
+                                        onChange={(emp) => dispatch(setFilterEmployee(emp?.EmployeeNumber || ''))}/>
                     </InputGroup>
 
                 </div>
@@ -96,16 +107,18 @@ const AnalysisFilters: React.FC = () => {
                 </div>
 
                 <div className="col-auto">
-                    <InputGroup bsSize="sm">
-                        <label className="input-group-text bi-upc"/>
-                        <input type="text" value={item ?? ''} placeholder="item code"
-                               className="form-control form-control-sm"
-                               onChange={(ev) => dispatch(setFilterItem(ev.target.value))}/>
+                    <InputGroup size="sm">
+                        <InputGroup.Text as="label" htmlFor={idItemCode} aria-label="Item Code">
+                            <span className="bi-upc" aria-hidden/>
+                        </InputGroup.Text>
+                        <FormControl type="text" placeholder="item code" size="sm" id={idItemCode}
+                                     value={item ?? ''}
+                                     onChange={(ev) => dispatch(setFilterItem(ev.target.value))}/>
                     </InputGroup>
                 </div>
 
                 <div className="col-auto">
-                    <SpinnerButton type="submit" className="btn btn-sm btn-primary"
+                    <SpinnerButton type="submit" size="sm" variant="primary" spinnerProps={{size: "sm"}}
                                    spinning={loading}>Submit</SpinnerButton>
                 </div>
                 <div className="col-auto">

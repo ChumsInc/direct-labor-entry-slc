@@ -1,5 +1,5 @@
 import {EmployeeTotalList} from "../common-types";
-import {SortProps} from "chums-components";
+import {SortProps} from "@chumsinc/sortable-tables";
 import Decimal from "decimal.js";
 import {BasicDLEntry, DLEntry, EmployeeDLEntryTotal} from "chums-types";
 

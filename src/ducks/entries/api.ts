@@ -1,4 +1,4 @@
-import {fetchJSON} from "chums-components";
+import {fetchJSON} from "@chumsinc/ui-utils";
 import {reSLCWorkCenter} from "../../contants";
 import {BasicDLEntry, DLEntry} from "chums-types";
 import {FetchEntriesProps, KeyedObject} from "../common-types";

@@ -1,7 +1,7 @@
 import {STORAGE_KEYS} from "../../utils/appStorage";
 import dayjs from "dayjs";
 import weekday from 'dayjs/plugin/weekday';
-import {LocalStore, SortProps} from 'chums-components';
+import {LocalStore} from '@chumsinc/ui-utils';
 import {ReportData, ReportGrouping, ReportGroupingId} from "./types";
 import {RootState} from "../../app/configureStore";
 import {FetchReportDataArgs} from "./api";
@@ -14,6 +14,7 @@ import {
     selectMinDate,
     selectWorkCenter
 } from "./selectors";
+import {SortProps} from "@chumsinc/sortable-tables";
 
 dayjs.extend(weekday);
 
@@ -138,7 +139,7 @@ export function setStorageReportGrouping(grouping: ReportGrouping) {
 }
 
 
-export function buildReportArgs(state: RootState): FetchReportDataArgs {
+export function buildReportArgs(state: RootState): URLSearchParams {
     const minDate = selectMinDate(state);
     const maxDate = selectMaxDate(state);
     const employeeNumber = selectFilterEmployee(state);
@@ -148,6 +149,8 @@ export function buildReportArgs(state: RootState): FetchReportDataArgs {
     const itemCode = selectFilterItem(state);
 
     const options = new URLSearchParams();
+    options.set('minDate', dayjs(minDate).format('YYYY-MM-DD'));
+    options.set('maxDate', dayjs(maxDate).format('YYYY-MM-DD'));
     if (employeeNumber) {
         options.set('EmployeeNumber', employeeNumber);
     }
@@ -160,19 +163,8 @@ export function buildReportArgs(state: RootState): FetchReportDataArgs {
     if (itemCode) {
         options.set('itemCode', itemCode);
     }
-    options.set(`group1`, groupBy[0]);
-    options.set(`group2`, groupBy[1]);
-    options.set(`group3`, groupBy[2]);
-    options.set(`group4`, groupBy[3]);
-    options.set(`group5`, groupBy[4]);
-    options.set(`group6`, groupBy[5]);
-    options.set(`group7`, groupBy[6]);
-
-    return {
-        minDate,
-        maxDate,
-        options
-    }
+    options.set('groups', Object.keys(groupBy).map(key => groupBy[key as unknown as ReportGroupingId] ?? '').filter(g => !!g).join(','))
+    return options;
 }
 
 

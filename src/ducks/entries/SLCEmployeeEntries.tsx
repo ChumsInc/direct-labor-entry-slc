@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import numeral from "numeral";
 import {between, MAX_DANGER, MAX_SUCCESS, MIN_DANGER, MIN_SUCCESS, rate} from './utils';
-import {Alert, ProgressBar, SortableTable, SortableTableField, SortProps, TablePagination} from "chums-components";
 import {
     selectCurrentEmployee,
     selectCurrentEntry,
@@ -15,6 +14,9 @@ import {loadEntries, setCurrentEntry, setEntriesSort} from "./actions";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import Decimal from "decimal.js";
 import {DLEntry} from "chums-types";
+import {SortableTable, SortableTableField, SortProps, TablePagination} from "@chumsinc/sortable-tables";
+import Alert from "react-bootstrap/Alert";
+import ProgressBar from "react-bootstrap/ProgressBar";
 
 const entryTableFields: SortableTableField<DLEntry>[] = [
     {field: 'WorkCenter', title: 'W/C', sortable: true},
@@ -25,14 +27,14 @@ const entryTableFields: SortableTableField<DLEntry>[] = [
         field: 'Minutes',
         title: 'Minutes',
         render: ({Minutes}) => numeral(Minutes).format('0,0'),
-        className: 'right',
+        align: 'end',
         sortable: true
     },
     {
         field: 'Quantity',
         title: 'Quantity',
         render: ({Quantity}) => numeral(Quantity).format('0,0'),
-        className: 'right',
+        align: 'end',
         sortable: true
     },
     // {field: 'AllowedMinutes', title: 'Allowed Minutes', render: (entry:Entry) => numeral(entry.AllowedMinutes).format('0,0'), className: 'right'},
@@ -40,7 +42,7 @@ const entryTableFields: SortableTableField<DLEntry>[] = [
         field: 'AllowedMinutes',
         title: 'Rate',
         render: (entry: DLEntry) => numeral(rate(entry)).format('0.0000'),
-        className: 'right',
+        align: 'end',
         sortable: true
     },
     {field: 'UPH', title: 'UPH', render: ({UPH}) => numeral(UPH).format('0,0'), className: 'right', sortable: true},
@@ -48,21 +50,23 @@ const entryTableFields: SortableTableField<DLEntry>[] = [
         field: 'StandardAllowedMinutes',
         title: "SAM",
         render: ({StandardAllowedMinutes}) => numeral(StandardAllowedMinutes).format('0.0000'),
-        className: 'right border-left',
+        className: 'border-left',
+        align: 'end',
         sortable: true
     },
     {
         field: 'StdUPH',
         title: 'Std UPH',
         render: ({StdUPH}) => numeral(StdUPH).format('0,0'),
-        className: 'right',
+        align: 'end',
         sortable: true
     },
     {
         field: 'AllowedMinutes',
         title: 'Rate %',
         render: (row) => numeral(row.StdUPH ? new Decimal(row.UPH).dividedBy(row.StdUPH).toString() : 1).format('0.0%'),
-        className: 'right border-left',
+        align: 'end',
+        className: 'border-left',
         sortable: true
     },
 ];
@@ -155,7 +159,7 @@ const SLCEmployeeEntries = () => {
     return (
         <div>
             <h4>Employee Entries - {employee.FullName || 'Select Employee'}</h4>
-            {loading && <ProgressBar striped={true} animated={true}/>}
+            {loading && <ProgressBar striped animated now={100}/>}
             <SortableTable fields={entryTableFields}
                            data={list.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
                            currentSort={sort} onChangeSort={sortChangeHandler}
@@ -165,7 +169,7 @@ const SLCEmployeeEntries = () => {
                            onSelectRow={onSelectEntry}
                            rowClassName={rowClassName} tfoot={tfoot}/>
             <TablePagination page={page} onChangePage={setPage}
-                             rowsPerPage={rowsPerPage} onChangeRowsPerPage={rowsPerPageChangeHandler}
+                             rowsPerPage={rowsPerPage} rowsPerPageProps={{onChange: rowsPerPageChangeHandler}}
                              count={list.length}/>
         </div>
     );

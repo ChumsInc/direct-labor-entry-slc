@@ -1,10 +1,8 @@
 import {ReportData} from "./types";
 import dayjs from "dayjs";
-import {fetchJSON} from "chums-components";
+import {fetchJSON} from "@chumsinc/ui-utils";
 
-export const API_PATH_REPORT = '/api/operations/production/dl/report/data/:minDate/:maxDate?:queryString';
-export const API_PATH_REPORT_EMPLOYEE_TOTAL = '/api/operations/production/dl/report/employee-total/:minDate/:maxDate/:workCenter/render';
-export const API_PATH_REPORT_STEP_TOTAL = '/api/operations/production/dl/report/step-total/:minDate/:maxDate/:workCenter/render';
+export const API_PATH_REPORT = '/api/operations/production/dl/report/data.json?:queryString';
 
 export interface FetchReportDataArgs {
     minDate: string;
@@ -12,12 +10,10 @@ export interface FetchReportDataArgs {
     options: URLSearchParams;
 }
 
-export async function fetchReportData(arg: FetchReportDataArgs): Promise<ReportData[]> {
+export async function fetchReportData(arg: URLSearchParams): Promise<ReportData[]> {
     try {
         const url = API_PATH_REPORT
-            .replace(':minDate', dayjs(arg.minDate).format('YYYYMMDD'))
-            .replace(':maxDate', dayjs(arg.maxDate).format('YYYYMMDD'))
-            .replace(':queryString', arg.options.toString());
+            .replace(':queryString', arg.toString());
         const res = await fetchJSON<{ result: ReportData[] }>(url, {cache: 'no-cache'});
         return res?.result ?? [];
     } catch (err: unknown) {

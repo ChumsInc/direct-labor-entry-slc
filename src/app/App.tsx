@@ -1,18 +1,28 @@
-import React, {useEffect, useState} from 'react';
+import React, {ReactNode, useEffect, useState} from 'react';
 import {useAppDispatch} from "./configureStore";
 import {loadEmployees} from "../ducks/employees/actions";
-import {Tab, TabList} from 'chums-components';
-import AlertList from '../ducks/alerts/AlertList';
+import AlertList from '../components/AlertList';
 import SLCEntryTab from "../ducks/entries/SLCEntryTab";
 import EmployeeTab from "../ducks/employees/EmployeesTab";
 import ReportTab from "../ducks/reports/ReportTab";
 import AnalysisTab from "../ducks/analysis/AnalysisTab";
 import {appStorage, STORAGE_KEYS} from "../utils/appStorage";
 import {ErrorBoundary} from "react-error-boundary";
-import ErrorBoundaryFallbackAlert from "../ducks/alerts/ErrorBoundaryFallbackAlert";
+import ErrorBoundaryFallbackAlert from "../components/ErrorBoundaryFallbackAlert";
 import VersionNo from "../ducks/version/VersionNo";
 import ChangeLog from "../ducks/version/ChangeLog";
+import AppTabs from "./AppTabs";
 
+export interface Tab {
+    id: string,
+    title: string|ReactNode,
+
+    /** Bootstrap icon className */
+    icon?: string,
+
+    canClose?: boolean,
+    disabled?: boolean,
+}
 
 const TAB_SLC_ENTRY = 'slcEntry';
 const TAB_REPORTS = 'reports';
@@ -37,15 +47,16 @@ const App = () => {
         dispatch(loadEmployees());
     }, []);
 
-    const tabChangeHandler = (tab:Tab) => {
-        appStorage.setItem(STORAGE_KEYS.TAB, tab.id);
-        setTab(tab.id);
+    const tabChangeHandler = (tab:string|null) => {
+        appStorage.setItem(STORAGE_KEYS.TAB, tab ?? appTabs[0].id);
+        setTab(tab ?? appTabs[0].id);
     }
 
     return (
         <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
             <div>
-                <TabList tabs={appTabs} currentTabId={tab} onSelectTab={tabChangeHandler} className="mb-3"/>
+
+                <AppTabs tabs={appTabs} currentTab={tab} onChangeTab={tabChangeHandler} className="mb-3"/>
                 <AlertList/>
                 {tab === TAB_SLC_ENTRY && (
                     <SLCEntryTab/>

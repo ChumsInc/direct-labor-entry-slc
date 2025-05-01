@@ -1,13 +1,14 @@
 import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import numeral from "numeral";
-import {SortableTable, SortableTableField, SortProps, SpinnerButton} from "chums-components";
+import {SortableTable, SortableTableField, SortProps} from "@chumsinc/sortable-tables";
 import {selectCurrentEmployee, selectEmployeeList} from "../employees/selectors";
 import {loadEntries, setEntryEmployee, setEntryTotalsSort} from "./actions";
 import {selectEmployeeTotals, selectEntriesLoading, selectEntryDate, selectEntryTotalsSort} from "./selectors";
 import {useAppDispatch, useAppSelector} from "../../app/configureStore";
 import Decimal from "decimal.js";
-import {DLEntry, EmployeeDLEntryTotal} from "chums-types";
+import {EmployeeDLEntryTotal} from "chums-types";
+import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
 
 const employeeTableFields: SortableTableField<EmployeeDLEntryTotal>[] = [
     {field: 'FullName', title: 'Name', sortable: true},
@@ -16,21 +17,21 @@ const employeeTableFields: SortableTableField<EmployeeDLEntryTotal>[] = [
         title: 'Minutes',
         sortable: true,
         render: (row: EmployeeDLEntryTotal) => numeral(row.Minutes).format('0,0'),
-        className: 'text-end'
+        align: 'end',
     },
     {
         field: 'AllowedMinutes',
         title: 'Allowed',
         sortable: true,
         render: (row: EmployeeDLEntryTotal) => numeral(row.AllowedMinutes).format('0,0'),
-        className: 'right'
+        align: 'end',
     },
     {
         field: 'Rate',
         title: 'Rate',
         sortable: true,
         render: row => numeral(row.Rate).format('0.0%'),
-        className: 'text-end'
+        align: 'end',
     }
 ];
 
@@ -97,7 +98,7 @@ const EmployeeTotals: React.FC = () => {
             <div className="row g-3">
                 <h4 className="col">Employee Totals</h4>
                 <div className="col-auto">
-                    <SpinnerButton spinning={isLoading} onClick={onReload} size="sm">Reload</SpinnerButton>
+                    <SpinnerButton spinning={isLoading} onClick={onReload} size="sm" spinnerProps={{size: 'sm'}}>Reload</SpinnerButton>
                 </div>
             </div>
             <SortableTable currentSort={sort} onChangeSort={sortChangeHandler} size="sm"
