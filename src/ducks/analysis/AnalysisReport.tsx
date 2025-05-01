@@ -12,19 +12,28 @@ import ErrorBoundaryFallbackAlert from "../alerts/ErrorBoundaryFallbackAlert";
 import {setReportSort} from "./actions";
 import Decimal from "decimal.js";
 
-const _rate = ({Quantity = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Quantity).eq(0) ? 0 : new Decimal(Minutes).div(Quantity).toString();
-const _uph = ({Quantity = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Quantity).eq(0) ? 0 : new Decimal(60).div(_rate({Quantity, Minutes})).toString();
-const _ratePct = ({AllowedMinutes = 0, Minutes = 0}:Partial<AnalysisTotal>) => new Decimal(Minutes).eq(0) ? 0 : new Decimal(AllowedMinutes).div(Minutes).toString();
+const _rate = ({
+                   Quantity = 0,
+                   Minutes = 0
+               }: Partial<AnalysisTotal>) => new Decimal(Quantity).eq(0) ? 0 : new Decimal(Minutes).div(Quantity).toString();
+const _uph = ({
+                  Quantity = 0,
+                  Minutes = 0
+              }: Partial<AnalysisTotal>) => new Decimal(Quantity).eq(0) ? 0 : new Decimal(60).div(_rate({
+    Quantity,
+    Minutes
+})).toString();
+const _ratePct = ({
+                      AllowedMinutes = 0,
+                      Minutes = 0
+                  }: Partial<AnalysisTotal>) => new Decimal(Minutes).eq(0) ? 0 : new Decimal(AllowedMinutes).div(Minutes).toString();
 
 interface AnalysisField extends SortableTableField<ReportData> {
     total?: boolean;
 }
 
 
-
-type FieldDefinitionObject = {
-    [key in keyof ReportData]: AnalysisField;
-};
+type FieldDefinitionObject = Record<keyof ReportData | string, AnalysisField>;
 
 const fieldsDefinition: FieldDefinitionObject = {
     idEntries: {field: "idEntries", title: 'ID', sortable: true},
@@ -32,7 +41,7 @@ const fieldsDefinition: FieldDefinitionObject = {
     Minutes: {
         field: 'Minutes',
         title: 'Minutes',
-        className: 'right',
+        className: 'text-end',
         total: true,
         sortable: true,
         render: (row: ReportData) => numeral(row.Minutes).format('0,0')
@@ -40,14 +49,14 @@ const fieldsDefinition: FieldDefinitionObject = {
     AllowedMinutes: {
         field: 'AllowedMinutes',
         title: 'Std Minutes',
-        className: 'right',
+        className: 'text-end',
         total: true, sortable: true,
         render: (row: ReportData) => numeral(row.AllowedMinutes).format('0,0')
     },
     Quantity: {
         field: 'Quantity',
         title: 'Quantity',
-        className: 'right',
+        className: 'text-end',
         total: true,
         sortable: true,
         render: (row: ReportData) => numeral(row.Quantity).format('0,0')
@@ -69,23 +78,32 @@ const fieldsDefinition: FieldDefinitionObject = {
     StandardAllowedMinutes: {
         field: 'StandardAllowedMinutes',
         title: 'SAM',
-        className: 'right', sortable: true,
+        className: 'text-end', sortable: true,
         render: (row: ReportData) => numeral(row.StandardAllowedMinutes).format('0.0000')
     },
     Rate: {
-        field: 'Rate', className: 'right', sortable: true, title: 'Rate %',
+        field: 'Rate', className: 'text-end', sortable: true, title: 'Rate %',
         render: (row: ReportData) => numeral(row.Rate).format('0,0.0%')
     },
     UPH: {
         field: 'UPH',
-        className: 'right',
+        className: 'text-end',
         title: 'UPH',
         render: (row: ReportData) => numeral(row.UPH).format('0,0'),
         sortable: true
     },
+    UPHHistoric: {
+        field: 'SAM',
+        title: 'Std UPH',
+        className: 'text-end',
+        sortable: true,
+        render: (row) => row.SAM ? numeral(new Decimal(60).div(row.SAM)).format('0,0') : 'N/A',
+    },
     UPHStd: {
-        field: 'UPHStd', title: 'Std UPH', className: 'right',
-        render: (row: ReportData) => numeral(row.UPHStd).format('0,0'),
+        field: 'UPHStd',
+        title: 'Current Std UPH',
+        className: 'text-end',
+        render: (row: ReportData) => row.UPHStd ? numeral(row.UPHStd).format('0,0') : 'N/A',
         sortable: true
     },
     SAM: {
@@ -140,11 +158,11 @@ const groupFields = (group: keyof ReportData): AnalysisField[] => {
 }
 
 interface AnalysisTotal {
-    Minutes: number|string,
-    AllowedMinutes: number|string,
-    Quantity: number|string,
-    Rate: number|string,
-    UPH: number|string,
+    Minutes: number | string,
+    AllowedMinutes: number | string,
+    Quantity: number | string,
+    Rate: number | string,
+    UPH: number | string,
 }
 
 const totalInit: AnalysisTotal = {
@@ -191,6 +209,7 @@ const AnalysisReport: React.FC = () => {
 
         if (fields.filter(f => f.field === fieldsDefinition.StepCode.field).length > 0
             && !fields.filter(f => f.field === fieldsDefinition.UPHStd.field).length) {
+            fields.push(fieldsDefinition.UPHHistoric);
             fields.push(fieldsDefinition.UPHStd);
         }
         if (!!fields.filter(f => f.field === fieldsDefinition.StandardAllowedMinutes.field).length
@@ -251,7 +270,7 @@ interface ReportTFoot {
     fields: AnalysisField[],
 }
 
-const ReportTFoot = ({totals, fields}:ReportTFoot) => {
+const ReportTFoot = ({totals, fields}: ReportTFoot) => {
     const [, ...otherFields] = fields;
     return (
         <tfoot>

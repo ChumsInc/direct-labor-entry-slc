@@ -27,6 +27,7 @@ export interface ReportData {
     Rate: number,
     UPH: number,
     UPHStd: number,
+    UPHHistoric: number|string;
 }
 
 export type HTMLReportType = 'employee-total'|'step-total';
