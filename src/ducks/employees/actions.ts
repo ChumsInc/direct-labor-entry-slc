@@ -32,8 +32,7 @@ export const saveEmployee = createAsyncThunk<DLEmployee | null, DLEmployee>(
     {
         condition: (arg, {getState}) => {
             const state = getState() as RootState;
-            return selectEmployeesActionStatus(state) === 'idle'
-                && arg.EmployeeNumber !== '';
+            return selectEmployeesActionStatus(state) === 'idle';
         }
     }
 )
