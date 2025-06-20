@@ -6,7 +6,7 @@ import reportsReducer from "../ducks/reports";
 import workTicketReducer from "../ducks/work-ticket";
 import stepsReducer from "../ducks/steps";
 import analysisReducer from "../ducks/analysis";
-import versionReducer from "../ducks/version";
+import versionSlice from "../ducks/version";
 import {alertsSlice} from "@chumsinc/alert-list";
 
 
@@ -18,7 +18,7 @@ const rootReducer = combineReducers({
     reports: reportsReducer,
     steps: stepsReducer,
     workTicket: workTicketReducer,
-    version: versionReducer,
+    [versionSlice.reducerPath]: versionSlice.reducer,
 });
 
 const store = configureStore({

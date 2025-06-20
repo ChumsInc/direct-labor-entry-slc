@@ -2,7 +2,7 @@ import {fetchHTML, fetchJSON} from "@chumsinc/ui-utils";
 
 export async function fetchVersion():Promise<string|null> {
     try {
-        const packageJSON = await fetchJSON<{version:string}>('package.json');
+        const packageJSON = await fetchJSON<{version:string}>('package.json', {cache: 'no-cache'});
         return packageJSON?.version ?? null
     } catch(err:unknown) {
         if (err instanceof Error) {
@@ -16,7 +16,7 @@ export async function fetchVersion():Promise<string|null> {
 
 export async function fetchChangeLog():Promise<string|null> {
     try {
-        const content = await fetchHTML('CHANGELOG.md');
+        const content = await fetchHTML('./CHANGELOG.md', {cache: 'no-cache'});
         return content ?? null;
     } catch(err:unknown) {
         if (err instanceof Error) {

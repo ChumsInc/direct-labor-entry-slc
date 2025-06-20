@@ -1,18 +1,26 @@
-import React, {useEffect} from 'react';
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
-import {selectVersionNo} from "./selectors";
+import React, {useEffect, useRef} from 'react';
+import {useAppDispatch, useAppSelector} from "@/app/configureStore";
+import {selectVersionNo} from "./index";
 import {loadVersion} from "./actions";
 
 const VersionNo = () => {
     const dispatch = useAppDispatch();
     const versionNo = useAppSelector(selectVersionNo);
+    const timerRef = useRef<number>(0);
 
     useEffect(() => {
-        dispatch(loadVersion())
+        loadHandler()
+        timerRef.current = window.setInterval(loadHandler, 1000 * 60 * 60)
+        return () => {
+            clearTimeout(timerRef.current);
+        }
     }, []);
 
+    const loadHandler = () => {
+        dispatch(loadVersion());
+    }
     return (
-        <span>Version: {versionNo ?? 'loading'}</span>
+        <span onClick={loadHandler}>Version: {versionNo ?? 'loading'}</span>
     )
 }
 
