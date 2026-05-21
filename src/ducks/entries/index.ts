@@ -19,7 +19,7 @@ import {
 import {loadDocument} from "../work-ticket/actions";
 import Decimal from "decimal.js";
 import {storeEntryDate} from "../../contants";
-import {previousSLCWorkDay} from "../../utils/workDays";
+import {currentSLCWorkDay, previousSLCWorkDay} from "../../utils/workDays";
 import {SortProps} from "@chumsinc/sortable-tables";
 
 export interface EntriesState {
@@ -40,7 +40,7 @@ export const initialEntriesState = (): EntriesState => ({
     list: [],
     current: null,
     actionStatus: 'idle',
-    entryDate: LocalStore.getItem<string>(storeEntryDate, previousSLCWorkDay()),
+    entryDate: currentSLCWorkDay(),
     employee: null,
     sort: {...defaultSort},
     totalsSort: {

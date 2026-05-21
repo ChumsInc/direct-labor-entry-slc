@@ -6,3 +6,7 @@ export const previousSLCWorkDay = (): string => {
         ? day.subtract(1, 'week').day(5).format('YYYY-MM-DD')
         : day.subtract(1, 'day').format('YYYY-MM-DD');
 };
+
+export const currentSLCWorkDay = () => {
+    return dayjs().format('YYYY-MM-DD');
+}
