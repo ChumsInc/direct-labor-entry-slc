@@ -1,5 +1,4 @@
-import React from 'react';
-import {FallbackProps} from "react-error-boundary";
+import type {FallbackProps} from "react-error-boundary";
 import Alert from "react-bootstrap/Alert";
 
 export default function ErrorBoundaryFallbackAlert({error, resetErrorBoundary}: FallbackProps) {
@@ -7,7 +6,7 @@ export default function ErrorBoundaryFallbackAlert({error, resetErrorBoundary}: 
         <Alert variant="danger" dismissible onClose={resetErrorBoundary}>
             <strong>Something went wrong!</strong>
             <div className="text-light">
-                {error instanceof Error ? error.message : "something went wrong"}
+                {error instanceof Error ? error.message : "An unknown error occurred."}
             </div>
         </Alert>
     )

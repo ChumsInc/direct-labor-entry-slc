@@ -1,6 +1,5 @@
-import React from 'react';
 import {useAppDispatch, useAppSelector} from "../app/configureStore";
-import {dismissAlert, selectAllAlerts, StyledErrorAlert} from "@chumsinc/alert-list";
+import {dismissAlert, selectAllAlerts, type StyledErrorAlert} from "@chumsinc/alert-list";
 import {ContextAlert} from "@chumsinc/react-bootstrap-addons";
 
 const AlertList = () => {
