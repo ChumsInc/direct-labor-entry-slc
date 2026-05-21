@@ -1,10 +1,10 @@
-import React, {ChangeEvent} from 'react';
+import {type ChangeEvent} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {selectMaxDate, selectMinDate} from "./selectors";
-import {inputDate} from "../../utils/date";
-import {setMaxDate, setMinDate} from "./actions";
+import {selectMaxDate, selectMinDate} from "../selectors.ts";
+import {inputDate} from "@/utils/date.ts";
+import {setMaxDate, setMinDate} from "../actions.ts";
 import dayjs from "dayjs";
-import {FormControl, FormControlProps} from "react-bootstrap";
+import {FormControl, type FormControlProps} from "react-bootstrap";
 
 export type ReportMinDateProps = Omit<FormControlProps, 'value'|'onChange'|'type'>;
 const ReportMinDate = (props:ReportMinDateProps) => {

@@ -1,8 +1,8 @@
-import React, {ChangeEvent} from 'react';
-import {ReportData, ReportGroupingId} from "./types";
-import {selectGroupBy, selectLowerGroupBy} from "./selectors";
-import {setReportGrouping} from "./actions";
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {type ChangeEvent} from 'react';
+import type {ReportData, ReportGroupingId} from "../types.ts";
+import {selectGroupBy, selectLowerGroupBy} from "../selectors.ts";
+import {setReportGrouping} from "../actions.ts";
+import {useAppDispatch, useAppSelector} from "@/app/configureStore.ts";
 
 export interface GroupOption {
     value: keyof ReportData;
@@ -25,7 +25,7 @@ export interface GroupBySelectProps {
     onChange: () => void,
 }
 
-const GroupBySelect: React.FC<GroupBySelectProps> = ({groupId, onChange}) => {
+const GroupBySelect = ({groupId, onChange}:GroupBySelectProps) => {
     const dispatch = useAppDispatch();
     const value = useAppSelector((state) => selectGroupBy(state, groupId));
     const lower = useAppSelector((state) => selectLowerGroupBy(state, groupId));

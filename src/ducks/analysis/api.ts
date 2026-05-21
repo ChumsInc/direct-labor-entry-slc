@@ -1,5 +1,4 @@
-import {ReportData} from "./types";
-import dayjs from "dayjs";
+import type {ReportData} from "./types";
 import {fetchJSON} from "@chumsinc/ui-utils";
 
 export const API_PATH_REPORT = '/api/operations/production/dl/report/data.json?:queryString';

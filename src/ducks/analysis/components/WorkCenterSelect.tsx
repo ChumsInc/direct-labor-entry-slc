@@ -1,8 +1,8 @@
-import React, {ChangeEvent} from "react";
-import {WORK_CENTERS} from "./constants";
+import {type ChangeEvent} from "react";
+import {WORK_CENTERS} from "../constants.ts";
 import {useDispatch, useSelector} from "react-redux";
-import {selectWorkCenter} from "./selectors";
-import {setWorkCenter} from "./actions";
+import {selectWorkCenter} from "../selectors.ts";
+import {setWorkCenter} from "../actions.ts";
 
 const WorkCenterSelect = () => {
     const dispatch = useDispatch();

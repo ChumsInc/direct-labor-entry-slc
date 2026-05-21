@@ -1,5 +1,5 @@
-import {RootState} from "../../app/configureStore";
-import {ReportGroupingId} from "./types";
+import type {RootState} from "@/app/configureStore";
+import type {ReportGroupingId} from "./types";
 import {createSelector} from "@reduxjs/toolkit";
 import {reportSorter} from "./utils";
 
@@ -22,7 +22,7 @@ export const selectAllGroupBy = (state: RootState) => state.analysis.groupBy;
 export const selectGroupBy = (state: RootState, id: ReportGroupingId) => state.analysis.groupBy[id];
 
 export const selectLowerGroupBy = createSelector(
-    [selectAllGroupBy, (state, id) => id],
+    [selectAllGroupBy, (_, id) => id],
     (list, id) => {
         return Object.keys(list)
             .sort()

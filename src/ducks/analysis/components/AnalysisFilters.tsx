@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FormEvent, useId} from "react";
+import {type ChangeEvent, useId} from "react";
 import {useSelector} from "react-redux";
 import {
     selectFilterEmployee,
@@ -6,7 +6,7 @@ import {
     selectFilterOperation,
     selectReportLoading,
     selectWorkCenter
-} from "./selectors";
+} from "../selectors.ts";
 import {
     loadReportData,
     loadReportExcel,
@@ -14,14 +14,14 @@ import {
     setFilterItem,
     setFilterOperation,
     setWorkCenter
-} from "./actions";
-import EmployeeSelect from "../employees/EmployeeSelect";
-import GroupBySelect from "./GroupBySelect";
-import ReportMinDate from "./ReportMinDate";
-import ReportMaxDate from "./ReportMaxDate";
-import {WORK_CENTERS} from "./constants";
-import StepInput from "../steps/StepInput";
-import {useAppDispatch} from "../../app/configureStore";
+} from "../actions.ts";
+import EmployeeSelect from "../../employees/EmployeeSelect.tsx";
+import GroupBySelect from "./GroupBySelect.tsx";
+import ReportMinDate from "./ReportMinDate.tsx";
+import ReportMaxDate from "./ReportMaxDate.tsx";
+import {WORK_CENTERS} from "../constants.ts";
+import StepInput from "../../steps/StepInput.tsx";
+import {useAppDispatch} from "@/app/configureStore.ts";
 import InputGroup from "react-bootstrap/InputGroup";
 import {FormControl, FormSelect} from "react-bootstrap";
 import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
@@ -41,8 +41,7 @@ const AnalysisFilters = () => {
 
     const onChangeWorkCenter = (ev: ChangeEvent<HTMLSelectElement>) => dispatch(setWorkCenter(ev.target.value));
 
-    const onSubmit = (ev: FormEvent) => {
-        ev.preventDefault();
+    const onSubmit = () => {
         dispatch(loadReportData())
     }
 
@@ -60,7 +59,7 @@ const AnalysisFilters = () => {
 
     return (
 
-        <form onSubmit={onSubmit}>
+        <form action={onSubmit}>
             <div className="row g-3">
 
                 <div className="col-auto">

@@ -1,6 +1,6 @@
 import {WORK_CENTER_INH} from "./constants";
-import {ReportData, ReportGrouping} from "./types";
-import {ActionStatus} from "../common-types";
+import type {ReportData, ReportGrouping} from "./types";
+import type {ActionStatus} from "../common-types";
 import {
     getGroupingSortProps,
     getStorageEmployee,
@@ -12,7 +12,7 @@ import {
     getStorageWorkCenter
 } from "./utils";
 import {createReducer} from "@reduxjs/toolkit";
-import {SortProps} from "@chumsinc/sortable-tables";
+import type {SortProps} from "@chumsinc/sortable-tables";
 import {
     loadReportData,
     setFilterEmployee,

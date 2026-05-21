@@ -1,5 +1,5 @@
 import {selectReportLoading} from "./selectors";
-import {ReportData, ReportGrouping} from "./types";
+import type {ReportData, ReportGrouping} from "./types";
 import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
 import {
     buildReportArgs,
@@ -11,10 +11,9 @@ import {
     setStorageShowInactive,
     setStorageWorkCenter
 } from "./utils";
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore.ts";
 import {fetchReportData} from "./api";
-import dayjs from "dayjs";
-import {SortProps} from "@chumsinc/sortable-tables";
+import type {SortProps} from "@chumsinc/sortable-tables";
 
 export const API_PATH_REPORT = '/api/operations/production/dl/report/data.json?:queryString';
 export const API_PATH_REPORT_XLSX = '/api/operations/production/dl/report/data.xlsx?:queryString';
@@ -90,7 +89,7 @@ export const loadReportExcel = createAsyncThunk<void, void>(
         window.open(url, '_blank');
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return !selectReportLoading(state);
         }

@@ -1,10 +1,9 @@
-import {STORAGE_KEYS} from "../../utils/appStorage";
+import {STORAGE_KEYS} from "@/utils/appStorage";
 import dayjs from "dayjs";
 import weekday from 'dayjs/plugin/weekday';
 import {LocalStore} from '@chumsinc/ui-utils';
-import {ReportData, ReportGrouping, ReportGroupingId} from "./types";
-import {RootState} from "../../app/configureStore";
-import {FetchReportDataArgs} from "./api";
+import type {ReportData, ReportGrouping, ReportGroupingId} from "./types";
+import type {RootState} from "@/app/configureStore";
 import {
     selectAllGroupBy,
     selectFilterEmployee,
@@ -14,7 +13,7 @@ import {
     selectMinDate,
     selectWorkCenter
 } from "./selectors";
-import {SortProps} from "@chumsinc/sortable-tables";
+import type {SortProps} from "@chumsinc/sortable-tables";
 
 dayjs.extend(weekday);
 
@@ -91,7 +90,6 @@ export function getStorageMaxDate(): string {
 export function setStorageMaxDate(date: string): string {
     if (!date || !dayjs(date).isValid()) {
         date = dayjs().subtract(1, 'weeks').weekday(5).toISOString();
-        ``
     }
     LocalStore.setItem<string>(STORAGE_KEYS.analysis.maxDate, date);
     return date;
