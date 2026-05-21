@@ -8,7 +8,6 @@
 
 use chums\ui\WebUI2;
 use chums\user\Groups;
-use chums\ui\CSSOptions;
 
 require_once "autoload.inc.php";
 
@@ -17,6 +16,5 @@ $ui = new WebUI2([
     'bodyClassName' => 'container-fluid',
     'requiredRoles' => [Groups::DIRECTLABOR, Groups::PRODUCTION],
 ]);
-$ui->addManifestJSON('./public/js/manifest.json')
-    ->addCSS('./public/styles.css', CSSOptions::parse(['useTimestampVersion' => true]))
+$ui->addViteManifest()
     ->render();
