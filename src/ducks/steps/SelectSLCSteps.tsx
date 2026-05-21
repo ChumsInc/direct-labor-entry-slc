@@ -1,10 +1,10 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
+import {type ChangeEvent, startTransition, useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
 import {loadSteps} from "./actions";
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {useAppDispatch, useAppSelector} from "@/app/configureStore";
 import {selectStepsLoaded, selectWorkCenterSteps} from "./selectors";
 import {stepSorter} from "./utils";
-import {MinimalStep} from "../common-types";
+import type {MinimalStep} from "../common-types";
 
 
 export interface SelectSLCStepsProps {
@@ -27,15 +27,17 @@ const SelectSLCSteps = ({workCenter, value, stepId, step, onChange, required, di
         if (!loaded) {
             dispatch(loadSteps());
         }
-    }, []);
+    }, [dispatch, loaded]);
 
     useEffect(() => {
-        let _list: MinimalStep[] = [...list];
-        if (step && !step.id) {
-            _list = [...list, step];
-        }
-        const steps = _list.sort(stepSorter({field: "stepCode", ascending: true}));
-        setSteps(steps);
+        startTransition(() => {
+            let _list: MinimalStep[] = [...list];
+            if (step && !step.id) {
+                _list = [...list, step];
+            }
+            const steps = _list.sort(stepSorter({field: "stepCode", ascending: true}));
+            setSteps(steps);
+        })
     }, [list, workCenter, step]);
 
     const changeHandler = (ev: ChangeEvent<HTMLSelectElement>) => {

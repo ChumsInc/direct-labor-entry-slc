@@ -1,11 +1,11 @@
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 import {createSelector} from "@reduxjs/toolkit";
 import {stepSorter} from "./utils";
 
 export const selectStepsList = (state: RootState) => state.steps.list;
 export const selectStepsLoading = (state: RootState) => state.steps.status === 'loading';
 export const selectStepsLoaded = (state: RootState) => state.steps.loaded;
-export const selectStepsWorkCenter = (state: RootState, wc: string) => wc;
+export const selectStepsWorkCenter = (_: RootState, wc: string) => wc;
 
 export const selectWorkCenterSteps = createSelector(
     [selectStepsList, selectStepsWorkCenter],

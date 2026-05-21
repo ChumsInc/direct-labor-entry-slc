@@ -1,4 +1,4 @@
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 
 
 export const selectWorkTicketLoading = (state: RootState): boolean => state.workTicket.status === 'loading';

@@ -1,4 +1,3 @@
-import React from 'react';
 import {Toast, ToastContainer} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "@/app/configureStore";
 import {dismissNewVersion, selectNextVersionNo} from "@/ducks/version/index";

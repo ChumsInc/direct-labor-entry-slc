@@ -1,12 +1,12 @@
-import React, {ChangeEvent, FormEvent, useState} from "react";
+import {type ChangeEvent, useState} from "react";
 import {useSelector} from "react-redux";
 import {selectHTML} from "./selectors";
 import {loadHTMLReport} from "./actions";
-import {HTMLReportType} from "./types";
+import type {HTMLReportType} from "./types";
 import ReportMinDate from "./ReportMinDate";
 import ReportMaxDate from "./ReportMaxDate";
 import WorkCenterSelect from "./WorkCenterSelect";
-import {useAppDispatch} from "../../app/configureStore";
+import {useAppDispatch} from "@/app/configureStore";
 
 
 const ReportTab: React.FC = () => {
@@ -16,14 +16,13 @@ const ReportTab: React.FC = () => {
 
     const onChangeReportType = (ev: ChangeEvent<HTMLSelectElement>) => setReportType(ev.target.value as HTMLReportType);
 
-    const onSubmit = (ev: FormEvent) => {
-        ev.preventDefault();
+    const onSubmit = () => {
         dispatch(loadHTMLReport(reportType))
     }
 
     return (
         <div>
-            <form className="row g-3 align-items-baseline" onSubmit={onSubmit}>
+            <form className="row g-3 align-items-baseline" action={onSubmit}>
                 <label className="col-auto">From</label>
                 <div className="col-auto">
                     <ReportMinDate/>

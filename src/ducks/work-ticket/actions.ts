@@ -1,7 +1,7 @@
 import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
-import {WorkTicketResponse} from "../common-types";
+import type {WorkTicketResponse} from "../common-types";
 import {fetchDocument} from "./api";
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 import {selectWorkTicketLoading} from "./selectors";
 
 export const loadDocument = createAsyncThunk<WorkTicketResponse, string>(
@@ -10,7 +10,7 @@ export const loadDocument = createAsyncThunk<WorkTicketResponse, string>(
         return await fetchDocument(arg);
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return !selectWorkTicketLoading(state);
         }

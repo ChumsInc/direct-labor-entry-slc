@@ -1,10 +1,10 @@
-import {ActionStatus} from "../common-types";
+import type {ActionStatus} from "../common-types";
 import {createReducer} from "@reduxjs/toolkit";
 import {loadSteps} from "./actions";
-import {SortProps} from "@chumsinc/sortable-tables";
+import type {SortProps} from "@chumsinc/sortable-tables";
 import {stepSorter} from "./utils";
 import {reSLCWorkCenter} from "../../contants";
-import {DLStep} from "chums-types";
+import type {DLStep} from "chums-types";
 
 export interface StepsState {
     list: DLStep[];

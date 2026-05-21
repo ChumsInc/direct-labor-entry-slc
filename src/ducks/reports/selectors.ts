@@ -1,4 +1,4 @@
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 
 export const selectMinDate = (state: RootState) => state.reports.minDate;
 export const selectMaxDate = (state: RootState) => state.reports.maxDate;

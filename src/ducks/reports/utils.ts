@@ -1,4 +1,4 @@
-import {STORAGE_KEYS} from "../../utils/appStorage";
+import {STORAGE_KEYS} from "@/utils/appStorage";
 import dayjs from "dayjs";
 import weekday from 'dayjs/plugin/weekday'
 import {LocalStore} from '@chumsinc/ui-utils';

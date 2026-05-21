@@ -1,8 +1,8 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {fetchSteps} from "./api";
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 import {selectStepsLoading} from "./selectors";
-import {DLStep} from "chums-types";
+import type {DLStep} from "chums-types";
 
 export const loadSteps = createAsyncThunk<DLStep[], void>(
     'steps/load',

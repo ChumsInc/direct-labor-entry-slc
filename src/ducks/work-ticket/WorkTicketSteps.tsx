@@ -1,11 +1,10 @@
-import React from "react";
 import {useSelector} from "react-redux";
 import {selectWorkTicket} from "./selectors";
 import numeral from "numeral";
 import {updateEntry} from "../entries/actions";
 import classNames from "classnames";
-import {useAppDispatch} from "../../app/configureStore";
-import {WorkTicketDetail} from "chums-types";
+import {useAppDispatch} from "@/app/configureStore";
+import type {WorkTicketDetail} from "chums-types";
 import Decimal from "decimal.js";
 
 export interface WorkTicketStepsProps {

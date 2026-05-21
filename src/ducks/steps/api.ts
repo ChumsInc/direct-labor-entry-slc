@@ -1,5 +1,5 @@
 import {fetchJSON} from "@chumsinc/ui-utils";
-import {DLStep} from "chums-types";
+import type {DLStep} from "chums-types";
 
 export async function fetchSteps(): Promise<DLStep[]> {
     try {

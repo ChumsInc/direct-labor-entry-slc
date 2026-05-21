@@ -1,12 +1,11 @@
-import React from "react";
 import {useSelector} from "react-redux";
 import {selectCurrentEntry} from "../entries/selectors";
 import {selectITOrders} from "./selectors";
-import {ITOrder} from "../common-types";
+import type {ITOrder} from "../common-types";
 import numeral from "numeral";
 import {updateEntry} from "../entries/actions";
 import classNames from "classnames";
-import {useAppDispatch} from "../../app/configureStore";
+import {useAppDispatch} from "@/app/configureStore";
 
 export interface ITOrderRowsProps {
     onSelect: () => void,

@@ -1,4 +1,4 @@
-import {HTMLReportType} from "./types";
+import type {HTMLReportType} from "./types";
 import dayjs from "dayjs";
 import {fetchHTML} from "@chumsinc/ui-utils";
 

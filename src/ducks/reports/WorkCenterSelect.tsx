@@ -1,4 +1,4 @@
-import React, {ChangeEvent} from "react";
+import {type ChangeEvent} from "react";
 import {WORK_CENTERS} from "./constants";
 import {useDispatch, useSelector} from "react-redux";
 import {selectWorkCenter} from "./selectors";

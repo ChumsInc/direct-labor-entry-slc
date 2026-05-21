@@ -1,5 +1,5 @@
-import {ActionStatus, ITOrder} from "../common-types";
-import {WorkTicket} from 'chums-types'
+import type {ActionStatus, ITOrder} from "../common-types";
+import type {WorkTicket} from 'chums-types'
 import {createReducer} from "@reduxjs/toolkit";
 import {loadDocument, setWorkTicketNo} from "./actions";
 import {removeEntry, saveEntry, setNewEntry} from "../entries/actions";

@@ -1,14 +1,8 @@
 import {selectMaxDate, selectMinDate, selectReportLoading, selectWorkCenter} from "./selectors";
-import {HTMLReportType} from "./types";
+import type {HTMLReportType} from "./types";
 import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
-import {
-    getStorageShowInactive,
-    setStorageMaxDate,
-    setStorageMinDate,
-    setStorageShowInactive,
-    setStorageWorkCenter
-} from "./utils";
-import {RootState} from "../../app/configureStore";
+import {setStorageMaxDate, setStorageMinDate, setStorageWorkCenter} from "./utils";
+import type {RootState} from "@/app/configureStore";
 import {fetchHTMLReport} from "./api";
 
 export const setMinDate = createAction('reports/setMinDate', (arg: string) => {
@@ -57,7 +51,7 @@ export const loadHTMLReport = createAsyncThunk<string | null, HTMLReportType>(
         return await fetchHTMLReport({reportType: arg, minDate, maxDate, workCenter})
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return !selectReportLoading(state);
         }

@@ -1,4 +1,4 @@
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 
 export const selectVersionNo = (state: RootState) => state.version.version;
 export const selectVersionLoading = (state: RootState) => state.version.loading;

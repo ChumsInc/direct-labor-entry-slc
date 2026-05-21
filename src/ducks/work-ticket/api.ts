@@ -1,6 +1,6 @@
-import {WorkTicket} from "chums-types";
+import type {WorkTicket} from "chums-types";
 import {fetchJSON} from "@chumsinc/ui-utils";
-import {ITOrder, WorkTicketResponse} from "../common-types";
+import type {ITOrder, WorkTicketResponse} from "../common-types";
 
 export async function fetchWorkTicket(arg: string): Promise<WorkTicket | null> {
     try {

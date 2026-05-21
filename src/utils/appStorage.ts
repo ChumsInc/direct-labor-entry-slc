@@ -1,28 +1,4 @@
-export const storePrefix = 'com.chums.intranet.dl-entry-slc';
-
-export const appStorage = {
-    getItem: (key) => {
-        if (window.localStorage) {
-            const val = window.localStorage.getItem(key);
-            try {
-                return JSON.parse(val || null);
-            } catch (e) {
-                console.log('getItem()', e.message, val);
-            }
-        }
-        return null;
-    },
-    setItem: (key, value) => {
-        if (window.localStorage) {
-            window.localStorage.setItem(key, JSON.stringify(value));
-        }
-    },
-    delete: (key) => {
-        if (window.localStorage) {
-            window.localStorage.removeItem(key);
-        }
-    }
-};
+export const storePrefix = 'chums::intranet::dl-entry-slc';
 
 export const STORAGE_KEYS = {
     TAB: `${storePrefix}.tab`,

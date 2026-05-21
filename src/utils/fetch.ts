@@ -1,4 +1,4 @@
-import {KeyedObject} from "../ducks/common-types";
+import type {KeyedObject} from "../ducks/common-types";
 
 export function searchParams(arg:KeyedObject):URLSearchParams {
     const params = new URLSearchParams();

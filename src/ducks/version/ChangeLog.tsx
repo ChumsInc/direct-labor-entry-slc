@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import {startTransition, useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "@/app/configureStore";
 import {selectChangeLog, selectLoadingChangeLog} from "./index";
 import ProgressBar from "react-bootstrap/ProgressBar";
@@ -27,14 +27,16 @@ const ChangeLog = () => {
     const loading = useAppSelector(selectLoadingChangeLog);
     const changeLog = useAppSelector(selectChangeLog);
 
-    const [parsed, setParsed] = React.useState<string>(removeLinks(changeLog ?? ''));
+    const [parsed, setParsed] = useState<string>(removeLinks(changeLog ?? ''));
 
     useEffect(() => {
-        if (!changeLog) {
-            dispatch(loadChangeLog())
-        }
-        setParsed(removeLinks(changeLog ?? ''));
-    }, [changeLog]);
+        startTransition(() => {
+            if (!changeLog) {
+                dispatch(loadChangeLog())
+            }
+            setParsed(removeLinks(changeLog ?? ''));
+        })
+    }, [changeLog, dispatch]);
 
     return (
         <div className="row g-3 justify-content-md-center">

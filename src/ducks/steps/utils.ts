@@ -1,6 +1,6 @@
-import {SortProps} from "@chumsinc/sortable-tables";
-import {MinimalStep} from "../common-types";
-import {DLBasicStep, DLStep} from "chums-types";
+import type {SortProps} from "@chumsinc/sortable-tables";
+import type {MinimalStep} from "../common-types";
+import type {DLBasicStep, DLStep} from "chums-types";
 
 export type SortFn<T> = (a:T, b:T) => number;
 

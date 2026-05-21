@@ -1,5 +1,5 @@
 import {WORK_CENTER_INH} from "./constants";
-import {ActionStatus} from "../common-types";
+import type {ActionStatus} from "../common-types";
 import {
     getStorageEmployee,
     getStorageMaxDate,

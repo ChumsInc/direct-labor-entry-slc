@@ -1,11 +1,11 @@
-import React, {ChangeEvent} from 'react';
+import {type ChangeEvent} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {selectMaxDate, selectMinDate} from "./selectors";
-import {inputDate} from "../../utils/date";
+import {inputDate} from "@/utils/date";
 import {setMaxDate, setMinDate} from "./actions";
 import dayjs from "dayjs";
 
-const ReportMaxDate: React.FC = () => {
+const ReportMaxDate = () => {
     const dispatch = useDispatch();
     const minDate = useSelector(selectMinDate);
     const maxDate = useSelector(selectMaxDate);

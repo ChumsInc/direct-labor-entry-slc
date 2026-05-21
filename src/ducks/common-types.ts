@@ -1,4 +1,4 @@
-import {WorkTicket, DLDepartmentKey, EmployeeDLEntryTotal, DLStep} from "chums-types";
+import type {WorkTicket, DLDepartmentKey, EmployeeDLEntryTotal, DLStep} from "chums-types";
 
 export interface EmployeePostBody {
     id: string;

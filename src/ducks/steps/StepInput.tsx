@@ -1,12 +1,11 @@
-import React, {ChangeEvent, useEffect, useId, useState} from "react";
-import {selectWorkCenter} from "../reports/selectors";
+import {type ChangeEvent, startTransition, useEffect, useId, useState} from "react";
 import InputGroup from "react-bootstrap/InputGroup";
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {useAppDispatch, useAppSelector} from "@/app/configureStore";
 import {selectStepsList, selectStepsLoaded} from "./selectors";
 import {loadSteps} from "./actions";
 import {stepSorter} from "./utils";
-import {DLStep} from "chums-types";
-import {FormControl, FormControlProps} from "react-bootstrap";
+import type {DLStep} from "chums-types";
+import {FormControl, type FormControlProps} from "react-bootstrap";
 
 export interface StepInputProps extends Omit<FormControlProps, 'value' | 'onChange' | 'id' | 'list'> {
     value: string,
@@ -23,16 +22,18 @@ const StepInput = ({value, onChange, workCenter, ...rest}: StepInputProps) => {
     const inputId = useId();
 
     useEffect(() => {
-        const steps = list.filter(step => !workCenter || step.workCenter === workCenter)
-            .sort(stepSorter({field: 'stepCode', ascending: true}));
-        setSteps(steps);
+        startTransition(() => {
+            const steps = list.filter(step => !workCenter || step.workCenter === workCenter)
+                .sort(stepSorter({field: 'stepCode', ascending: true}));
+            setSteps(steps);
+        })
     }, [workCenter, list]);
 
     useEffect(() => {
         if (!loaded) {
             dispatch(loadSteps());
         }
-    }, [])
+    }, [loaded, dispatch]);
 
     return (
         <>

@@ -1,4 +1,3 @@
-import React from "react";
 import {useSelector} from "react-redux";
 import WorkTicketSteps from "./WorkTicketSteps";
 import ITOrderRows from "./ITOrderRows";
@@ -17,7 +16,17 @@ const  DocumentContainer = ({onSelect}:DocumentContainerProps) => {
     return (
         <div>
             {!!workTicket && (
-                <div><strong>{workTicket.ParentWarehouseCode}/{workTicket.ParentItemCode}</strong></div>
+                <div className="row g-3">
+                    <div className="col">
+                        <strong>{workTicket.ParentWarehouseCode}/{workTicket.ParentItemCode}</strong>
+                    </div>
+                    <div className="col-auto">
+                        <span className="text-secondary">{workTicket.ParentItemCodeDesc}</span>
+                        {workTicket.WorkTicketStatus === 'C' && (
+                            <span className="ms-1 badge bg-danger">Closed</span>
+                        )}
+                    </div>
+                </div>
             )}
             {itOrders.map(it => (
                 <div key={it.PurchaseOrderNo}><strong>{it.WarehouseCode}/{it.ItemCode}</strong></div>
