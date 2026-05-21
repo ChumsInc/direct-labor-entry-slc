@@ -1,6 +1,5 @@
-import React from 'react';
-import {Nav, NavProps} from "react-bootstrap";
-import {Tab} from "./App";
+import {Nav, type NavProps} from "react-bootstrap";
+import type {Tab} from "./app-tabs.tsx";
 
 export interface AppTabsProps extends NavProps {
     currentTab: string;

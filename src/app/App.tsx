@@ -1,60 +1,77 @@
-import React, {ReactNode, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useAppDispatch} from "./configureStore";
 import {loadEmployees} from "../ducks/employees/actions";
 import AlertList from '../components/AlertList';
 import SLCEntryTab from "../ducks/entries/SLCEntryTab";
 import EmployeeTab from "../ducks/employees/EmployeesTab";
 import ReportTab from "../ducks/reports/ReportTab";
-import AnalysisTab from "../ducks/analysis/AnalysisTab";
-import {appStorage, STORAGE_KEYS} from "../utils/appStorage";
+import AnalysisTab from "@/ducks/analysis/components/AnalysisTab.tsx";
+import {STORAGE_KEYS} from "../utils/appStorage";
 import {ErrorBoundary} from "react-error-boundary";
 import ErrorBoundaryFallbackAlert from "../components/ErrorBoundaryFallbackAlert";
-import VersionNo from "../ducks/version/VersionNo";
 import ChangeLog from "../ducks/version/ChangeLog";
 import AppTabs from "./AppTabs";
+import {LocalStore} from "@chumsinc/ui-utils";
+import {
+    appTabs,
+    currentTab,
+    TAB_ABOUT,
+    TAB_ANALYSIS,
+    TAB_EMPLOYEES,
+    TAB_REPORTS,
+    TAB_SLC_ENTRY
+} from "@/app/app-tabs.tsx";
+import styled from "@emotion/styled";
 
-export interface Tab {
-    id: string,
-    title: string|ReactNode,
+const AppContainer = styled.div`
+    .table {
+        &.table-selectable tbody tr {
+            td {
+                cursor: pointer;
+            }
+            &.text-danger  td {
+                cursor: not-allowed;
+            }
+        }
+        tfoot tr td {
+            font-weight: bold;
+        }
+    }
 
-    /** Bootstrap icon className */
-    icon?: string,
+    @media print {
+        .hidden-print {
+            display: none;
+        }
+        .container {
+            max-width: 100%;
+        }
+        table tbody.employee {
+            display: block;
+            page-break-after: always;
+            width: 100%;
+        }
+    }
+    footer {
+        display: none;
+    }
+`
 
-    canClose?: boolean,
-    disabled?: boolean,
-}
-
-const TAB_SLC_ENTRY = 'slcEntry';
-const TAB_REPORTS = 'reports';
-const TAB_EMPLOYEES = 'employees';
-const TAB_ANALYSIS = 'analysis';
-const TAB_ABOUT = 'about';
-
-const currentTab = appStorage.getItem(STORAGE_KEYS.TAB);
-
-const appTabs:Tab[] = [
-    {id: TAB_SLC_ENTRY, title: 'SLC Entry'},
-    {id: TAB_REPORTS, title: 'Reports'},
-    {id: TAB_ANALYSIS, title: 'Analysis'},
-    {id: TAB_EMPLOYEES, title: 'Employees'},
-    {id: TAB_ABOUT, title: <VersionNo />},
-]
 const App = () => {
     const dispatch = useAppDispatch();
     const [tab, setTab] = useState<string>(currentTab ?? TAB_SLC_ENTRY);
 
     useEffect(() => {
         dispatch(loadEmployees());
-    }, []);
+    }, [dispatch]);
 
-    const tabChangeHandler = (tab:string|null) => {
-        appStorage.setItem(STORAGE_KEYS.TAB, tab ?? appTabs[0].id);
+    const tabChangeHandler = (tab: string | null) => {
+        LocalStore.setItem(STORAGE_KEYS.TAB, tab ?? appTabs[0].id);
         setTab(tab ?? appTabs[0].id);
     }
 
     return (
         <ErrorBoundary FallbackComponent={ErrorBoundaryFallbackAlert}>
-            <div>
+            <AppContainer>
 
                 <AppTabs tabs={appTabs} currentTab={tab} onChangeTab={tabChangeHandler} className="mb-3"/>
                 <AlertList/>
@@ -73,7 +90,7 @@ const App = () => {
                 {tab === TAB_ABOUT && (
                     <ChangeLog/>
                 )}
-            </div>
+            </AppContainer>
         </ErrorBoundary>
     )
 }

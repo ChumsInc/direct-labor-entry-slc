@@ -1,6 +1,6 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import employeesReducer from "../ducks/employees";
-import {TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
+import {type TypedUseSelectorHook, useDispatch, useSelector} from "react-redux";
 import entriesReducer from "../ducks/entries";
 import reportsReducer from "../ducks/reports";
 import workTicketReducer from "../ducks/work-ticket";
