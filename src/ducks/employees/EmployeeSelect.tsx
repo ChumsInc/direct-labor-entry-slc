@@ -1,9 +1,9 @@
-import React, {ChangeEvent, useEffect} from "react";
+import {type ChangeEvent} from "react";
 import {selectEmployeeList} from "./selectors";
 import {employeeSorter} from "./utils";
-import {DLEmployee} from "chums-types";
-import {FormSelect, FormSelectProps} from "react-bootstrap";
-import {useAppSelector} from "../../app/configureStore";
+import type {DLEmployee} from "chums-types";
+import {FormSelect, type FormSelectProps} from "react-bootstrap";
+import {useAppSelector} from "@/app/configureStore";
 
 
 export interface EmployeeSelectProps extends Omit<FormSelectProps, 'value' | 'onChange'> {
@@ -20,22 +20,16 @@ function filterVisibleEmployees(list: DLEmployee[], filter?: RegExp): DLEmployee
 }
 
 export default function EmployeeSelect({
-                                   value,
-                                   filter,
-                                   onChange,
-                                   ref,
-                                   ...props
-                               }: EmployeeSelectProps) {
+                                           value,
+                                           filter,
+                                           onChange,
+                                           ref,
+                                           ...props
+                                       }: EmployeeSelectProps) {
     const list = useAppSelector(selectEmployeeList);
-    const [visibleList, setVisibleList] = React.useState<DLEmployee[]>(filterVisibleEmployees(list, filter));
-
-    useEffect(() => {
-        setVisibleList(filterVisibleEmployees(list, filter));
-    }, [list, filter]);
 
     const selectHandler = (ev: ChangeEvent<HTMLSelectElement>) => {
-        const [employee] = visibleList.filter(emp => emp.EmployeeNumber === ev.target.value);
-        console.log(employee);
+        const [employee] = list.filter(emp => emp.EmployeeNumber === ev.target.value);
         onChange(employee || null);
     }
 
@@ -44,8 +38,8 @@ export default function EmployeeSelect({
                     onChange={selectHandler}
                     onSelect={selectHandler} value={value} ref={ref} {...props}>
             <option value="">Select Employee</option>
-            {visibleList.map(emp => <option value={emp.EmployeeNumber}
-                                            key={emp.EmployeeNumber}>{emp.FullName}</option>)}
+            {filterVisibleEmployees(list, filter).map(emp => <option value={emp.EmployeeNumber}
+                                                                     key={emp.EmployeeNumber}>{emp.FullName}</option>)}
         </FormSelect>
     )
 }

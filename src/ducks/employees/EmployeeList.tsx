@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useId, useState} from 'react';
+import {type ChangeEvent, useId, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {DEPARTMENT_NAMES} from './constants';
 import {
@@ -9,7 +9,7 @@ import {
     setEmployeesSort,
     toggleShowInactiveEmployees
 } from './actions';
-import {EmployeeFilter} from "../common-types";
+import type {EmployeeFilter} from "../common-types";
 import {
     selectCurrentEmployee,
     selectEmployeeFilter,
@@ -20,9 +20,9 @@ import {
 } from "./selectors";
 import DepartmentFilterSelect from "./DepartmentFilterSelect";
 import classNames from "classnames";
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
-import {DLDepartmentKey, DLEmployee} from "chums-types";
-import {SortableTable, SortableTableField, SortProps, TablePagination} from "@chumsinc/sortable-tables";
+import {useAppDispatch, useAppSelector} from "@/app/configureStore";
+import type {DLDepartmentKey, DLEmployee} from "chums-types";
+import {SortableTable, type SortableTableField, type SortProps, TablePagination} from "@chumsinc/sortable-tables";
 import {FormCheck} from "react-bootstrap";
 import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
 
@@ -74,9 +74,9 @@ const EmployeeList = () => {
 
     return (
         <div className="report-form">
-            <div className="row g-3">
+            <div className="row g-3 align-items-baseline">
                 <div className="col-auto">
-                    <DepartmentFilterSelect onChange={onChangeEmployeeDepartment}/>
+                    <DepartmentFilterSelect onChange={onChangeEmployeeDepartment} size="sm"/>
                 </div>
                 <div className="col-auto">
                     <input type="search" className="form-control form-control-sm" value={filter}
@@ -88,6 +88,7 @@ const EmployeeList = () => {
                                checked={showInactive}
                                onChange={(ev) => dispatch(toggleShowInactiveEmployees(ev.target.checked))}/>
                 </div>
+                <div className="col" />
                 <div className="col-auto">
                     <SpinnerButton spinning={loading} type="button" spinnerProps={{size: 'sm'}}
                                    onClick={() => dispatch(loadEmployees())} variant="outline-primary" size="sm">
@@ -102,7 +103,7 @@ const EmployeeList = () => {
                            selected={selected?.EmployeeNumber}
                            size="xs"
                            onSelectRow={onSelectEmployee}/>
-            <TablePagination page={page} onChangePage={setPage}
+            <TablePagination page={page} onChangePage={setPage} size="sm"
                              rowsPerPage={rowsPerPage} rowsPerPageProps={{onChange: rowsPerPageChangeHandler}}
                              count={list.length}/>
         </div>

@@ -1,5 +1,5 @@
-import {DepartmentList} from "../common-types";
-import {DLEmployee} from "chums-types";
+import type {DepartmentList} from "../common-types";
+import type {DLEmployee} from "chums-types";
 
 export const REGEX_FILTER_EMPLOYEES_SLC = /^[578][HS][T]*$/;
 

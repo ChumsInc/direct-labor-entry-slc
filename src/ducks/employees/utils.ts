@@ -1,5 +1,5 @@
-import {SortProps} from "@chumsinc/sortable-tables";
-import {DLEmployee} from "chums-types";
+import type {SortProps} from "@chumsinc/sortable-tables";
+import type {DLEmployee} from "chums-types";
 
 export const employeeSorter = (sort: SortProps<DLEmployee>) => (a: DLEmployee, b: DLEmployee) => {
     const {field, ascending} = sort;

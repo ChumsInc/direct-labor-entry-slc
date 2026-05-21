@@ -1,7 +1,6 @@
-import React from "react";
-import {useAppSelector} from "../../app/configureStore";
+import {useAppSelector} from "@/app/configureStore";
 import {selectEmployeeDepartment} from "./selectors";
-import {FormSelect, FormSelectProps} from "react-bootstrap";
+import {FormSelect, type FormSelectProps} from "react-bootstrap";
 
 
 const DepartmentFilterSelect = ({size, ...props}: FormSelectProps) => {

@@ -1,5 +1,5 @@
-import {ActionStatus} from "../common-types";
-import {Editable} from "chums-types/src/generics";
+import type {ActionStatus} from "../common-types";
+import type {DLEmployee, Editable} from "chums-types";
 import {createReducer} from "@reduxjs/toolkit";
 import {
     loadEmployees,
@@ -10,9 +10,8 @@ import {
     setEmployeesSort,
     toggleShowInactiveEmployees
 } from "./actions";
-import {SortProps} from "@chumsinc/sortable-tables";
+import type {SortProps} from "@chumsinc/sortable-tables";
 import {employeeSorter} from "./utils";
-import {DLEmployee} from "chums-types";
 
 export interface EmployeesState {
     list: DLEmployee[];

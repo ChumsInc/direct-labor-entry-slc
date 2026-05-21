@@ -1,5 +1,5 @@
-import {RootState} from "../../app/configureStore";
-import {EmployeeFilter} from "../common-types";
+import type {RootState} from "@/app/configureStore";
+import type {EmployeeFilter} from "../common-types";
 import {SLCEmployeesRegex, SLCTempEmployeesRegex} from "./constants";
 import {employeeSorter} from "./utils";
 import {createSelector} from "@reduxjs/toolkit";
@@ -28,7 +28,7 @@ export const selectVisibleEmployees = createSelector(
         let reFilter = /^/;
         try {
             reFilter = new RegExp(filter, 'i');
-        } catch (err: unknown) {
+        } catch (_err: unknown) {
             reFilter = /^/;
         }
         return list

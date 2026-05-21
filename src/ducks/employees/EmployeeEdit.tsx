@@ -1,18 +1,18 @@
-import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
+import {type ChangeEvent, startTransition, useEffect, useState} from 'react';
 import classNames from 'classnames';
 import {DEPARTMENT_NAMES, newEmployee} from './constants';
 import {useSelector} from 'react-redux';
 import {selectCurrentEmployee, selectSaving} from "./selectors";
 import {saveEmployee, setCurrentEmployee} from "./actions";
-import {useAppDispatch} from "../../app/configureStore";
-import {DLDepartmentKey, DLEmployee, Editable} from "chums-types";
+import {useAppDispatch} from "@/app/configureStore";
+import type {DLDepartmentKey, DLEmployee, Editable} from "chums-types";
 import Alert from "react-bootstrap/Alert";
 import {Col, Form, FormSelect, Row, Stack} from "react-bootstrap";
 import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
 
 const reTemp = /^(TEMP|[0-9]*HT)$/;
 
-const EmployeeEdit: React.FC = () => {
+const EmployeeEdit = () => {
     const dispatch = useAppDispatch();
     const selected = useSelector(selectCurrentEmployee);
     const isSaving = useSelector(selectSaving);
@@ -21,7 +21,9 @@ const EmployeeEdit: React.FC = () => {
 
     useEffect(() => {
         if (!isSaving) {
-            setEmployee(selected || newEmployee);
+            startTransition(() => {
+                setEmployee(selected || newEmployee);
+            })
         }
     }, [selected, isSaving]);
 
@@ -45,8 +47,7 @@ const EmployeeEdit: React.FC = () => {
         setEmployee({...employee, active, changed: true});
     }
 
-    const onSubmit = (ev: FormEvent) => {
-        ev.preventDefault();
+    const onSubmit = () => {
         if (!employee) {
             return;
         }
@@ -77,7 +78,7 @@ const EmployeeEdit: React.FC = () => {
         });
 
     return (
-        <Form onSubmit={onSubmit}>
+        <Form action={onSubmit}>
             <Form.Group as={Row}>
                 <Form.Label column sm={4}>ID / Status</Form.Label>
                 <Col sm={8}>

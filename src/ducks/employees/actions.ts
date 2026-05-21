@@ -1,10 +1,10 @@
-import {EmployeeFilter} from "../common-types";
+import type {EmployeeFilter} from "../common-types";
 import {selectEmployeesActionStatus} from "./selectors";
 import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
 import {fetchEmployees, postEmployee} from "./api";
-import {RootState} from "../../app/configureStore";
-import {SortProps} from "@chumsinc/sortable-tables";
-import {DLEmployee} from 'chums-types'
+import type {RootState} from "@/app/configureStore";
+import type {SortProps} from "@chumsinc/sortable-tables";
+import type {DLEmployee} from 'chums-types'
 
 export const setCurrentEmployee = createAction<DLEmployee | null>('employees/setCurrent');
 export const toggleShowInactiveEmployees = createAction<boolean | undefined>('employees/showInactive');
@@ -18,7 +18,7 @@ export const loadEmployees = createAsyncThunk<DLEmployee[]>(
         return await fetchEmployees();
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return selectEmployeesActionStatus(state) === 'idle';
         }
@@ -30,7 +30,7 @@ export const saveEmployee = createAsyncThunk<DLEmployee | null, DLEmployee>(
         return await postEmployee(arg);
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return selectEmployeesActionStatus(state) === 'idle';
         }
