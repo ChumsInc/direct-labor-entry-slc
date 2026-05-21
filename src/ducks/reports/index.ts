@@ -48,11 +48,11 @@ const reportsReducer = createReducer(initialState, (builder) => {
         })
         .addCase(loadHTMLReport.fulfilled, (state, action) => {
             state.actionStatus = 'idle';
-            state.html = action.payload ?? '<div className="alert alert-info">No report data returned</div>';
+            state.html = action.payload ?? '<div class="alert alert-info">No report data returned</div>';
         })
         .addCase(loadHTMLReport.rejected, (state, action) => {
             state.actionStatus = 'idle';
-            state.html = `<div className="alert alert-info"><strong class="me-3">Error</strong>${action.error.message}</div>`;
+            state.html = `<div class="alert alert-info"><strong class="me-3">Error</strong>${action.error.message}</div>`;
         })
 });
 
