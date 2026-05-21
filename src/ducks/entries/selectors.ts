@@ -1,4 +1,4 @@
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 import {buildEmployeeTotals, employeeTotalsSorter, entrySorter} from "./utils";
 import {createSelector} from "@reduxjs/toolkit";
 

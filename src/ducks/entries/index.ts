@@ -1,8 +1,7 @@
 import {entrySorter, NEW_ENTRY} from "./utils";
-import {ActionStatus} from "../common-types";
-import {BasicDLEntry, DLEmployee, DLEntry, Editable, EmployeeDLEntryTotal} from "chums-types";
+import type {ActionStatus} from "../common-types";
+import type {BasicDLEntry, DLEmployee, DLEntry, Editable, EmployeeDLEntryTotal} from "chums-types";
 import {createReducer} from "@reduxjs/toolkit";
-import {LocalStore} from "@chumsinc/ui-utils";
 import {
     loadEntries,
     removeEntry,
@@ -18,14 +17,13 @@ import {
 } from "./actions";
 import {loadDocument} from "../work-ticket/actions";
 import Decimal from "decimal.js";
-import {storeEntryDate} from "../../contants";
-import {currentSLCWorkDay, previousSLCWorkDay} from "../../utils/workDays";
-import {SortProps} from "@chumsinc/sortable-tables";
+import {currentSLCWorkDay} from "@/utils/workDays";
+import type {SortProps} from "@chumsinc/sortable-tables";
 
 export interface EntriesState {
     workCenters: string[];
     list: DLEntry[];
-    current: (BasicDLEntry & Editable) | null;
+    current: (BasicDLEntry & Editable);
     actionStatus: ActionStatus;
     entryDate: string | null;
     employee: DLEmployee | null;
@@ -38,7 +36,7 @@ const defaultSort: SortProps<DLEntry> = {field: 'id', ascending: false};
 export const initialEntriesState = (): EntriesState => ({
     workCenters: [],
     list: [],
-    current: null,
+    current: newEntry(),
     actionStatus: 'idle',
     entryDate: currentSLCWorkDay(),
     employee: null,
@@ -48,6 +46,14 @@ export const initialEntriesState = (): EntriesState => ({
         ascending: true,
     }
 })
+
+function newEntry(state?:EntriesState):BasicDLEntry {
+    return {
+        ...NEW_ENTRY,
+        EntryDate: state?.entryDate ?? currentSLCWorkDay(),
+        EmployeeNumber: state?.employee?.EmployeeNumber ?? '',
+    }
+}
 
 const entriesReducer = createReducer(initialEntriesState, (builder) => {
     builder
@@ -63,7 +69,7 @@ const entriesReducer = createReducer(initialEntriesState, (builder) => {
             state.entryDate = action.payload;
         })
         .addCase(setCurrentEntry, (state, action) => {
-            state.current = action.payload ?? null;
+            state.current = action.payload ?? newEntry(state)
         })
         .addCase(setWorkCenters, (state, action) => {
             state.workCenters = action.payload.sort();
@@ -76,11 +82,7 @@ const entriesReducer = createReducer(initialEntriesState, (builder) => {
         })
         .addCase(setEntryEmployee, (state, action) => {
             state.employee = action.payload ?? null;
-            state.current = {
-                ...NEW_ENTRY,
-                EntryDate: state.entryDate,
-                EmployeeNumber: action.payload.EmployeeNumber ?? '',
-            }
+            state.current = newEntry(state)
         })
         .addCase(loadEntries.pending, (state, action) => {
             state.actionStatus = 'loading';
@@ -115,12 +117,7 @@ const entriesReducer = createReducer(initialEntriesState, (builder) => {
                     .filter(entry => entry.id !== action.meta.arg.id)
                     .sort(entrySorter(defaultSort));
             }
-            state.current = {
-                ...NEW_ENTRY,
-                EntryDate: state.entryDate,
-                EmployeeNumber: state.employee?.EmployeeNumber ?? '',
-            }
-
+            state.current = newEntry(state);
         })
         .addCase(saveEntry.rejected, (state) => {
             state.actionStatus = 'idle';
@@ -133,7 +130,7 @@ const entriesReducer = createReducer(initialEntriesState, (builder) => {
             state.list = state.list
                 .filter(entry => entry.id !== action.meta.arg.id)
                 .sort(entrySorter(defaultSort));
-            state.current = null;
+            state.current = newEntry(state)
             if (state.entryDate) {
                 state.current = {
                     ...NEW_ENTRY,

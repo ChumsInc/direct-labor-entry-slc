@@ -1,11 +1,11 @@
 import {selectEntriesActionStatus} from "./selectors";
 import {createAction, createAsyncThunk} from "@reduxjs/toolkit";
 import {deleteEntry, fetchEntries, postEntry} from "./api";
-import {RootState} from "../../app/configureStore";
+import type {RootState} from "@/app/configureStore";
 import dayjs from "dayjs";
-import {SortProps} from "@chumsinc/sortable-tables";
-import {BasicDLEntry, DLEmployee, DLEntry, EmployeeDLEntryTotal} from "chums-types";
-import {FetchEntriesProps} from "../common-types";
+import type {SortProps} from "@chumsinc/sortable-tables";
+import type {BasicDLEntry, DLEmployee, DLEntry, EmployeeDLEntryTotal} from "chums-types";
+import type {FetchEntriesProps} from "../common-types";
 
 export const updateEntry = createAction<Partial<DLEntry>>('entries/updateCurrent');
 export const setEntryDate = createAction<string | null>('entries/setEntryDate');
@@ -37,7 +37,7 @@ export const saveEntry = createAsyncThunk<DLEntry | null, BasicDLEntry>(
         return await postEntry(arg);
     },
     {
-        condition: (arg, {getState}) => {
+        condition: (_, {getState}) => {
             const state = getState() as RootState;
             return selectEntriesActionStatus(state) === 'idle';
         }

@@ -1,8 +1,8 @@
-import {useAppDispatch} from "../../app/configureStore";
+import {useAppDispatch} from "@/app/configureStore";
 import {useSelector} from "react-redux";
 import {selectEntryDate} from "./selectors";
 import {setEntryDate} from "./actions";
-import React, {ChangeEvent} from "react";
+import type {ChangeEvent} from "react";
 import {Col, FormControl, FormGroup, FormLabel, Row} from "react-bootstrap";
 import dayjs from "dayjs";
 

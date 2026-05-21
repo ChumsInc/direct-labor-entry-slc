@@ -1,7 +1,7 @@
-import {EmployeeTotalList} from "../common-types";
-import {SortProps} from "@chumsinc/sortable-tables";
+import type {EmployeeTotalList} from "../common-types";
+import type {SortProps} from "@chumsinc/sortable-tables";
 import Decimal from "decimal.js";
-import {BasicDLEntry, DLEntry, EmployeeDLEntryTotal} from "chums-types";
+import type {BasicDLEntry, DLEntry, EmployeeDLEntryTotal} from "chums-types";
 
 export const friendlyDocumentNo = (value: string) => value.replace(/^0+/, '');
 

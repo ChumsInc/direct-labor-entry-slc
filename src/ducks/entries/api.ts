@@ -1,8 +1,8 @@
 import {fetchJSON} from "@chumsinc/ui-utils";
 import {reSLCWorkCenter} from "../../contants";
-import {BasicDLEntry, DLEntry} from "chums-types";
-import {FetchEntriesProps, KeyedObject} from "../common-types";
-import {searchParams} from "../../utils/fetch";
+import type {BasicDLEntry, DLEntry} from "chums-types";
+import type {FetchEntriesProps, KeyedObject} from "../common-types";
+import {searchParams} from "@/utils/fetch";
 
 
 export async function fetchEntries(arg: FetchEntriesProps): Promise<DLEntry[]> {

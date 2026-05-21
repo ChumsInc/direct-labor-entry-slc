@@ -1,13 +1,13 @@
-import React, {useEffect} from 'react';
+import {startTransition, useCallback, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import numeral from "numeral";
-import {SortableTable, SortableTableField, SortProps} from "@chumsinc/sortable-tables";
+import {SortableTable, type SortableTableField, type SortProps} from "@chumsinc/sortable-tables";
 import {selectCurrentEmployee, selectEmployeeList} from "../employees/selectors";
 import {loadEntries, setEntryEmployee, setEntryTotalsSort} from "./actions";
 import {selectEmployeeTotals, selectEntriesLoading, selectEntryDate, selectEntryTotalsSort} from "./selectors";
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {useAppDispatch, useAppSelector} from "@/app/configureStore";
 import Decimal from "decimal.js";
-import {EmployeeDLEntryTotal} from "chums-types";
+import type {EmployeeDLEntryTotal} from "chums-types";
 import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
 
 const employeeTableFields: SortableTableField<EmployeeDLEntryTotal>[] = [
@@ -51,16 +51,17 @@ const EmployeeTotals: React.FC = () => {
     const employees = useSelector(selectEmployeeList);
     const selected = useSelector(selectCurrentEmployee);
     const isLoading = useSelector(selectEntriesLoading);
-
-    useEffect(() => {
-        onReload();
-    }, [date]);
-
-    const onReload = () => {
+    const onReload = useCallback(() => {
         if (date) {
             dispatch(loadEntries({entryDate: date}));
         }
-    }
+    }, [date, dispatch]);
+
+    useEffect(() => {
+        startTransition(() => {
+            onReload();
+        })
+    }, [date, onReload]);
 
     const onSelectEmployee = (total: EmployeeDLEntryTotal) => {
         const [employee] = employees.filter(emp => emp.EmployeeNumber === total.EmployeeNumber);

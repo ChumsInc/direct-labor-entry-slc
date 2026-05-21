@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {startTransition, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import numeral from "numeral";
 import {between, MAX_DANGER, MAX_SUCCESS, MIN_DANGER, MIN_SUCCESS, rate} from './utils';
@@ -11,10 +11,10 @@ import {
     selectEntrySort
 } from "./selectors";
 import {loadEntries, setCurrentEntry, setEntriesSort} from "./actions";
-import {useAppDispatch, useAppSelector} from "../../app/configureStore";
+import {useAppDispatch, useAppSelector} from "@/app/configureStore";
 import Decimal from "decimal.js";
-import {DLEntry} from "chums-types";
-import {SortableTable, SortableTableField, SortProps, TablePagination} from "@chumsinc/sortable-tables";
+import type {DLEntry} from "chums-types";
+import {SortableTable, type SortableTableField, type SortProps, TablePagination} from "@chumsinc/sortable-tables";
 import Alert from "react-bootstrap/Alert";
 import ProgressBar from "react-bootstrap/ProgressBar";
 
@@ -106,15 +106,19 @@ const SLCEmployeeEntries = () => {
     const [rowsPerPage, setRowsPerPage] = useState(25);
 
     useEffect(() => {
-        setPage(0)
+        startTransition(() => {
+            setPage(0)
+        })
     }, [employee, list, sort]);
 
     useEffect(() => {
-        setPage(0);
-        if (date) {
-            dispatch(loadEntries({entryDate: date, employeeNo: employee?.EmployeeNumber}))
-        }
-    }, [employee]);
+        startTransition(() => {
+            setPage(0);
+            if (date) {
+                dispatch(loadEntries({entryDate: date, employeeNo: employee?.EmployeeNumber}))
+            }
+        })
+    }, [employee, date, dispatch]);
 
     const rowsPerPageChangeHandler = (rpp: number) => {
         setPage(0);

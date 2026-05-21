@@ -1,11 +1,11 @@
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import EmployeeTotals from "./EmployeeTotals";
 import {selectEntryDate} from "./selectors";
 import {loadEntries, setWorkCenters} from "./actions";
 import SLCEntryForm from "./SLCEntryForm";
 import SLCEmployeeEntries from "./SLCEmployeeEntries";
-import {useAppDispatch} from "../../app/configureStore";
+import {useAppDispatch} from "@/app/configureStore";
 import EntryDate from "./EntryDate";
 
 
@@ -15,13 +15,13 @@ const SLCEntryTab = () => {
 
     useEffect(() => {
         dispatch(setWorkCenters(['INH', 'IMP', 'CON']));
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         if (entryDate) {
             dispatch(loadEntries({entryDate}));
         }
-    }, [entryDate])
+    }, [entryDate, dispatch])
 
     return (
         <div className="row g-3">

@@ -1,6 +1,6 @@
-import React, {ChangeEvent, FormEvent, useEffect, useRef} from 'react';
+import {type ChangeEvent, useCallback, useEffect, useRef} from 'react';
 import {useSelector} from 'react-redux';
-import {selectCurrentEntry, selectEntriesActionStatus, selectEntryEmployee} from "./selectors";
+import {selectCurrentEntry, selectEntriesActionStatus} from "./selectors";
 import {removeEntry, saveEntry, setEntryEmployee, setNewEntry, updateEntry} from "./actions";
 import EmployeeSelect from "../employees/EmployeeSelect";
 import {REGEX_FILTER_EMPLOYEES_SLC} from "../employees/constants";
@@ -8,10 +8,10 @@ import SelectSLCSteps from "../steps/SelectSLCSteps";
 import DocumentContainer from "../work-ticket/DocumentContainer";
 import numeral from "numeral";
 import {selectWorkTicketLoading} from "../work-ticket/selectors";
-import {useAppDispatch} from "../../app/configureStore";
+import {useAppDispatch} from "@/app/configureStore";
 import {loadDocument} from "../work-ticket/actions";
-import {BasicDLEntry, DLEmployee} from "chums-types";
-import {MinimalStep} from "../common-types";
+import type {BasicDLEntry, DLEmployee} from "chums-types";
+import type {MinimalStep} from "../common-types";
 import InputGroup from "react-bootstrap/InputGroup";
 import {Col, Form, FormControl, Row, Stack} from "react-bootstrap";
 import {SpinnerButton} from "@chumsinc/react-bootstrap-addons";
@@ -22,53 +22,60 @@ const SLCEntryForm = () => {
     const entry = useSelector(selectCurrentEntry);
     const actionStatus = useSelector(selectEntriesActionStatus);
     const workTicketLoading = useSelector(selectWorkTicketLoading);
-    const currentEmployee = useSelector(selectEntryEmployee);
-
-    useEffect(() => {
-        focusNextInputField();
-    }, []);
-
-    useEffect(() => {
-        focusNextInputField();
-    }, [entry?.EmployeeNumber]);
-
     const employeeSelectRef = useRef<HTMLSelectElement>(null);
     const documentRef = useRef<HTMLInputElement>(null);
     const minutesRef = useRef<HTMLInputElement>(null);
 
-    const onChangeEmployee = (employee?: DLEmployee | null) => {
-        if (entry) {
-            dispatch(updateEntry({...entry, EmployeeNumber: employee?.EmployeeNumber || ''}));
-            focusNextInputField();
+    const focusNextInputField = useCallback(() => {
+        if (!entry?.EmployeeNumber && employeeSelectRef.current) {
+            return employeeSelectRef.current.focus();
         }
-        if (!currentEmployee && !!employee) {
-            dispatch(setEntryEmployee(employee));
+        if (!entry?.DocumentNo && documentRef.current) {
+            return documentRef.current.focus();
         }
-    }
+        minutesRef.current?.focus();
+    }, [employeeSelectRef, minutesRef, documentRef, entry])
 
-    const onSaveEntry = (ev: FormEvent) => {
-        ev.preventDefault();
-        if (entry) {
-            dispatch(saveEntry(entry));
-            documentRef.current?.focus();
-        }
-    }
-
-    const onDeleteEntry = () => {
+    const deleteHandler = useCallback(async (entry: BasicDLEntry | null) => {
         if (!window.confirm('Are you sure you want to delete this entry?')) {
             return;
         }
         if (!entry || !entry?.id) {
             dispatch(setNewEntry());
         } else {
-            dispatch(removeEntry(entry));
+            await dispatch(removeEntry(entry));
         }
-        focusNextInputField();
+        documentRef.current?.focus();
+    }, [dispatch, documentRef])
+
+    const onLoadDocument = useCallback(async () => {
+        if (!entry?.DocumentNo) {
+            return;
+        }
+        await dispatch(loadDocument(entry?.DocumentNo));
+        minutesRef.current?.focus();
+    }, [entry, dispatch, minutesRef]);
+
+
+    useEffect(() => {
+        return employeeSelectRef.current?.focus();
+    }, [employeeSelectRef]);
+
+    const onChangeEmployee = (employee?: DLEmployee | null) => {
+        if (employee) {
+            dispatch(setEntryEmployee(employee));
+        }
+        dispatch(updateEntry({...entry, EmployeeNumber: employee?.EmployeeNumber || ''}));
+    }
+
+    const onSaveEntry = async () => {
+        await dispatch(saveEntry(entry));
+        documentRef.current?.focus();
     }
 
     const onNewEntry = () => {
         dispatch(setNewEntry());
-        focusNextInputField();
+        documentRef.current?.focus();
     }
 
     const onChangeEntry = (field: keyof BasicDLEntry) => (ev: ChangeEvent) => {
@@ -96,38 +103,6 @@ const SLCEntryForm = () => {
     }
 
 
-    const focusNextInputField = () => {
-        if (!entry?.EmployeeNumber && employeeSelectRef.current) {
-            return employeeSelectRef.current.focus();
-        }
-        if (!entry?.DocumentNo && documentRef.current) {
-            return documentRef.current.focus();
-        }
-        minutesRef.current?.focus();
-    }
-
-    const onLoadDocument = () => {
-        if (!entry?.DocumentNo) {
-            return;
-        }
-        dispatch(loadDocument(entry?.DocumentNo));
-        minutesRef.current?.focus();
-    }
-
-    if (!entry) {
-        return (
-            <div className="row g-3">
-                <div className="col-auto">
-                    <button type="button" className="btn btn-sm btn-outline-secondary"
-                            disabled={actionStatus !== 'idle'}
-                            onClick={onNewEntry}>
-                        New Entry
-                    </button>
-                </div>
-            </div>
-        )
-    }
-
     const entryStep = (entry: BasicDLEntry): MinimalStep => {
         return {
             id: entry.idSteps ?? 0,
@@ -140,7 +115,7 @@ const SLCEntryForm = () => {
 
     return (
         <div>
-            <Form onSubmit={onSaveEntry} className="mb-3" id="entry-form--slc">
+            <Form action={onSaveEntry} className="mb-3" id="entry-form--slc">
                 <Form.Group as={Row} width={8} label="Employee">
                     <Form.Label column sm={4}>Employee</Form.Label>
                     <Col sm={8}>
@@ -248,6 +223,12 @@ const SLCEntryForm = () => {
                 </Row>
                 <Row className="g-3 justify-content-end">
                     <Col xs="auto">
+                        {entry.id > 0 && (
+                            <div className="badge bg-warning text-dark">Editing Existing Entry</div>
+                        )}
+                    </Col>
+                    <Col />
+                    <Col xs="auto">
                         <button type="button" className="btn btn-sm btn-outline-secondary"
                                 disabled={actionStatus != 'idle'}
                                 onClick={onNewEntry}>
@@ -256,7 +237,7 @@ const SLCEntryForm = () => {
                     </Col>
                     <Col xs="auto">
                         <SpinnerButton type="button" variant="outline-danger" size="sm" spinnerProps={{size: "sm"}}
-                                       onClick={onDeleteEntry}
+                                       onClick={() => deleteHandler(entry)}
                                        spinning={actionStatus === 'deleting'}
                                        disabled={entry.id === 0 || actionStatus !== 'idle'}>
                             Delete
