@@ -18,7 +18,7 @@ export default defineConfig({
             "@/utils": path.resolve(process.cwd(), 'src/utils'),
         }
     },
-    base: "/apps/b2b-products/",
+    base: "/apps/direct-labor-entry-slc/",
     build: {
         manifest: true,
         sourcemap: true,

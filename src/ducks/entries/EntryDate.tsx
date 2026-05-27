@@ -4,22 +4,16 @@ import {selectEntryDate} from "./selectors";
 import {setEntryDate} from "./actions";
 import type {ChangeEvent} from "react";
 import {Col, FormControl, FormGroup, FormLabel, Row} from "react-bootstrap";
-import dayjs from "dayjs";
+import {currentSLCWorkDay} from "@/utils/workDays.ts";
+import {LocalStore} from "@chumsinc/ui-utils";
+import {STORAGE_KEYS} from "@/utils/appStorage.ts";
 
 const EntryDate = () => {
     const dispatch = useAppDispatch();
     const entryDate = useSelector(selectEntryDate);
 
     const onChange = (ev: ChangeEvent<HTMLInputElement>) => {
-        if (ev.target.valueAsDate && dayjs(ev.target.valueAsDate).isValid()) {
-            dispatch(
-                setEntryDate(
-                    dayjs(ev.target.value)
-                        .add(ev.target.valueAsDate.getTimezoneOffset(), 'minutes')
-                        .format('YYYY-MM-DD'))
-            );
-            return;
-        }
+        LocalStore.setItem(STORAGE_KEYS.SLC_ENTRY_DATE, ev.target.value)
         dispatch(setEntryDate(ev.target.value));
     }
 
@@ -31,7 +25,7 @@ const EntryDate = () => {
                 </FormLabel>
                 <Col>
                     <FormControl type="date" form="entry-form--slc" required={true}
-                                 value={dayjs(entryDate).format('YYYY-MM-DD')} onChange={onChange}/>
+                                 value={entryDate ?? currentSLCWorkDay()} onChange={onChange}/>
                 </Col>
             </FormGroup>
         </div>
