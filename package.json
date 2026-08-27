@@ -1,6 +1,6 @@
 {
   "name": "direct-labor-entry-slq",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "main": "index.js",
   "type": "module",
   "scripts": {
