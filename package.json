@@ -1,7 +1,8 @@
 {
-  "name": "directlabor-entry",
+  "name": "direct-labor-entry-slq",
   "version": "3.3.2",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
